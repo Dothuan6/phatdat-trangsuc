@@ -465,6 +465,24 @@
   margin-top: var(--space-xl);
 }
 
+@media (max-width: 768px) {
+  .footer-categories {
+    grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .footer-legal {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+  }
+}
+
 /* ══════════════════════════════════════════════════════════════
    PRODUCT CARD
    ══════════════════════════════════════════════════════════════ */
