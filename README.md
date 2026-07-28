@@ -1,2 +1,2 @@
 ﻿# phatdat-trangsuc
-fouder: Mr. Thuan, Mr. Dang, Mr. Phuong
+fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
