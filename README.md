@@ -1,2 +1,2 @@
 ﻿# phatdat-trangsuc
-fouder: Do Van Thuan, Cao Huu Dang, Nguyen Nhat Phuong
+fouder: Mr. Thuan, Mr. Dang, Mr. Phuong
