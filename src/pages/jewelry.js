@@ -127,11 +127,11 @@ export function renderJewelry(container, params = {}) {
 
 function getCategoryDescription(category) {
   const descriptions = {
-    necklaces: 'In a dazzling range of forms and colors, necklaces drape the neck with gold, precious, fine or hard stones. Long necklaces – like the iconic Van Cleef & Arpels\' Alhambra® model created in 1968 – can be worn in multiple ways to suit every occasion.',
-    rings: 'Van Cleef & Arpels rings are miniature works of art, celebrating flowers, nature and the poetry of life. Each creation reveals exceptional savoir-faire and a passion for precious stones.',
-    bracelets: 'From the iconic Alhambra motif to the golden beads of Perlée, Van Cleef & Arpels bracelets adorn the wrist with grace and elegance, reflecting the Maison\'s creative universe.',
-    earrings: 'Earrings by Van Cleef & Arpels illuminate the face with their radiance. From delicate studs to sculptural ear clips, each pair embodies the Maison\'s love of nature and beautiful stones.',
-    all: 'Discover the world of Van Cleef & Arpels jewelry creations. From the iconic Alhambra collection to the golden beads of Perlée, each piece reflects the Maison\'s tradition of excellence and poetic creativity.',
+    necklaces: 'In a dazzling range of forms and colors, necklaces drape the neck with gold, precious, fine or hard stones. Long necklaces – like the iconic Phat Dat Jewelry\' Alhambra® model created in 1968 – can be worn in multiple ways to suit every occasion.',
+    rings: 'Phat Dat Jewelry rings are miniature works of art, celebrating flowers, nature and the poetry of life. Each creation reveals exceptional savoir-faire and a passion for precious stones.',
+    bracelets: 'From the iconic Alhambra motif to the golden beads of Perlée, Phat Dat Jewelry bracelets adorn the wrist with grace and elegance, reflecting the Maison\'s creative universe.',
+    earrings: 'Earrings by Phat Dat Jewelry illuminate the face with their radiance. From delicate studs to sculptural ear clips, each pair embodies the Maison\'s love of nature and beautiful stones.',
+    all: 'Discover the world of Phat Dat Jewelry jewelry creations. From the iconic Alhambra collection to the golden beads of Perlée, each piece reflects the Maison\'s tradition of excellence and poetic creativity.',
   };
   return descriptions[category] || descriptions.all;
 }

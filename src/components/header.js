@@ -29,7 +29,9 @@ export function createHeader() {
         </button>
       </div>
       <div class="header-center">
-        <a href="#/" class="brand-logo" id="brand-logo">Van Cleef & Arpels</a>
+        <a href="#/" class="brand-logo" id="brand-logo">
+          <img src="/images/logo.png" alt="Phat Dat Jewelry" style="height: 50px; width: auto; object-fit: contain;">
+        </a>
       </div>
       <div class="header-right">
         <button class="header-region hide-mobile" aria-label="Select region">
@@ -58,6 +60,11 @@ export function createHeader() {
       header.classList.remove('site-header--scrolled');
     }
     lastScrollY = scrollY;
+  });
+
+  // Search toggle
+  header.querySelector('.header-search-btn').addEventListener('click', () => {
+    openSearchDrawer();
   });
 
   // Menu toggle
@@ -159,4 +166,97 @@ function openNavDrawer() {
       closeDrawer();
     });
   });
+}
+
+// ── Search Drawer ──
+
+function openSearchDrawer() {
+  const existing = document.querySelector('.search-overlay');
+  if (existing) existing.remove();
+  const existingDrawer = document.querySelector('.search-drawer');
+  if (existingDrawer) existingDrawer.remove();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'search-overlay';
+
+  const drawer = document.createElement('div');
+  drawer.className = 'search-drawer';
+  drawer.innerHTML = `
+    <div class="search-drawer__inner">
+      <div class="search-drawer__top">
+        ${SVG_ICONS.search}
+        <input type="text" class="search-drawer__input" placeholder="Search creations, articles, videos ...">
+        <button class="search-drawer__close" aria-label="Close search">✕</button>
+      </div>
+      <div class="search-drawer__content">
+        <div class="search-col">
+          <h4 class="search-col__title">CATEGORIES</h4>
+          <ul class="search-col__list">
+            <li><a href="#/jewelry">Necklaces and pendants</a></li>
+            <li><a href="#/jewelry">Bracelets</a></li>
+            <li><a href="#/jewelry">Rings</a></li>
+            <li><a href="#/jewelry">Earrings</a></li>
+          </ul>
+        </div>
+        <div class="search-col">
+          <h4 class="search-col__title">COLLECTIONS</h4>
+          <ul class="search-col__list">
+            <li><a href="#/jewelry">Alhambra®</a></li>
+            <li><a href="#/jewelry">Perlée®</a></li>
+            <li><a href="#/jewelry">Frivole®</a></li>
+            <li><a href="#/jewelry">Fauna</a></li>
+          </ul>
+        </div>
+        <div class="search-col search-col--wide">
+          <h4 class="search-col__title">CREATIONS</h4>
+          <div class="search-creations-grid">
+            <a href="#/product/vintage-alhambra-pendant" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
+              <img src="/images/products/necklace-2.png" alt="Vintage Alhambra pendant">
+              <div class="search-creation-item__name">Vintage Alhambra pendant</div>
+              <div class="search-creation-item__price">₫ 96,500,000</div>
+            </a>
+            <a href="#/product/perlee-signature-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
+              <img src="/images/products/bracelet-1.png" alt="Perlée signature bracelet">
+              <div class="search-creation-item__name">Perlée signature bracelet, medium model</div>
+              <div class="search-creation-item__price">₫ 215,000,000</div>
+            </a>
+            <a href="#/product/perlee-signature-ring" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
+              <img src="/images/products/ring-1.png" alt="Perlée signature ring">
+              <div class="search-creation-item__name">Perlée signature ring</div>
+              <div class="search-creation-item__price">From ₫ 82,000,000</div>
+            </a>
+            <a href="#/product/vintage-alhambra-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
+              <img src="/images/products/bracelet-4.png" alt="Vintage Alhambra bracelet">
+              <div class="search-creation-item__name">Vintage Alhambra bracelet, 5 motifs</div>
+              <div class="search-creation-item__price">₫ 118,000,000</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(drawer);
+  document.body.classList.add('no-scroll');
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('is-open');
+    drawer.classList.add('is-open');
+    drawer.querySelector('.search-drawer__input').focus();
+  });
+
+  // Close handlers
+  function closeSearch() {
+    overlay.classList.remove('is-open');
+    drawer.classList.remove('is-open');
+    document.body.classList.remove('no-scroll');
+    setTimeout(() => {
+      overlay.remove();
+      drawer.remove();
+    }, 400);
+  }
+
+  overlay.addEventListener('click', closeSearch);
+  drawer.querySelector('.search-drawer__close').addEventListener('click', closeSearch);
 }

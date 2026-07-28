@@ -1,5 +1,5 @@
 // ============================================================
-// PRODUCT DATA — Static product catalog
+// PRODUCT DATA â€” Static product catalog
 // ============================================================
 
 export const products = [
@@ -14,13 +14,13 @@ export const products = [
     price: 88500000,
     currency: '₫',
     images: [
-      '/images/products/necklace-1.jpg',
-      '/images/products/necklace-1-worn.jpg',
+      '/images/products/necklace-1.png',
+      '/images/products/necklace-1-worn.png',
     ],
     variants: [
-      { id: 'white-gold', label: '18K white gold', image: '/images/products/necklace-1-wg.jpg' },
+      { id: 'white-gold', label: '18K white gold', image: '/images/products/necklace-1-wg.png' },
     ],
-    description: 'The Vintage Alhambra creations by Van Cleef & Arpels are distinguished by their unique, immediately recognizable aesthetic.',
+    description: 'The Vintage Alhambra creations by Phat Dat Jewelry are distinguished by their unique, immediately recognizable aesthetic.',
     specifications: {
       'Stone': 'Mother-of-pearl',
       'Material': '18K yellow gold',
@@ -41,7 +41,7 @@ export const products = [
     price: 117000000,
     currency: '₫',
     images: [
-      '/images/products/ring-1.jpg',
+      '/images/products/ring-1.png',
     ],
     variants: [],
     description: 'The Vintage Alhambra ring reflects the iconic clover motif in radiant yellow gold.',
@@ -63,7 +63,7 @@ export const products = [
     price: 150000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-1.jpg',
+      '/images/products/bracelet-1.png',
     ],
     variants: [],
     description: 'Five lucky clover motifs adorn this exquisite bracelet in yellow gold and mother-of-pearl.',
@@ -85,7 +85,7 @@ export const products = [
     price: 555500000,
     currency: '₫',
     images: [
-      '/images/products/necklace-2.jpg',
+      '/images/products/necklace-2.png',
     ],
     variants: [],
     description: 'Twenty clover motifs in yellow gold and mother-of-pearl create a long necklace of timeless elegance.',
@@ -108,7 +108,7 @@ export const products = [
     price: 45000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-3.jpg',
+      '/images/products/necklace-3.png',
     ],
     variants: [],
     description: 'The Sweet Alhambra pendant features a delicate clover motif.',
@@ -129,7 +129,7 @@ export const products = [
     price: 272000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-4.jpg',
+      '/images/products/necklace-4.png',
     ],
     variants: [],
     description: 'Six motifs of varying sizes create a playful, harmonious composition.',
@@ -142,8 +142,8 @@ export const products = [
   },
   {
     id: 'perlee-signature-bracelet',
-    name: 'Perlée signature bracelet',
-    collection: 'Perlée',
+    name: 'PerlÃ©e signature bracelet',
+    collection: 'PerlÃ©e',
     category: 'bracelets',
     materials: 'Yellow Gold',
     stones: '',
@@ -151,10 +151,10 @@ export const products = [
     price: 155000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-2.jpg',
+      '/images/products/bracelet-2.png',
     ],
     variants: [],
-    description: 'The Perlée signature bracelet celebrates the golden bead, a symbol of Van Cleef & Arpels.',
+    description: 'The PerlÃ©e signature bracelet celebrates the golden bead, a symbol of Phat Dat Jewelry.',
     specifications: {
       'Material': 'Yellow Gold',
       'Finish': 'Mirror polish',
@@ -163,8 +163,8 @@ export const products = [
   },
   {
     id: 'perlee-clover-bracelet',
-    name: 'Perlée sweet clovers bracelet',
-    collection: 'Perlée',
+    name: 'PerlÃ©e sweet clovers bracelet',
+    collection: 'PerlÃ©e',
     category: 'bracelets',
     materials: 'Rose Gold, Diamond',
     stones: 'Diamond',
@@ -172,7 +172,7 @@ export const products = [
     price: 280000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-3.jpg',
+      '/images/products/bracelet-3.png',
     ],
     variants: [],
     description: 'Rows of golden beads frame clover motifs set with diamonds.',
@@ -193,7 +193,7 @@ export const products = [
     price: 135000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-5.jpg',
+      '/images/products/necklace-5.png',
     ],
     variants: [],
     description: 'A delicate flower in yellow gold, illuminated by a diamond at its heart.',
@@ -215,7 +215,7 @@ export const products = [
     price: 195000000,
     currency: '₫',
     images: [
-      '/images/products/earring-1.jpg',
+      '/images/products/earring-1.png',
     ],
     variants: [],
     description: 'Two Frivole flowers in gold and diamond create an elegant pair.',
@@ -236,7 +236,7 @@ export const products = [
     price: 105000000,
     currency: '₫',
     images: [
-      '/images/products/earring-2.jpg',
+      '/images/products/earring-2.png',
     ],
     variants: [],
     description: 'Classic Alhambra earclips in onyx and yellow gold.',
@@ -257,7 +257,7 @@ export const products = [
     price: 449000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-6.jpg',
+      '/images/products/necklace-6.png',
     ],
     variants: [],
     description: 'Three delicate flowers in white gold, fully paved with diamonds.',
@@ -278,7 +278,7 @@ export const products = [
     price: 271500000,
     currency: '₫',
     images: [
-      '/images/products/ring-2.jpg',
+      '/images/products/ring-2.png',
     ],
     variants: [],
     description: 'Inspired by the floral world, this ring blooms with diamonds.',
@@ -290,8 +290,8 @@ export const products = [
   },
   {
     id: 'perlee-ring-3-rows',
-    name: 'Perlée signature ring, 3 rows',
-    collection: 'Perlée',
+    name: 'PerlÃ©e signature ring, 3 rows',
+    collection: 'PerlÃ©e',
     category: 'rings',
     materials: 'Yellow Gold',
     stones: '',
@@ -299,10 +299,10 @@ export const products = [
     price: 98000000,
     currency: '₫',
     images: [
-      '/images/products/ring-3.jpg',
+      '/images/products/ring-3.png',
     ],
     variants: [],
-    description: 'Three rows of golden beads form this iconic Perlée ring.',
+    description: 'Three rows of golden beads form this iconic PerlÃ©e ring.',
     specifications: {
       'Material': 'Yellow Gold',
     },
@@ -319,7 +319,7 @@ export const products = [
     price: 320000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-7.jpg',
+      '/images/products/necklace-7.png',
     ],
     variants: [],
     description: 'Two butterflies in gold, diamond, and turquoise take flight.',
@@ -340,7 +340,7 @@ export const products = [
     price: 385000000,
     currency: '₫',
     images: [
-      '/images/products/earring-3.jpg',
+      '/images/products/earring-3.png',
     ],
     variants: [],
     description: 'The Cosmos collection brings to life the hypnotic beauty of a spinning flower.',
@@ -361,7 +361,7 @@ export const products = [
     price: 493500000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-4.jpg',
+      '/images/products/bracelet-4.png',
     ],
     variants: [],
     description: 'Ten clover motifs in carnelian and yellow gold.',
@@ -383,7 +383,7 @@ export const products = [
     price: 42000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-5.jpg',
+      '/images/products/bracelet-5.png',
     ],
     variants: [],
     description: 'A dainty bracelet with the Sweet Alhambra motif.',
@@ -406,7 +406,7 @@ export const categories = [
 // Collections filter
 export const collections = [
   'Alhambra',
-  'Perlée',
+  'PerlÃ©e',
   'Frivole',
   'Flora',
   'Socrate',

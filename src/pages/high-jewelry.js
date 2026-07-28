@@ -13,12 +13,15 @@ export function renderHighJewelry(container) {
   hero.className = 'hj-hero';
   hero.innerHTML = `
     <div class="hj-hero__bg">
-      <div style="width:100%;height:100%;background: linear-gradient(135deg, #8B9A84 0%, #AAB89E 30%, #C4CEB8 60%, #D8DAE8 100%);"></div>
+      <div style="width:100%;height:100%;"></div>
     </div>
-    <div class="hj-hero__content">
-      <h1 class="hj-hero__title">Van Cleef & Arpels<br>Signature collections</h1>
-      <p class="hj-hero__subtitle">Icons of the Maison's know-how, Van Cleef & Arpels Signature collection creations are timeless expressions of Van Cleef & Arpels' enchanted vision of the world.</p>
-      <a href="#/jewelry" class="link-underline link-underline--subtle">DISCOVER ALL CREATIONS</a>
+    <div class="hj-hero__decoration" style="position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: 45%; max-width: 500px; z-index: 2; pointer-events: none; mix-blend-mode: multiply;">
+      <img src="/images/products/bracelet-2.png" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.5) brightness(1.1);">
+    </div>
+    <div class="hj-hero__content" style="text-align: left;">
+      <h1 class="hj-hero__title" style="font-style: normal; font-size: 2.8rem; margin-bottom: 20px; line-height: 1.15; text-align: left; white-space: nowrap;">A graphic aesthetic in<br>tribute<br>to the golden bead</h1>
+      <p class="hj-hero__subtitle" style="font-size: 1rem; margin-bottom: 32px; color: var(--color-text-primary); text-align: left; max-width: 450px; line-height: 1.5;">The Perlée collection combines pure lines and<br>refined craftsmanship</p>
+      <a href="#/jewelry" class="link-underline" style="font-size: 11px; letter-spacing: 0.1em; display: inline-block;">COMPOSE YOUR SET</a>
     </div>
   `;
   page.appendChild(hero);

@@ -12,7 +12,7 @@ export const hjCollections = [
   {
     id: 'flowers',
     name: 'Flowers',
-    description: 'Since its founding, Van Cleef & Arpels has drawn endless inspiration from flowers, celebrating their beauty through High Jewelry creations of extraordinary craftsmanship.',
+    description: 'Since its founding, Phat Dat Jewelry has drawn endless inspiration from flowers, celebrating their beauty through High Jewelry creations of extraordinary craftsmanship.',
     color: '#A8B09A',
   },
   {
@@ -30,7 +30,7 @@ export const hjCollections = [
   {
     id: 'ballet-precieux',
     name: 'Ballet Précieux',
-    description: 'The enchanting world of dance has been a lasting source of inspiration for Van Cleef & Arpels since the 1940s.',
+    description: 'The enchanting world of dance has been a lasting source of inspiration for Phat Dat Jewelry since the 1940s.',
     color: '#D8C4D8',
   },
   {
@@ -46,14 +46,14 @@ export const hjFeatures = [
   {
     id: 'savoir-faire',
     title: 'A tradition of excellence',
-    description: 'For over a century, Van Cleef & Arpels has perpetuated its tradition of excellence through exceptional High Jewelry creations, each one a testament to the Maison\'s savoir-faire.',
+    description: 'For over a century, Phat Dat Jewelry has perpetuated its tradition of excellence through exceptional High Jewelry creations, each one a testament to the Maison\'s savoir-faire.',
     cta: 'Discover the savoir-faire',
     ctaLink: '#/high-jewelry',
   },
   {
     id: 'stones',
     title: 'Exceptional stones',
-    description: 'Van Cleef & Arpels selects extraordinary gemstones for its High Jewelry collections, seeking out rare specimens distinguished by their exceptional color, purity and character.',
+    description: 'Phat Dat Jewelry selects extraordinary gemstones for its High Jewelry collections, seeking out rare specimens distinguished by their exceptional color, purity and character.',
     cta: 'Explore our stones',
     ctaLink: '#/high-jewelry',
   },

@@ -10,7 +10,7 @@ export function createFooter() {
   footer.innerHTML = `
     <div class="container">
       <div class="footer-tagline">
-        <p>Thanks to the savoir-faire, creativity and excellence, Van Cleef & Arpels accompanies the happiest moments of life</p>
+        <p>Thanks to the savoir-faire, creativity and excellence, Phat Dat Jewelry accompanies the happiest moments of life</p>
         <a href="#/high-jewelry" class="link-underline">ENTER THE TIMELESS UNIVERSE</a>
       </div>
 
@@ -88,7 +88,7 @@ export function createFooter() {
         </div>
       </div>
 
-      <p class="footer-copyright">© Van Cleef & Arpels ${new Date().getFullYear()}</p>
+      <p class="footer-copyright">© Phat Dat Jewelry ${new Date().getFullYear()}</p>
     </div>
   `;
 
