@@ -1,0 +1,109 @@
+/* ============================================================
+   BASE STYLES — Element-level defaults
+   ============================================================ */
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  overflow-x: hidden;
+}
+
+/* ── Headings ── */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-tight);
+}
+
+h1 {
+  font-size: var(--fs-hero);
+}
+
+h2 {
+  font-size: var(--fs-section-title);
+}
+
+h3 {
+  font-size: var(--fs-page-title);
+}
+
+h4 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body-lg);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+h5, h6 {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+/* ── Paragraphs ── */
+p {
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+  line-height: var(--lh-body);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Links ── */
+a {
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-text-primary);
+}
+
+/* ── Images ── */
+img {
+  height: auto;
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: var(--color-accent-gold);
+  color: var(--color-text-inverse);
+}
+
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar (WebKit) ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* ── Body lock for modals/drawers ── */
+body.no-scroll {
+  overflow: hidden;
+}

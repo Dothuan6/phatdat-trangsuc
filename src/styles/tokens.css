@@ -1,0 +1,109 @@
+/* ============================================================
+   DESIGN TOKENS — Van Cleef & Arpels Clone
+   Extracted from visual analysis of vancleefarpels.com
+   ============================================================ */
+
+:root {
+  /* ── Color Palette ── */
+  --color-text-primary: #2B2B2B;
+  --color-text-secondary: #6B6B6B;
+  --color-text-muted: #999999;
+  --color-text-inverse: #FFFFFF;
+  --color-accent-gold: #C5A467;
+
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F5F5F0;
+  --color-bg-tertiary: #FAFAFA;
+  --color-bg-hero-sage: #A8B09A;
+  --color-bg-hero-lavender: #D8DAE8;
+  --color-bg-contact-cream: #E8E4D4;
+  --color-bg-form: #ECEEF5;
+  --color-bg-dark: #1A1A1A;
+
+  --color-border: #D4D4D4;
+  --color-border-light: #E8E8E8;
+  --color-border-dark: #2B2B2B;
+
+  --color-error: #D4380D;
+  --color-success: #389E0D;
+  --color-focus: #4A90D9;
+
+  --color-overlay: rgba(0, 0, 0, 0.45);
+
+  /* ── Typography ── */
+  --font-display: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --fs-hero: clamp(2.5rem, 5vw, 4.5rem);
+  --fs-section-title: clamp(2rem, 3.5vw, 3.5rem);
+  --fs-page-title: clamp(1.75rem, 3vw, 2.75rem);
+  --fs-product-name: clamp(1.125rem, 1.5vw, 1.5rem);
+  --fs-body-lg: 1.125rem;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-xs: 0.75rem;
+  --fs-label: 0.8125rem;
+
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --ls-wide: 0.15em;
+  --ls-medium: 0.08em;
+  --ls-normal: 0.02em;
+  --ls-tight: -0.01em;
+
+  --lh-heading: 1.2;
+  --lh-body: 1.65;
+  --lh-tight: 1.4;
+  --lh-loose: 1.8;
+
+  /* ── Spacing Scale ── */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 80px;
+  --space-5xl: 120px;
+
+  /* ── Layout ── */
+  --container-max: 1440px;
+  --container-padding: 60px;
+  --container-padding-tablet: 40px;
+  --container-padding-mobile: 20px;
+  --grid-gap: 24px;
+  --grid-gap-mobile: 16px;
+
+  /* ── Breakpoints (used as reference, actual usage via @media) ── */
+  --bp-mobile: 480px;
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+  --bp-wide: 1440px;
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 300ms ease;
+  --transition-slow: 500ms ease;
+  --transition-drawer: 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --shadow-header: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* ── Z-index Scale ── */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-drawer: 900;
+  --z-overlay: 950;
+  --z-modal: 1000;
+  --z-header: 800;
+}
