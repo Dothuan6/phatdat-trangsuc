@@ -129,7 +129,7 @@ export const locales = {
       emailUs: 'GỬI EMAIL'
     },
     hero: {
-      title: 'Vẻ đẹp thẩm mỹ đồ họa<br>tôn vinh<br>những hạt vàng',
+      title: 'Vẻ đẹp thẩm mỹ đồ họa<br>tôn vinh những hạt vàng',
       subtitle: 'Bộ sưu tập Perlée kết hợp những đường nét thanh thuần<br>và sự khéo léo tinh xảo',
       giftsTitle: 'Quà tặng diệu kỳ'
     },
