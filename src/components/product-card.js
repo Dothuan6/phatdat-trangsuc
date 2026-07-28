@@ -3,6 +3,7 @@
 // ============================================================
 
 import { formatPrice } from '../data/products.js';
+import { t } from '../i18n.js';
 
 export function createProductCard(product) {
   const card = document.createElement('a');
@@ -11,7 +12,7 @@ export function createProductCard(product) {
   card.id = `product-card-${product.id}`;
 
   const variationsHtml = product.variationCount > 0
-    ? `<p class="product-card__variations">+${product.variationCount} stone variations</p>`
+    ? `<p class="product-card__variations">+${product.variationCount} ${t('common.variations') || 'stone variations'}</p>`
     : '';
 
   card.innerHTML = `

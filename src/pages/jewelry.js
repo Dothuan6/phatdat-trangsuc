@@ -6,6 +6,7 @@ import { products, getProductsByCategory, categories, formatPrice } from '../dat
 import { createProductCard } from '../components/product-card.js';
 import { createFilterPanel } from '../components/filter-panel.js';
 import { createBreadcrumb } from '../components/breadcrumb.js';
+import { t } from '../i18n.js';
 
 export function renderJewelry(container, params = {}) {
   const category = params.category || 'all';
@@ -14,7 +15,7 @@ export function renderJewelry(container, params = {}) {
 
   // Get category info
   const categoryInfo = categories.find(c => c.slug === category);
-  const categoryTitle = categoryInfo ? categoryInfo.name : 'All Jewelry';
+  const categoryTitle = categoryInfo ? t(`nav.${categoryInfo.slug}`) : t('common.allJewelry');
   const categoryDesc = getCategoryDescription(category);
 
   // Filter panel
@@ -48,10 +49,10 @@ export function renderJewelry(container, params = {}) {
         <circle cx="16" cy="12" r="2" fill="currentColor"/>
         <circle cx="10" cy="18" r="2" fill="currentColor"/>
       </svg>
-      FILTER
+      ${t('common.filter')}
     </button>
     <button class="sort-btn">
-      SORT BY <span style="font-size: 10px; margin-left: 4px;">▼</span>
+      ${t('common.sortBy')} <span style="font-size: 10px; margin-left: 4px;">▼</span>
     </button>
   `;
   page.appendChild(filterBar);
@@ -80,15 +81,15 @@ export function renderJewelry(container, params = {}) {
   const loadMore = document.createElement('div');
   loadMore.className = 'load-more container';
   loadMore.innerHTML = `
-    <p class="load-more__count">${filteredProducts.length} creations of ${filteredProducts.length}</p>
-    <a class="link-underline" href="#" onclick="return false;">LOAD MORE</a>
+    <p class="load-more__count">${filteredProducts.length} ${t('common.creationsOf')} ${filteredProducts.length}</p>
+    <a class="link-underline" href="#" onclick="return false;">${t('common.loadMore')}</a>
   `;
   page.appendChild(loadMore);
 
   // ── Bottom "Our Creations" ──
   const bottomCreations = document.createElement('section');
   bottomCreations.className = 'plp-bottom-creations container';
-  bottomCreations.innerHTML = `<h2>OUR CREATIONS</h2>`;
+  bottomCreations.innerHTML = `<h2>${t('common.ourCreations') || 'OUR CREATIONS'}</h2>`;
 
   const catGrid = document.createElement('div');
   catGrid.className = 'grid-3';
@@ -108,7 +109,7 @@ export function renderJewelry(container, params = {}) {
       <div style="width:100%;height:100%;background: ${catColors[idx % catColors.length]}; display: flex; align-items: center; justify-content: center;">
         ${catSvgs[idx % catSvgs.length]}
       </div>
-      <span class="footer-category-card__label" style="color: #2B2B2B; text-shadow: none;">${cat.name}</span>
+      <span class="footer-category-card__label" style="color: #2B2B2B; text-shadow: none;">${t(`nav.${cat.slug}`)}</span>
     `;
     catGrid.appendChild(card);
   });
@@ -126,12 +127,5 @@ export function renderJewelry(container, params = {}) {
 }
 
 function getCategoryDescription(category) {
-  const descriptions = {
-    necklaces: 'In a dazzling range of forms and colors, necklaces drape the neck with gold, precious, fine or hard stones. Long necklaces – like the iconic Phat Dat Jewelry\' Alhambra® model created in 1968 – can be worn in multiple ways to suit every occasion.',
-    rings: 'Phat Dat Jewelry rings are miniature works of art, celebrating flowers, nature and the poetry of life. Each creation reveals exceptional savoir-faire and a passion for precious stones.',
-    bracelets: 'From the iconic Alhambra motif to the golden beads of Perlée, Phat Dat Jewelry bracelets adorn the wrist with grace and elegance, reflecting the Maison\'s creative universe.',
-    earrings: 'Earrings by Phat Dat Jewelry illuminate the face with their radiance. From delicate studs to sculptural ear clips, each pair embodies the Maison\'s love of nature and beautiful stones.',
-    all: 'Discover the world of Phat Dat Jewelry jewelry creations. From the iconic Alhambra collection to the golden beads of Perlée, each piece reflects the Maison\'s tradition of excellence and poetic creativity.',
-  };
-  return descriptions[category] || descriptions.all;
+  return t(`categoryDesc.${category}`) || t('categoryDesc.all');
 }

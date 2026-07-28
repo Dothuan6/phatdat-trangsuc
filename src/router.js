@@ -17,8 +17,11 @@ export function getCurrentPath() {
   return window.location.hash.slice(1) || '/';
 }
 
+let isRouterInitialized = false;
+let currentHandleRoute = null;
+
 export function initRouter(contentEl) {
-  function handleRoute() {
+  currentHandleRoute = function handleRoute() {
     const path = getCurrentPath();
 
     // Clean up previous page
@@ -57,15 +60,20 @@ export function initRouter(contentEl) {
 
     // Scroll to top
     window.scrollTo(0, 0);
-  }
+  };
 
-  window.addEventListener('hashchange', handleRoute);
+  if (!isRouterInitialized) {
+    window.addEventListener('hashchange', () => {
+      if (currentHandleRoute) currentHandleRoute();
+    });
+    isRouterInitialized = true;
+  }
 
   // Initial route
   if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
     navigate('/high-jewelry');
   } else {
-    handleRoute();
+    currentHandleRoute();
   }
 }
 

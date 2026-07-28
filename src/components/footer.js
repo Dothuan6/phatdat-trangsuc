@@ -2,6 +2,8 @@
 // FOOTER COMPONENT — Site footer
 // ============================================================
 
+import { t } from '../i18n.js';
+
 export function createFooter() {
   const footer = document.createElement('footer');
   footer.className = 'site-footer';
@@ -10,15 +12,15 @@ export function createFooter() {
   footer.innerHTML = `
     <div class="container">
       <div class="footer-tagline">
-        <p>Thanks to the savoir-faire, creativity and excellence, Phat Dat Jewelry accompanies the happiest moments of life</p>
-        <a href="#/high-jewelry" class="link-underline">ENTER THE TIMELESS UNIVERSE</a>
+        <p>${t('footer.tagline')}</p>
+        <a href="#/high-jewelry" class="link-underline">${t('footer.enterUniverse')}</a>
       </div>
 
       <div class="footer-divider"></div>
 
       <div class="footer-creations">
-        <h2>Our creations</h2>
-        <p>Discover a variety of our pieces.</p>
+        <h2>${t('footer.ourCreations')}</h2>
+        <p>${t('footer.creationsDesc')}</p>
       </div>
 
       <div class="footer-categories">
@@ -29,7 +31,7 @@ export function createFooter() {
               <circle cx="40" cy="95" r="6" stroke="#C5A467" stroke-width="1" fill="none"/>
             </svg>
           </div>
-          <span class="footer-category-card__label">Necklaces</span>
+          <span class="footer-category-card__label">${t('nav.necklaces')}</span>
         </a>
         <a href="#/jewelry/rings" class="footer-category-card" id="footer-cat-rings">
           <div class="footer-category-card__bg" style="background: linear-gradient(135deg, #F0EDE5, #E5DDD4); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
@@ -38,7 +40,7 @@ export function createFooter() {
               <circle cx="40" cy="12" r="8" stroke="#C5A467" stroke-width="1" fill="none"/>
             </svg>
           </div>
-          <span class="footer-category-card__label">Rings</span>
+          <span class="footer-category-card__label">${t('nav.rings')}</span>
         </a>
         <a href="#/jewelry/bracelets" class="footer-category-card" id="footer-cat-bracelets">
           <div class="footer-category-card__bg" style="background: linear-gradient(135deg, #EDE8F0, #DDD8E5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
@@ -49,17 +51,17 @@ export function createFooter() {
               <circle cx="80" cy="25" r="5" stroke="#C5A467" stroke-width="1" fill="none"/>
             </svg>
           </div>
-          <span class="footer-category-card__label">Bracelets</span>
+          <span class="footer-category-card__label">${t('nav.bracelets')}</span>
         </a>
       </div>
 
       <div class="footer-bottom">
         <div class="footer-legal">
-          <a href="#">Legal notices</a>
-          <a href="#">Privacy policy</a>
-          <a href="#">Cookies</a>
-          <a href="#">Accessibility</a>
-          <a href="#">Sitemap</a>
+          <a href="#">${t('footer.legalNotices')}</a>
+          <a href="#">${t('footer.privacyPolicy')}</a>
+          <a href="#">${t('footer.cookies')}</a>
+          <a href="#">${t('footer.accessibility')}</a>
+          <a href="#">${t('footer.sitemap')}</a>
         </div>
         <div class="footer-social">
           <a href="#" aria-label="Instagram">
@@ -88,7 +90,7 @@ export function createFooter() {
         </div>
       </div>
 
-      <p class="footer-copyright">© Phat Dat Jewelry ${new Date().getFullYear()}</p>
+      <p class="footer-copyright">${t('common.copyright')}</p>
     </div>
   `;
 

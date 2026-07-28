@@ -3,6 +3,7 @@
 // ============================================================
 
 import { createFormField, validateForm } from '../components/form-field.js';
+import { t } from '../i18n.js';
 
 export function renderContact(container) {
   const page = document.createElement('div');
@@ -13,8 +14,8 @@ export function renderContact(container) {
   hero.className = 'contact-hero';
   hero.innerHTML = `
     <div class="container">
-      <h1 class="contact-hero__title">EMAIL US</h1>
-      <p class="contact-hero__desc">We invite you to write to us with any question you may have. Our client advisors would be delighted to assist you with your enquiry.</p>
+      <h1 class="contact-hero__title">${t('contact.emailUs')}</h1>
+      <p class="contact-hero__desc">${t('contact.heroDesc')}</p>
     </div>
   `;
   page.appendChild(hero);
@@ -24,7 +25,7 @@ export function renderContact(container) {
   note.className = 'contact-note';
   note.innerHTML = `
     <div class="container">
-      <p>Kindly note, our client advisors are also at your disposal <a href="#" id="by-phone-link">by phone</a></p>
+      <p>${t('contact.note')}</p>
     </div>
   `;
   page.appendChild(note);
@@ -38,7 +39,7 @@ export function renderContact(container) {
 
   const formHeading = document.createElement('h2');
   formHeading.className = 'contact-form__heading';
-  formHeading.textContent = 'SEND A MESSAGE';
+  formHeading.textContent = t('common.contactTitle');
   formContainer.appendChild(formHeading);
 
   // Form element
@@ -50,16 +51,16 @@ export function renderContact(container) {
   form.appendChild(createFormField({
     type: 'select',
     name: 'subject',
-    label: 'Subject',
-    placeholder: 'Select a subject',
+    label: t('contact.form.subject'),
+    placeholder: t('contact.form.selectSubject'),
     required: true,
-    errorMessage: 'This field is mandatory',
+    errorMessage: t('contact.form.mandatoryField'),
     options: [
-      { value: 'general', label: 'General enquiry' },
-      { value: 'product', label: 'Product information' },
-      { value: 'order', label: 'Order enquiry' },
-      { value: 'boutique', label: 'Boutique information' },
-      { value: 'other', label: 'Other' },
+      { value: 'general', label: t('contact.form.generalEnquiry') },
+      { value: 'product', label: t('contact.form.productInfo') },
+      { value: 'order', label: t('contact.form.orderEnquiry') },
+      { value: 'boutique', label: t('contact.form.boutiqueInfo') },
+      { value: 'other', label: t('contact.form.other') },
     ],
   }));
 
@@ -67,12 +68,12 @@ export function renderContact(container) {
   form.appendChild(createFormField({
     type: 'radio',
     name: 'title',
-    label: 'Title',
+    label: t('contact.form.title'),
     required: true,
     options: [
-      { value: 'mr', label: 'Mr.' },
-      { value: 'mrs', label: 'Mrs.' },
-      { value: 'ms', label: 'Ms.' },
+      { value: 'mr', label: t('contact.form.mr') },
+      { value: 'mrs', label: t('contact.form.mrs') },
+      { value: 'ms', label: t('contact.form.ms') },
     ],
   }));
 
@@ -80,37 +81,37 @@ export function renderContact(container) {
   form.appendChild(createFormField({
     type: 'text',
     name: 'firstName',
-    label: 'First name',
-    placeholder: 'Your first name',
+    label: t('contact.form.firstName'),
+    placeholder: t('contact.form.firstNamePlace'),
     required: true,
-    errorMessage: 'Please enter your first name.',
+    errorMessage: t('contact.form.firstNameErr'),
   }));
 
   // Last name
   form.appendChild(createFormField({
     type: 'text',
     name: 'lastName',
-    label: 'Last name',
-    placeholder: 'Your last name',
+    label: t('contact.form.lastName'),
+    placeholder: t('contact.form.lastNamePlace'),
     required: true,
-    errorMessage: 'Please enter your last name.',
+    errorMessage: t('contact.form.lastNameErr'),
   }));
 
   // Email
   form.appendChild(createFormField({
     type: 'email',
     name: 'email',
-    label: 'Email',
-    placeholder: 'Your email address',
+    label: t('contact.form.email'),
+    placeholder: t('contact.form.emailPlace'),
     required: true,
-    errorMessage: 'Please enter a valid email address.',
+    errorMessage: t('contact.form.emailErr'),
   }));
 
   // Phone
   form.appendChild(createFormField({
     type: 'tel',
     name: 'phone',
-    label: 'Contact phone',
+    label: t('contact.form.phone'),
     placeholder: '',
     required: false,
   }));
@@ -119,10 +120,10 @@ export function renderContact(container) {
   form.appendChild(createFormField({
     type: 'textarea',
     name: 'message',
-    label: 'Your message',
-    placeholder: 'Enter your message here',
+    label: t('contact.form.message'),
+    placeholder: t('contact.form.messagePlace'),
     required: true,
-    errorMessage: 'Please enter your message.',
+    errorMessage: t('contact.form.messageErr'),
   }));
 
   // Newsletter checkbox
@@ -130,7 +131,7 @@ export function renderContact(container) {
   checkboxWrapper.innerHTML = `
     <label class="form-checkbox">
       <input type="checkbox" name="newsletter" id="newsletter-checkbox">
-      <span>I would like to receive the newsletter and agree to be contacted using any of the contact details I have provided. I may ask to unsubscribe at any time. Further information is available in the Maison Privacy Policy.</span>
+      <span>${t('contact.form.newsletter')}</span>
     </label>
   `;
   form.appendChild(checkboxWrapper);
@@ -139,7 +140,7 @@ export function renderContact(container) {
   const submitBtn = document.createElement('button');
   submitBtn.type = 'submit';
   submitBtn.className = 'btn btn--full';
-  submitBtn.textContent = 'SEND A MESSAGE';
+  submitBtn.textContent = t('common.contactTitle').toUpperCase();
   submitBtn.id = 'submit-contact-form';
   form.appendChild(submitBtn);
 
@@ -147,14 +148,14 @@ export function renderContact(container) {
   const legal = document.createElement('div');
   legal.className = 'contact-form__legal';
   legal.innerHTML = `
-    <p>By clicking on « Send a Message », I acknowledge that I have read and accepted the <a href="#">Phat Dat Jewelry Privacy Policy</a>.</p>
+    <p>${t('contact.form.legal')}</p>
   `;
   form.appendChild(legal);
 
   // Mandatory note
   const mandatory = document.createElement('p');
   mandatory.className = 'contact-form__mandatory';
-  mandatory.textContent = '* Mandatory Fields';
+  mandatory.textContent = t('contact.form.mandatoryFields');
   form.appendChild(mandatory);
 
   // Form submit handler
@@ -163,12 +164,12 @@ export function renderContact(container) {
     const isValid = validateForm(form);
     if (isValid) {
       // Show success feedback
-      submitBtn.textContent = 'MESSAGE SENT ✓';
+      submitBtn.textContent = t('contact.form.messageSent');
       submitBtn.style.backgroundColor = '#2B2B2B';
       submitBtn.style.color = '#FFFFFF';
       submitBtn.disabled = true;
       setTimeout(() => {
-        submitBtn.textContent = 'SEND A MESSAGE';
+        submitBtn.textContent = t('common.contactTitle').toUpperCase();
         submitBtn.style.backgroundColor = '';
         submitBtn.style.color = '';
         submitBtn.disabled = false;

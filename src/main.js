@@ -64,3 +64,8 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+// Listen for language changes to re-render
+window.addEventListener('languagechange', () => {
+  init();
+});

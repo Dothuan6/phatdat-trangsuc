@@ -6,6 +6,7 @@ import { getProductById, getRelatedProducts, formatPrice } from '../data/product
 import { createAccordion } from '../components/accordion.js';
 import { createProductCard } from '../components/product-card.js';
 import { createCarousel } from '../components/carousel.js';
+import { t } from '../i18n.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -14,9 +15,9 @@ export function renderProductDetail(container, params = {}) {
   if (!product) {
     container.innerHTML = `
       <div class="container section text-center">
-        <h2 style="font-family: var(--font-display); margin-bottom: 24px;">Product not found</h2>
-        <p>The product you are looking for does not exist.</p>
-        <a href="#/jewelry" class="link-underline" style="margin-top: 24px; display: inline-block;">BACK TO JEWELRY</a>
+        <h2 style="font-family: var(--font-display); margin-bottom: 24px;">${t('pdp.notFound')}</h2>
+        <p>${t('pdp.notFoundDesc')}</p>
+        <a href="#/jewelry" class="link-underline" style="margin-top: 24px; display: inline-block;">${t('pdp.backToJewelry')}</a>
       </div>
     `;
     return;
@@ -131,7 +132,7 @@ export function renderProductDetail(container, params = {}) {
   const refRow = document.createElement('div');
   refRow.className = 'pdp-info__ref';
   refRow.innerHTML = `
-    <span class="pdp-info__ref-text">${product.reference} - <a href="#">Product details</a></span>
+    <span class="pdp-info__ref-text">${product.reference} - <a href="#">${t('pdp.productDetails')}</a></span>
     <button class="wishlist-btn" aria-label="Add to wishlist" id="wishlist-btn-${product.id}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
@@ -143,7 +144,7 @@ export function renderProductDetail(container, params = {}) {
   // Price
   const priceEl = document.createElement('div');
   priceEl.className = 'pdp-info__price';
-  priceEl.textContent = `${formatPrice(product.price, product.currency)} Including taxes`;
+  priceEl.textContent = `${formatPrice(product.price, product.currency)} ${t('pdp.includingTaxes')}`;
   info.appendChild(priceEl);
 
   // Variant Selector (if applicable)
@@ -153,7 +154,7 @@ export function renderProductDetail(container, params = {}) {
     variants.innerHTML = `
       <div class="pdp-variants__header">
         <span class="pdp-variants__label">
-          DISCOVER MORE STONES
+          ${t('pdp.discoverMore')}
           <span class="pdp-variants__dot"></span>
         </span>
         <span class="pdp-variants__chevron">›</span>
@@ -190,13 +191,13 @@ export function renderProductDetail(container, params = {}) {
   // Size Guide link
   const sizeGuide = document.createElement('div');
   sizeGuide.className = 'pdp-size-guide';
-  sizeGuide.innerHTML = `<a href="#">Which size to choose?</a>`;
+  sizeGuide.innerHTML = `<a href="#">${t('pdp.sizeGuide')}</a>`;
   info.appendChild(sizeGuide);
 
   // Order button
   const orderBtn = document.createElement('button');
   orderBtn.className = 'btn btn--full';
-  orderBtn.textContent = 'ORDER BY PHONE';
+  orderBtn.textContent = t('pdp.orderByPhone');
   orderBtn.id = 'order-btn';
   orderBtn.addEventListener('click', () => {
     document.dispatchEvent(new CustomEvent('toggle-contact-drawer'));
@@ -216,18 +217,18 @@ export function renderProductDetail(container, params = {}) {
       </div>
     `).join('');
 
-    specsSection.appendChild(createAccordion('THE CREATION', `
+    specsSection.appendChild(createAccordion(t('pdp.theCreation'), `
       <p style="margin-bottom: 16px;">${product.description}</p>
       ${specsContent}
     `));
 
-    specsSection.appendChild(createAccordion('DELIVERY & RETURNS', `
-      <p>Phat Dat Jewelry offers complimentary delivery on all orders.</p>
-      <p>Items may be returned within 30 days of delivery. Please contact our Client Advisors for more information.</p>
+    specsSection.appendChild(createAccordion(t('pdp.deliveryReturns'), `
+      <p>${t('pdp.deliveryDesc1')}</p>
+      <p>${t('pdp.deliveryDesc2')}</p>
     `));
 
-    specsSection.appendChild(createAccordion('GIFTING', `
-      <p>Each Phat Dat Jewelry creation is presented in the Maison's iconic packaging, making it the perfect gift for any occasion.</p>
+    specsSection.appendChild(createAccordion(t('pdp.gifting'), `
+      <p>${t('pdp.giftingDesc')}</p>
     `));
 
     info.appendChild(specsSection);
@@ -246,7 +247,7 @@ export function renderProductDetail(container, params = {}) {
     const relatedHeader = document.createElement('div');
     relatedHeader.className = 'pdp-related__header';
     relatedHeader.innerHTML = `
-      <h2 class="pdp-related__title">${product.collection} collection</h2>
+      <h2 class="pdp-related__title">${product.collection} ${t('pdp.collection')}</h2>
     `;
     relatedSection.appendChild(relatedHeader);
 
@@ -264,7 +265,7 @@ export function renderProductDetail(container, params = {}) {
     // CTA
     const relatedCta = document.createElement('div');
     relatedCta.className = 'pdp-related__cta';
-    relatedCta.innerHTML = `<a href="#/jewelry" class="link-underline">SEE ALL ${product.collection.toUpperCase()} COLLECTION</a>`;
+    relatedCta.innerHTML = `<a href="#/jewelry" class="link-underline">${t('pdp.seeAllCollection')} ${product.collection.toUpperCase()} ${t('pdp.collection').toUpperCase()}</a>`;
     relatedSection.appendChild(relatedCta);
 
     page.appendChild(relatedSection);

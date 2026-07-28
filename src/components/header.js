@@ -3,6 +3,7 @@
 // ============================================================
 
 import { navigate } from '../router.js';
+import { t, currentLang, toggleLang } from '../i18n.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -25,7 +26,7 @@ export function createHeader() {
         </button>
         <button class="header-search-btn" aria-label="Search">
           ${SVG_ICONS.search}
-          <span>SEARCH</span>
+          <span>${t('nav.search')}</span>
         </button>
       </div>
       <div class="header-center">
@@ -34,8 +35,10 @@ export function createHeader() {
         </a>
       </div>
       <div class="header-right">
-        <button class="header-region hide-mobile" aria-label="Select region">
-          VN - ₫ <span style="margin-left: 4px;">›</span>
+        <button class="header-region hide-mobile" id="lang-toggle" aria-label="Toggle language">
+          <span style="${currentLang === 'vi' ? 'font-weight: 600;' : 'opacity: 0.5;'}">VN</span>
+          <span style="margin: 0 4px;">|</span>
+          <span style="${currentLang === 'en' ? 'font-weight: 600;' : 'opacity: 0.5;'}">EN</span>
         </button>
         <button class="header-icon hide-mobile" aria-label="Store locator">
           ${SVG_ICONS.location}
@@ -78,6 +81,14 @@ export function createHeader() {
     document.dispatchEvent(event);
   });
 
+  // Language toggle
+  const langToggle = header.querySelector('#lang-toggle');
+  if (langToggle) {
+    langToggle.addEventListener('click', () => {
+      toggleLang();
+    });
+  }
+
   return header;
 }
 
@@ -106,31 +117,31 @@ function openNavDrawer() {
     </div>
     <div class="nav-drawer__items">
       <a class="nav-item" href="#/high-jewelry">
-        <span>High Jewelry</span>
+        <span>${t('nav.highJewelry')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry">
-        <span>Jewelry</span>
+        <span>${t('nav.jewelry')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/necklaces">
-        <span>Necklaces & Pendants</span>
+        <span>${t('nav.necklaces')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/rings">
-        <span>Rings</span>
+        <span>${t('nav.rings')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/bracelets">
-        <span>Bracelets</span>
+        <span>${t('nav.bracelets')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/earrings">
-        <span>Earrings</span>
+        <span>${t('nav.earrings')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/contact">
-        <span>Contact Us</span>
+        <span>${t('nav.contactUs')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
     </div>
@@ -185,21 +196,21 @@ function openSearchDrawer() {
     <div class="search-drawer__inner">
       <div class="search-drawer__top">
         ${SVG_ICONS.search}
-        <input type="text" class="search-drawer__input" placeholder="Search creations, articles, videos ...">
+        <input type="text" class="search-drawer__input" placeholder="${t('common.searchPlaceholder')}">
         <button class="search-drawer__close" aria-label="Close search">✕</button>
       </div>
       <div class="search-drawer__content">
         <div class="search-col">
-          <h4 class="search-col__title">CATEGORIES</h4>
+          <h4 class="search-col__title">${t('common.categories')}</h4>
           <ul class="search-col__list">
-            <li><a href="#/jewelry">Necklaces and pendants</a></li>
-            <li><a href="#/jewelry">Bracelets</a></li>
-            <li><a href="#/jewelry">Rings</a></li>
-            <li><a href="#/jewelry">Earrings</a></li>
+            <li><a href="#/jewelry/necklaces">${t('nav.necklaces')}</a></li>
+            <li><a href="#/jewelry/bracelets">${t('nav.bracelets')}</a></li>
+            <li><a href="#/jewelry/rings">${t('nav.rings')}</a></li>
+            <li><a href="#/jewelry/earrings">${t('nav.earrings')}</a></li>
           </ul>
         </div>
         <div class="search-col">
-          <h4 class="search-col__title">COLLECTIONS</h4>
+          <h4 class="search-col__title">${t('common.collections')}</h4>
           <ul class="search-col__list">
             <li><a href="#/jewelry">Alhambra®</a></li>
             <li><a href="#/jewelry">Perlée®</a></li>
@@ -208,7 +219,7 @@ function openSearchDrawer() {
           </ul>
         </div>
         <div class="search-col search-col--wide">
-          <h4 class="search-col__title">CREATIONS</h4>
+          <h4 class="search-col__title">${t('common.creations')}</h4>
           <div class="search-creations-grid">
             <a href="#/product/vintage-alhambra-pendant" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
               <img src="/images/products/necklace-2.png" alt="Vintage Alhambra pendant">

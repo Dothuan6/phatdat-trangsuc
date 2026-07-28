@@ -3,6 +3,7 @@
 // ============================================================
 
 import { hjCollections, hjFeatures } from '../data/collections.js';
+import { t } from '../i18n.js';
 
 export function renderHighJewelry(container) {
   const page = document.createElement('div');
@@ -19,9 +20,9 @@ export function renderHighJewelry(container) {
       <img src="/images/products/bracelet-2.png" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.5) brightness(1.1);">
     </div>
     <div class="hj-hero__content" style="text-align: left;">
-      <h1 class="hj-hero__title" style="font-style: normal; font-size: 2.8rem; margin-bottom: 20px; line-height: 1.15; text-align: left; white-space: nowrap;">A graphic aesthetic in<br>tribute<br>to the golden bead</h1>
-      <p class="hj-hero__subtitle" style="font-size: 1rem; margin-bottom: 32px; color: var(--color-text-primary); text-align: left; max-width: 450px; line-height: 1.5;">The Perlée collection combines pure lines and<br>refined craftsmanship</p>
-      <a href="#/jewelry" class="link-underline" style="font-size: 11px; letter-spacing: 0.1em; display: inline-block;">COMPOSE YOUR SET</a>
+      <h1 class="hj-hero__title" style="font-style: normal; font-size: 2.8rem; margin-bottom: 20px; line-height: 1.15; text-align: left; white-space: nowrap;">${t('hero.title')}</h1>
+      <p class="hj-hero__subtitle" style="font-size: 1rem; margin-bottom: 32px; color: var(--color-text-primary); text-align: left; max-width: 450px; line-height: 1.5;">${t('hero.subtitle')}</p>
+      <a href="#/jewelry" class="link-underline" style="font-size: 11px; letter-spacing: 0.1em; display: inline-block;">${t('common.composeSet')}</a>
     </div>
   `;
   page.appendChild(hero);
@@ -46,7 +47,7 @@ export function renderHighJewelry(container) {
         </svg>
       </div>
       <div class="hj-collection-card__overlay"></div>
-      <span class="hj-collection-card__name">${collection.name}</span>
+      <span class="hj-collection-card__name">${t(`collections.${collection.id}.name`)}</span>
     `;
     collectionsGrid.appendChild(card);
   });
@@ -74,9 +75,9 @@ export function renderHighJewelry(container) {
         </div>
       </div>
       <div class="hj-feature__content">
-        <h2 class="hj-feature__name">${feature.title}</h2>
-        <p class="hj-feature__desc">${feature.description}</p>
-        <a href="${feature.ctaLink}" class="link-underline">${feature.cta.toUpperCase()}</a>
+        <h2 class="hj-feature__name">${t(`features.${feature.id}.title`)}</h2>
+        <p class="hj-feature__desc">${t(`features.${feature.id}.description`)}</p>
+        <a href="${feature.ctaLink}" class="link-underline">${t(`features.${feature.id}.cta`)}</a>
       </div>
     `;
     page.appendChild(section);
@@ -86,7 +87,7 @@ export function renderHighJewelry(container) {
   const giftsSection = document.createElement('section');
   giftsSection.className = 'hj-gifts container';
   giftsSection.innerHTML = `
-    <h2>Enchanting gifts</h2>
+    <h2>${t('hero.giftsTitle')}</h2>
     <div class="hj-gifts__image" style="margin-top: 32px;">
       <div style="width:100%;height:500px;background: linear-gradient(135deg, #A8B09A 0%, #C4CEB8 50%, #D8DAE8 100%); display: flex; align-items: center; justify-content: center; border-radius: 0;">
         <svg width="300" height="200" viewBox="0 0 300 200" fill="none" opacity="0.3">
@@ -99,7 +100,7 @@ export function renderHighJewelry(container) {
       </div>
     </div>
     <div style="text-align: center; margin-top: 32px;">
-      <a href="#/jewelry" class="link-underline">DISCOVER OUR GIFT SELECTION</a>
+      <a href="#/jewelry" class="link-underline">${t('common.discoverGift')}</a>
     </div>
   `;
   page.appendChild(giftsSection);
