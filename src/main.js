@@ -23,6 +23,7 @@ import { renderHighJewelry } from './pages/high-jewelry.js';
 import { renderJewelry } from './pages/jewelry.js';
 import { renderContact } from './pages/contact.js';
 import { renderProductDetail } from './pages/product-detail.js';
+import { renderLegal } from './pages/legal.js';
 
 // ── Initialize Application ──
 function init() {
@@ -53,6 +54,8 @@ function init() {
   registerRoute('/jewelry/:category', (container, params) => renderJewelry(container, params));
   registerRoute('/contact', renderContact);
   registerRoute('/product/:id', renderProductDetail);
+  registerRoute('/legal', (container, params) => renderLegal(container, { tab: 'privacy-policy' }));
+  registerRoute('/legal/:tab', (container, params) => renderLegal(container, params));
 
   // Initialize router
   initRouter(main);

@@ -57,8 +57,8 @@ export function createFooter() {
 
       <div class="footer-bottom">
         <div class="footer-legal">
-          <a href="#">${t('footer.legalNotices')}</a>
-          <a href="#">${t('footer.privacyPolicy')}</a>
+          <a href="#/legal/privacy-policy">${t('footer.legalNotices')}</a>
+          <a href="#/legal/privacy-policy">${t('footer.privacyPolicy')}</a>
           <a href="#">${t('footer.cookies')}</a>
           <a href="#">${t('footer.accessibility')}</a>
           <a href="#">${t('footer.sitemap')}</a>
