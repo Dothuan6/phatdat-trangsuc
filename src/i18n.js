@@ -247,7 +247,7 @@ export const locales = {
       }
     },
     home: {
-      heroTitle: 'Tuyệt tác<br>Trang sức',
+      heroTitle: 'Tuyệt tác Trang sức',
       heroSubtitle: 'Khám phá thế giới lấp lánh của những bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp vĩnh cửu.',
       discover: 'KHÁM PHÁ NGAY',
       collectionsTitle: 'Bộ Sưu Tập Nổi Bật'
@@ -513,7 +513,7 @@ export const locales = {
       }
     },
     home: {
-      heroTitle: 'Jewelry<br>Masterpieces',
+      heroTitle: 'Jewelry Masterpieces',
       heroSubtitle: 'Discover the sparkling world of exquisite jewelry collections, celebrating eternal beauty.',
       discover: 'DISCOVER NOW',
       collectionsTitle: 'Featured Collections'
