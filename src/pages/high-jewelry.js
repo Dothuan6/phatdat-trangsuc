@@ -17,7 +17,7 @@ export function renderHighJewelry(container) {
       <div style="width:100%;height:100%;"></div>
     </div>
     <div class="hj-hero__decoration" style="position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: 45%; max-width: 500px; z-index: 2; pointer-events: none; mix-blend-mode: multiply;">
-      <img src="/images/products/bracelet-2.png" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.5) brightness(1.1);">
+      <img src="./images/products/2.jpg" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.5) brightness(1.1);">
     </div>
     <div class="hj-hero__content" style="text-align: left;">
       <h1 class="hj-hero__title" style="font-style: normal; font-size: 2.8rem; margin-bottom: 20px; line-height: 1.15; text-align: left; white-space: nowrap;">${t('hero.title')}</h1>

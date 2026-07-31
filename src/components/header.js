@@ -230,22 +230,22 @@ function openSearchDrawer() {
           <h4 class="search-col__title">${t('common.creations')}</h4>
           <div class="search-creations-grid">
             <a href="#/product/vintage-alhambra-pendant" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="/images/products/necklace-2.png" alt="Vintage Alhambra pendant">
+              <img src="./images/products/2.jpg" alt="Vintage Alhambra pendant">
               <div class="search-creation-item__name">Vintage Alhambra pendant</div>
               <div class="search-creation-item__price">₫ 96,500,000</div>
             </a>
             <a href="#/product/perlee-signature-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="/images/products/bracelet-1.png" alt="Perlée signature bracelet">
+              <img src="./images/products/2.jpg" alt="Perlée signature bracelet">
               <div class="search-creation-item__name">Perlée signature bracelet, medium model</div>
               <div class="search-creation-item__price">₫ 215,000,000</div>
             </a>
             <a href="#/product/perlee-signature-ring" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="/images/products/ring-1.png" alt="Perlée signature ring">
+              <img src="./images/products/2.jpg" alt="Perlée signature ring">
               <div class="search-creation-item__name">Perlée signature ring</div>
               <div class="search-creation-item__price">From ₫ 82,000,000</div>
             </a>
             <a href="#/product/vintage-alhambra-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="/images/products/bracelet-4.png" alt="Vintage Alhambra bracelet">
+              <img src="./images/products/2.jpg" alt="Vintage Alhambra bracelet">
               <div class="search-creation-item__name">Vintage Alhambra bracelet, 5 motifs</div>
               <div class="search-creation-item__price">₫ 118,000,000</div>
             </a>

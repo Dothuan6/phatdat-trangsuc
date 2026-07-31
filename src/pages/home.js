@@ -17,7 +17,7 @@ export function renderHome(container) {
       <div style="width:100%;height:100%;"></div>
     </div>
     <div class="hj-hero__decoration" style="position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: 45%; max-width: 500px; z-index: 2; pointer-events: none; mix-blend-mode: multiply;">
-      <img src="/images/products/necklace-1.png" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.2) brightness(1.1);" onerror="this.onerror=null; this.style.display='none';">
+      <img src="./images/products/2.jpg" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.2) brightness(1.1);" onerror="this.onerror=null; this.style.display='none';">
     </div>
     <div class="hj-hero__content" style="text-align: left;">
       <h1 class="hj-hero__title" style="font-style: normal; font-size: 3rem; margin-bottom: 20px; line-height: 1.15; text-align: left;">${t('home.heroTitle') || 'Tuyệt tác<br>Trang sức'}</h1>
