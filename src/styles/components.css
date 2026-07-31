@@ -516,6 +516,8 @@
   object-fit: contain;
   padding: var(--space-xl);
   transition: transform var(--transition-slow);
+  mix-blend-mode: multiply;
+  filter: contrast(1.1);
 }
 
 .product-card:hover .product-card__image img {

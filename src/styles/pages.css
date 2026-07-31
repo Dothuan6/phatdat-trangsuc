@@ -374,6 +374,8 @@
   width: 100%;
   height: auto;
   object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.1);
 }
 
 .pdp-gallery__thumbs {
@@ -514,6 +516,8 @@
   width: 80%;
   height: 80%;
   object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.1);
 }
 
 .pdp-variant-thumb.is-active .pdp-variant-thumb__img {
