@@ -14,12 +14,9 @@ export const products = [
     price: 88500000,
     currency: '₫',
     images: [
-      '/images/products/necklace-1.png',
-      '/images/products/necklace-1-worn.png',
+      '/images/products/1.jpg',
     ],
-    variants: [
-      { id: 'white-gold', label: '18K white gold', image: '/images/products/necklace-1-wg.png' },
-    ],
+    variants: [],
     description: 'The Vintage Alhambra creations by Phat Dat Jewelry are distinguished by their unique, immediately recognizable aesthetic.',
     specifications: {
       'Stone': 'Mother-of-pearl',
@@ -41,7 +38,7 @@ export const products = [
     price: 117000000,
     currency: '₫',
     images: [
-      '/images/products/ring-1.png',
+      '/images/products/1785481792408_7505022088732498416_7505022088732498416_39fe0906cfeae1b89c34baed0f02cdac.jpg',
     ],
     variants: [],
     description: 'The Vintage Alhambra ring reflects the iconic clover motif in radiant yellow gold.',
@@ -63,7 +60,7 @@ export const products = [
     price: 150000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-1.png',
+      '/images/products/1785481792439_7505022088732498416_7505022088732498416_06f701412a7ef620da576e12d3b05115.jpg',
     ],
     variants: [],
     description: 'Five lucky clover motifs adorn this exquisite bracelet in yellow gold and mother-of-pearl.',
@@ -85,7 +82,7 @@ export const products = [
     price: 555500000,
     currency: '₫',
     images: [
-      '/images/products/necklace-2.png',
+      '/images/products/1785481792459_7505022088732498416_7505022088732498416_86bb32f1ccbfacd0be8241fb7ec24ab6.jpg',
     ],
     variants: [],
     description: 'Twenty clover motifs in yellow gold and mother-of-pearl create a long necklace of timeless elegance.',
@@ -108,7 +105,7 @@ export const products = [
     price: 45000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-3.png',
+      '/images/products/1785481792476_7505022088732498416_7505022088732498416_64c8eecb533a0ede15068ce9d72ca2f2.jpg',
     ],
     variants: [],
     description: 'The Sweet Alhambra pendant features a delicate clover motif.',
@@ -129,7 +126,7 @@ export const products = [
     price: 272000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-4.png',
+      '/images/products/1785481792488_7505022088732498416_7505022088732498416_8f64067bc6af9f9700fe9b24b463868a.jpg',
     ],
     variants: [],
     description: 'Six motifs of varying sizes create a playful, harmonious composition.',
@@ -151,7 +148,7 @@ export const products = [
     price: 155000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-2.png',
+      '/images/products/1785481792500_7505022088732498416_7505022088732498416_c24e4ec3c85db3cb873ec5f0a8221c76.jpg',
     ],
     variants: [],
     description: 'The PerlÃ©e signature bracelet celebrates the golden bead, a symbol of Phat Dat Jewelry.',
@@ -172,7 +169,7 @@ export const products = [
     price: 280000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-3.png',
+      '/images/products/1785481792510_7505022088732498416_7505022088732498416_7009caa00921523218e8163b30d451f4.jpg',
     ],
     variants: [],
     description: 'Rows of golden beads frame clover motifs set with diamonds.',
@@ -193,7 +190,7 @@ export const products = [
     price: 135000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-5.png',
+      '/images/products/1785481792520_7505022088732498416_7505022088732498416_a9e97d1fa5a9f80ffc6cb8a57b355cfb.jpg',
     ],
     variants: [],
     description: 'A delicate flower in yellow gold, illuminated by a diamond at its heart.',
@@ -215,7 +212,7 @@ export const products = [
     price: 195000000,
     currency: '₫',
     images: [
-      '/images/products/earring-1.png',
+      '/images/products/1785481792530_7505022088732498416_7505022088732498416_46cf07cb4f95f2898b45af990ab57056.jpg',
     ],
     variants: [],
     description: 'Two Frivole flowers in gold and diamond create an elegant pair.',
@@ -236,7 +233,7 @@ export const products = [
     price: 105000000,
     currency: '₫',
     images: [
-      '/images/products/earring-2.png',
+      '/images/products/1785481792550_7505022088732498416_7505022088732498416_7644406db7ce8e328da3fe11c0da1ceb.jpg',
     ],
     variants: [],
     description: 'Classic Alhambra earclips in onyx and yellow gold.',
@@ -257,7 +254,7 @@ export const products = [
     price: 449000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-6.png',
+      '/images/products/1785481792561_7505022088732498416_7505022088732498416_8db9e93f751f64740f2f3f63db7eb7e0.jpg',
     ],
     variants: [],
     description: 'Three delicate flowers in white gold, fully paved with diamonds.',
@@ -278,7 +275,7 @@ export const products = [
     price: 271500000,
     currency: '₫',
     images: [
-      '/images/products/ring-2.png',
+      '/images/products/1785481792571_7505022088732498416_7505022088732498416_68cd11ba175ade7af5c84433e4db0c36.jpg',
     ],
     variants: [],
     description: 'Inspired by the floral world, this ring blooms with diamonds.',
@@ -299,7 +296,7 @@ export const products = [
     price: 98000000,
     currency: '₫',
     images: [
-      '/images/products/ring-3.png',
+      '/images/products/1785481792581_7505022088732498416_7505022088732498416_a2a82f888eb4f9e81ddbaa26c4f6a52f.jpg',
     ],
     variants: [],
     description: 'Three rows of golden beads form this iconic PerlÃ©e ring.',
@@ -319,7 +316,7 @@ export const products = [
     price: 320000000,
     currency: '₫',
     images: [
-      '/images/products/necklace-7.png',
+      '/images/products/1785481792591_7505022088732498416_7505022088732498416_e8357383eb955fe6c8fd7fbbfbc9b0dd.jpg',
     ],
     variants: [],
     description: 'Two butterflies in gold, diamond, and turquoise take flight.',
@@ -340,7 +337,7 @@ export const products = [
     price: 385000000,
     currency: '₫',
     images: [
-      '/images/products/earring-3.png',
+      '/images/products/1785481792601_7505022088732498416_7505022088732498416_0d3556d7ef87c434f505d60b452f09d6.jpg',
     ],
     variants: [],
     description: 'The Cosmos collection brings to life the hypnotic beauty of a spinning flower.',
@@ -361,7 +358,7 @@ export const products = [
     price: 493500000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-4.png',
+      '/images/products/1785481792611_7505022088732498416_7505022088732498416_f3e07214749e819ca68b8517afad2315.jpg',
     ],
     variants: [],
     description: 'Ten clover motifs in carnelian and yellow gold.',
@@ -383,7 +380,7 @@ export const products = [
     price: 42000000,
     currency: '₫',
     images: [
-      '/images/products/bracelet-5.png',
+      '/images/products/1785481792621_7505022088732498416_7505022088732498416_3b70361c0a3fe4142815a21eb547af49.jpg',
     ],
     variants: [],
     description: 'A dainty bracelet with the Sweet Alhambra motif.',
