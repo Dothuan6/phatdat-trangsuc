@@ -19,11 +19,15 @@ import { createContactDrawer } from './components/contact-drawer.js';
 import { registerRoute, initRouter } from './router.js';
 
 // Import pages
+import { renderHome } from './pages/home.js';
 import { renderHighJewelry } from './pages/high-jewelry.js';
 import { renderJewelry } from './pages/jewelry.js';
 import { renderContact } from './pages/contact.js';
 import { renderProductDetail } from './pages/product-detail.js';
 import { renderLegal } from './pages/legal.js';
+import { renderAbout } from './pages/about.js';
+import { renderWishlist } from './pages/wishlist.js';
+import { renderNotFound } from './pages/not-found.js';
 
 // ── Initialize Application ──
 function init() {
@@ -49,6 +53,7 @@ function init() {
   document.body.appendChild(contactDrawer);
 
   // Register routes
+  registerRoute('/', renderHome);
   registerRoute('/high-jewelry', renderHighJewelry);
   registerRoute('/jewelry', (container, params) => renderJewelry(container, { category: 'all' }));
   registerRoute('/jewelry/:category', (container, params) => renderJewelry(container, params));
@@ -56,6 +61,9 @@ function init() {
   registerRoute('/product/:id', renderProductDetail);
   registerRoute('/legal', (container, params) => renderLegal(container, { tab: 'privacy-policy' }));
   registerRoute('/legal/:tab', (container, params) => renderLegal(container, params));
+  registerRoute('/about', renderAbout);
+  registerRoute('/wishlist', renderWishlist);
+  registerRoute('/404', renderNotFound);
 
   // Initialize router
   initRouter(main);

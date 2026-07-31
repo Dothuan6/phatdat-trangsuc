@@ -5,6 +5,9 @@
 export const locales = {
   vi: {
     nav: {
+      home: 'Trang chủ',
+      about: 'Về chúng tôi',
+      wishlist: 'Yêu thích',
       highJewelry: 'Trang sức cao cấp',
       jewelry: 'Trang sức',
       necklaces: 'Dây chuyền & Mặt dây chuyền',
@@ -242,10 +245,35 @@ export const locales = {
         description: 'Phat Dat Jewelry lựa chọn những viên đá quý phi thường cho các bộ sưu tập Trang sức Cao cấp, tìm kiếm những mẫu vật quý hiếm nổi bật bởi màu sắc, độ tinh khiết và đặc tính riêng biệt.',
         cta: 'Khám phá đá quý của chúng tôi'
       }
+    },
+    home: {
+      heroTitle: 'Tuyệt tác<br>Trang sức',
+      heroSubtitle: 'Khám phá thế giới lấp lánh của những bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp vĩnh cửu.',
+      discover: 'KHÁM PHÁ NGAY',
+      collectionsTitle: 'Bộ Sưu Tập Nổi Bật'
+    },
+    about: {
+      storyTitle: 'Câu Chuyện Thương Hiệu',
+      story1: 'Được thành lập với niềm đam mê bất tận dành cho cái đẹp và sự hoàn mỹ, thương hiệu của chúng tôi tự hào là người bạn đồng hành trong những khoảnh khắc đáng nhớ nhất của cuộc đời bạn. Mỗi món trang sức không chỉ là một vật phẩm lấp lánh, mà còn là một câu chuyện, một lời hứa và một di sản vượt thời gian.',
+      story2: 'Chúng tôi tin rằng trang sức đích thực phải có khả năng chạm đến cảm xúc. Chính vì vậy, từ khâu lên ý tưởng thiết kế, lựa chọn nguyên liệu cho đến khi hoàn thiện sản phẩm, mọi quy trình đều được thực hiện với sự tận tâm và tỉ mỉ cao nhất.',
+      craftTitle: 'Nghệ Thuật Chế Tác',
+      craft1: 'Sự xuất sắc trong chế tác (Savoir-Faire) là kim chỉ nam cho mọi hoạt động của chúng tôi. Những nghệ nhân kim hoàn lành nghề đã dành hàng nghìn giờ đồng hồ để gọt giũa, đánh bóng và nạm từng viên đá quý, đảm bảo rằng mỗi tác phẩm khi đến tay khách hàng đều đạt độ tinh xảo tuyệt đối.',
+      craft2: 'Chúng tôi chỉ sử dụng những vật liệu cao cấp nhất: vàng 18K, bạch kim và những viên kim cương, đá quý tự nhiên được tuyển chọn khắt khe theo tiêu chuẩn quốc tế. Khẳng định giá trị bền vững và vẻ đẹp vĩnh cửu.'
+    },
+    notFound: {
+      title: 'Không Tìm Thấy Trang',
+      desc: 'Xin lỗi, trang bạn đang tìm kiếm không tồn tại, đã bị xóa, đổi tên hoặc tạm thời không truy cập được.',
+      backHome: 'QUAY VỀ TRANG CHỦ'
+    },
+    wishlist: {
+      empty: 'Danh sách yêu thích của bạn đang trống.'
     }
   },
   en: {
     nav: {
+      home: 'Home',
+      about: 'About Us',
+      wishlist: 'Wishlist',
       highJewelry: 'High Jewelry',
       jewelry: 'Jewelry',
       necklaces: 'Necklaces & Pendants',
@@ -483,6 +511,28 @@ export const locales = {
         description: 'Phat Dat Jewelry selects extraordinary gemstones for its High Jewelry collections, seeking out rare specimens distinguished by their exceptional color, purity and character.',
         cta: 'Explore our stones'
       }
+    },
+    home: {
+      heroTitle: 'Jewelry<br>Masterpieces',
+      heroSubtitle: 'Discover the sparkling world of exquisite jewelry collections, celebrating eternal beauty.',
+      discover: 'DISCOVER NOW',
+      collectionsTitle: 'Featured Collections'
+    },
+    about: {
+      storyTitle: 'Our Brand Story',
+      story1: 'Founded with an endless passion for beauty and perfection, our brand is proud to be a companion in the most memorable moments of your life. Each piece of jewelry is not just a sparkling object, but a story, a promise, and a timeless legacy.',
+      story2: 'We believe that true jewelry must be able to touch emotions. That is why, from the conceptualization of the design, the selection of materials to the finishing of the product, every process is carried out with the utmost dedication and meticulousness.',
+      craftTitle: 'The Art of Craftsmanship',
+      craft1: 'Excellence in craftsmanship (Savoir-Faire) is the guiding principle for all our activities. Skilled jewelers have spent thousands of hours cutting, polishing, and setting each gemstone, ensuring that each piece reaches absolute sophistication when it reaches the customer.',
+      craft2: 'We only use the highest quality materials: 18K gold, platinum, and natural diamonds and gemstones strictly selected according to international standards. Affirming sustainable value and eternal beauty.'
+    },
+    notFound: {
+      title: 'Page Not Found',
+      desc: 'Sorry, the page you are looking for does not exist, has been removed, renamed, or is temporarily unavailable.',
+      backHome: 'BACK TO HOME'
+    },
+    wishlist: {
+      empty: 'Your wishlist is empty.'
     }
   }
 };

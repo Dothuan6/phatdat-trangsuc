@@ -7,6 +7,7 @@ import { createAccordion } from '../components/accordion.js';
 import { createProductCard } from '../components/product-card.js';
 import { createCarousel } from '../components/carousel.js';
 import { t } from '../i18n.js';
+import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -128,13 +129,17 @@ export function renderProductDetail(container, params = {}) {
   materialsEl.textContent = product.materials;
   info.appendChild(materialsEl);
 
+  const isLiked = isWishlisted(product.id);
+  const heartFill = isLiked ? 'currentColor' : 'none';
+  const heartColor = isLiked ? '#D4380D' : 'currentColor';
+
   // Reference + Wishlist
   const refRow = document.createElement('div');
   refRow.className = 'pdp-info__ref';
   refRow.innerHTML = `
     <span class="pdp-info__ref-text">${product.reference} - <a href="#">${t('pdp.productDetails')}</a></span>
-    <button class="wishlist-btn" aria-label="Add to wishlist" id="wishlist-btn-${product.id}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <button class="wishlist-btn" aria-label="Add to wishlist" id="wishlist-btn-${product.id}" style="color: ${heartColor}">
+      <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="currentColor" stroke-width="1.5">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
       </svg>
     </button>
@@ -277,10 +282,10 @@ export function renderProductDetail(container, params = {}) {
   const wishlistBtn = page.querySelector(`#wishlist-btn-${product.id}`);
   if (wishlistBtn) {
     wishlistBtn.addEventListener('click', () => {
+      const isNowLiked = toggleWishlist(product.id);
       const svg = wishlistBtn.querySelector('svg');
-      const isFilled = svg.getAttribute('fill') !== 'none';
-      svg.setAttribute('fill', isFilled ? 'none' : 'currentColor');
-      wishlistBtn.style.color = isFilled ? '' : '#D4380D';
+      svg.setAttribute('fill', isNowLiked ? 'currentColor' : 'none');
+      wishlistBtn.style.color = isNowLiked ? '#D4380D' : 'currentColor';
     });
   }
 

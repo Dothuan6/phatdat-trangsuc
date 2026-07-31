@@ -54,7 +54,7 @@ export function initRouter(contentEl) {
 
     // Default redirect
     if (!matched) {
-      navigate('/high-jewelry');
+      navigate('/404');
       return;
     }
 
@@ -71,7 +71,7 @@ export function initRouter(contentEl) {
 
   // Initial route
   if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
-    navigate('/high-jewelry');
+    navigate('/');
   } else {
     currentHandleRoute();
   }
