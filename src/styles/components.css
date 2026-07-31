@@ -516,8 +516,7 @@
   object-fit: contain;
   padding: var(--space-xl);
   transition: transform var(--transition-slow);
-  mix-blend-mode: multiply;
-  filter: contrast(1.1);
+  mix-blend-mode: darken;
 }
 
 .product-card:hover .product-card__image img {
@@ -1405,7 +1404,7 @@
   aspect-ratio: 1;
   object-fit: contain;
   margin-bottom: var(--space-md);
-  mix-blend-mode: multiply;
+  mix-blend-mode: darken;
   transition: transform var(--transition-base);
 }
 
