@@ -28,6 +28,10 @@ import { renderLegal } from './pages/legal.js';
 import { renderAbout } from './pages/about.js';
 import { renderWishlist } from './pages/wishlist.js';
 import { renderNotFound } from './pages/not-found.js';
+import { renderInfo } from './pages/info.js';
+import { renderStores } from './pages/stores.js';
+import { renderSitemap } from './pages/sitemap.js';
+import { renderCollection, renderSearch } from './pages/collection.js';
 
 // ── Initialize Application ──
 function init() {
@@ -64,6 +68,12 @@ function init() {
   registerRoute('/about', renderAbout);
   registerRoute('/wishlist', renderWishlist);
   registerRoute('/404', renderNotFound);
+  registerRoute('/info/:slug', renderInfo);
+  registerRoute('/stores', renderStores);
+  registerRoute('/sitemap', renderSitemap);
+  registerRoute('/collections/:id', renderCollection);
+  registerRoute('/search', (c) => renderSearch(c, { q: '' }));
+  registerRoute('/search/:q', renderSearch);
 
   // Initialize router
   initRouter(main);

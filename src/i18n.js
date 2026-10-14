@@ -31,7 +31,9 @@ export const locales = {
       services: 'DỊCH VỤ',
       followUs: 'THEO DÕI CHÚNG TÔI',
       legal: 'PHÁP LÝ',
-      copyright: '© 2026 Phat Dat Jewelry. All rights reserved.',
+      copyright: '© 2026 Phát Đạt Jewelry. Bảo lưu mọi quyền.',
+      ourCreations: 'SÁNG TÁC CỦA CHÚNG TÔI',
+      contactTitle: 'Gửi tin nhắn',
       contactText: 'Vui lòng điền thông tin bên dưới để được tư vấn.',
       allJewelry: 'Tất cả trang sức',
       filter: 'BỘ LỌC',
@@ -41,11 +43,11 @@ export const locales = {
       variations: 'phiên bản đá quý'
     },
     categoryDesc: {
-      necklaces: 'Trong một loạt các hình thức và màu sắc rực rỡ, dây chuyền tô điểm cho chiếc cổ bằng vàng, đá quý hoặc đá cứng. Dây chuyền dài – như mẫu Alhambra® mang tính biểu tượng được tạo ra vào năm 1968 – có thể được đeo theo nhiều cách để phù hợp với mọi dịp.',
-      rings: 'Nhẫn Phat Dat Jewelry là những tác phẩm nghệ thuật thu nhỏ, tôn vinh các loài hoa, thiên nhiên và chất thơ của cuộc sống. Mỗi tác phẩm tiết lộ savoir-faire đặc biệt và niềm đam mê đá quý.',
-      bracelets: 'Từ họa tiết Alhambra mang tính biểu tượng đến những hạt vàng của Perlée, những chiếc vòng tay tô điểm cho cổ tay vẻ duyên dáng và thanh lịch, phản ánh vũ trụ sáng tạo của Thương hiệu.',
-      earrings: 'Khuyên tai Phat Dat Jewelry làm bừng sáng khuôn mặt với vẻ rạng rỡ. Từ những đôi đinh tán thanh tú đến những chiếc kẹp tai điêu khắc, mỗi đôi đều thể hiện tình yêu thiên nhiên và những viên đá đẹp của Thương hiệu.',
-      all: 'Khám phá thế giới trang sức Phat Dat Jewelry. Từ bộ sưu tập Alhambra mang tính biểu tượng đến những hạt vàng của Perlée, mỗi tác phẩm đều phản ánh truyền thống xuất sắc và sự sáng tạo đầy chất thơ của Thương hiệu.'
+      necklaces: 'Dây chuyền và mặt dây chuyền bạc 925 với nhiều kiểu dáng: cỏ ba lá, trái tim, bông hoa, cánh bướm… tô điểm chiếc cổ thanh mảnh và phù hợp mọi dịp.',
+      rings: 'Nhẫn Phát Đạt Jewelry là những tác phẩm nhỏ xinh, tôn vinh vẻ đẹp thiên nhiên và ánh sáng lấp lánh của đá quý.',
+      bracelets: 'Từ họa tiết cỏ ba lá đến những hạt tròn bóng gương, lắc tay tô điểm cổ tay bạn thêm duyên dáng và thanh lịch.',
+      earrings: 'Bông tai Phát Đạt Jewelry làm bừng sáng gương mặt. Từ những đôi nụ thanh tú đến kiểu dáng hoa cá tính, đôi nào cũng tinh tế.',
+      all: 'Khám phá thế giới trang sức bạc Phát Đạt Jewelry — thiết kế tinh xảo, giá chỉ từ 129.000₫ đến 399.000₫.'
     },
     pdp: {
       notFound: 'Không tìm thấy sản phẩm',
@@ -58,10 +60,10 @@ export const locales = {
       orderByPhone: 'ĐẶT HÀNG QUA ĐIỆN THOẠI',
       theCreation: 'SÁNG TÁC',
       deliveryReturns: 'GIAO HÀNG & TRẢ HÀNG',
-      deliveryDesc1: 'Phat Dat Jewelry cung cấp dịch vụ giao hàng miễn phí cho tất cả các đơn hàng.',
+      deliveryDesc1: 'Phát Đạt Jewelry cung cấp dịch vụ giao hàng miễn phí cho tất cả các đơn hàng.',
       deliveryDesc2: 'Các mặt hàng có thể được trả lại trong vòng 30 ngày kể từ ngày giao hàng. Vui lòng liên hệ với các Chuyên viên Tư vấn của chúng tôi để biết thêm thông tin.',
       gifting: 'QUÀ TẶNG',
-      giftingDesc: 'Mỗi sáng tác của Phat Dat Jewelry đều được trình bày trong bao bì mang tính biểu tượng của Thương hiệu, khiến nó trở thành món quà hoàn hảo cho mọi dịp.',
+      giftingDesc: 'Mỗi sáng tác của Phát Đạt Jewelry đều được trình bày trong bao bì mang tính biểu tượng của Thương hiệu, khiến nó trở thành món quà hoàn hảo cho mọi dịp.',
       collection: 'bộ sưu tập',
       seeAllCollection: 'XEM TẤT CẢ BỘ SƯU TẬP'
     },
@@ -96,7 +98,7 @@ export const locales = {
         messagePlace: 'Nhập tin nhắn của bạn',
         messageErr: 'Vui lòng nhập tin nhắn.',
         newsletter: 'Tôi muốn nhận bản tin và đồng ý được liên hệ qua bất kỳ thông tin nào tôi đã cung cấp. Tôi có thể yêu cầu hủy đăng ký bất cứ lúc nào. Thông tin chi tiết có trong Chính sách Bảo mật của Thương hiệu.',
-        legal: 'Bằng cách nhấp vào « Gửi tin nhắn », tôi xác nhận rằng tôi đã đọc và chấp nhận <a href="#">Chính sách Bảo mật của Phat Dat Jewelry</a>.',
+        legal: 'Bằng cách nhấp vào « Gửi tin nhắn », tôi xác nhận rằng tôi đã đọc và chấp nhận <a href="#">Chính sách Bảo mật của Phát Đạt Jewelry</a>.',
         mandatoryFields: '* Các trường bắt buộc',
         messageSent: 'ĐÃ GỬI TIN NHẮN ✓'
       }
@@ -109,8 +111,8 @@ export const locales = {
       privacyDate: 'Tháng 7, 2026',
       termsDate: 'Tháng 7, 2026',
       privacy: {
-        aboutTitle: 'Giới Thiệu Về Phat Dat Jewelry',
-        aboutText: 'Phat Dat Jewelry ("Phat Dat Jewelry", "chúng tôi", "của chúng tôi") có trụ sở đăng ký tại TP. Hồ Chí Minh, Việt Nam. Đây được coi là "bên kiểm soát dữ liệu" cho các mục đích của luật và quy định bảo vệ dữ liệu nhất định.',
+        aboutTitle: 'Giới Thiệu Về Phát Đạt Jewelry',
+        aboutText: 'Phát Đạt Jewelry ("Phát Đạt Jewelry", "chúng tôi", "của chúng tôi") có trụ sở đăng ký tại TP. Hồ Chí Minh, Việt Nam. Đây được coi là "bên kiểm soát dữ liệu" cho các mục đích của luật và quy định bảo vệ dữ liệu nhất định.',
         commitmentTitle: 'Cam Kết Của Chúng Tôi',
         commitmentIntro: 'Chúng tôi cam kết bảo vệ quyền riêng tư của bạn. Chính sách này mô tả cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân của bạn:',
         commitment1Title: 'Minh bạch & Tin cậy',
@@ -160,24 +162,24 @@ export const locales = {
         contactTitle: 'Liên Hệ Về Quyền Riêng Tư',
         contactText: 'Nếu bạn có bất kỳ câu hỏi nào về chính sách bảo mật này hoặc muốn thực hiện quyền của mình, vui lòng liên hệ:',
         contactAddress: 'Địa chỉ',
-        contactAddressValue: 'TP. Hồ Chí Minh, Việt Nam',
+        contactAddressValue: 'C3B, 96, Ấp 3B, Tân Vĩnh Lộc, TP. Hồ Chí Minh, Việt Nam',
         contactPhone: 'Điện thoại'
       },
       terms: {
         aboutTitle: 'Giới Thiệu',
-        aboutText: 'Trang web này được sở hữu và điều hành bởi Phat Dat Jewelry, có trụ sở tại TP. Hồ Chí Minh, Việt Nam. Bằng việc truy cập và sử dụng trang web này, bạn đồng ý tuân thủ các điều khoản và điều kiện sau đây.',
+        aboutText: 'Trang web này được sở hữu và điều hành bởi Phát Đạt Jewelry, có trụ sở tại TP. Hồ Chí Minh, Việt Nam. Bằng việc truy cập và sử dụng trang web này, bạn đồng ý tuân thủ các điều khoản và điều kiện sau đây.',
         useTitle: 'Sử Dụng Tài Liệu',
         useText: 'Tất cả nội dung trên trang web này chỉ dành cho sử dụng cá nhân, phi thương mại. Các tài liệu (hình ảnh, văn bản, thiết kế) được bảo hộ bởi luật bản quyền và nhãn hiệu. Việc sao chép/phân phối trái phép sẽ chấm dứt quyền sử dụng ngay lập tức.',
         ipTitle: 'Sở Hữu Trí Tuệ',
-        ipText: 'Tất cả nội dung, bao gồm nhưng không giới hạn ở văn bản, đồ họa, logo, hình ảnh, âm thanh và phần mềm, là tài sản của Phat Dat Jewelry hoặc các nhà cung cấp nội dung và được bảo hộ bởi luật sở hữu trí tuệ quốc tế.',
+        ipText: 'Tất cả nội dung, bao gồm nhưng không giới hạn ở văn bản, đồ họa, logo, hình ảnh, âm thanh và phần mềm, là tài sản của Phát Đạt Jewelry hoặc các nhà cung cấp nội dung và được bảo hộ bởi luật sở hữu trí tuệ quốc tế.',
         submissionsTitle: 'Đệ Trình',
-        submissionsText: 'Mọi thông tin liên lạc không được yêu cầu (ý tưởng, đề xuất) được gửi đến Phat Dat Jewelry sẽ được coi là không bảo mật và không độc quyền. Phat Dat Jewelry có toàn quyền sử dụng các thông tin đó cho bất kỳ mục đích nào.',
+        submissionsText: 'Mọi thông tin liên lạc không được yêu cầu (ý tưởng, đề xuất) được gửi đến Phát Đạt Jewelry sẽ được coi là không bảo mật và không độc quyền. Phát Đạt Jewelry có toàn quyền sử dụng các thông tin đó cho bất kỳ mục đích nào.',
         liabilityTitle: 'Giới Hạn Trách Nhiệm',
-        liabilityText: 'Trang web này được cung cấp "NGUYÊN TRẠNG". Phat Dat Jewelry không đảm bảo về tính chính xác, hoạt động không lỗi hoặc máy chủ không có virus. Không chịu trách nhiệm cho các thiệt hại gián tiếp hoặc hậu quả.',
+        liabilityText: 'Trang web này được cung cấp "NGUYÊN TRẠNG". Phát Đạt Jewelry không đảm bảo về tính chính xác, hoạt động không lỗi hoặc máy chủ không có virus. Không chịu trách nhiệm cho các thiệt hại gián tiếp hoặc hậu quả.',
         trademarksTitle: 'Nhãn Hiệu & Bản Quyền',
-        trademarksText: 'Tất cả các nhãn hiệu là nhãn hiệu đã đăng ký/chưa đăng ký của Phat Dat Jewelry hoặc được cấp phép. Việc sử dụng trái phép bất kỳ nhãn hiệu nào là bị nghiêm cấm.',
+        trademarksText: 'Tất cả các nhãn hiệu là nhãn hiệu đã đăng ký/chưa đăng ký của Phát Đạt Jewelry hoặc được cấp phép. Việc sử dụng trái phép bất kỳ nhãn hiệu nào là bị nghiêm cấm.',
         linksTitle: 'Liên Kết Bên Thứ Ba',
-        linksText: 'Trang web của chúng tôi có thể chứa liên kết đến các trang web của bên thứ ba. Các liên kết này được cung cấp để thuận tiện và Phat Dat Jewelry không chịu trách nhiệm về nội dung hoặc chính sách bảo mật của các trang web đó.',
+        linksText: 'Trang web của chúng tôi có thể chứa liên kết đến các trang web của bên thứ ba. Các liên kết này được cung cấp để thuận tiện và Phát Đạt Jewelry không chịu trách nhiệm về nội dung hoặc chính sách bảo mật của các trang web đó.',
         prohibitedTitle: 'Hoạt Động Bị Cấm',
         prohibitedText: 'Khi sử dụng trang web này, bạn không được:',
         prohibited1: 'Sử dụng phương tiện tự động (scraping, bots) để thu thập dữ liệu mà không có sự chấp thuận bằng văn bản.',
@@ -192,7 +194,7 @@ export const locales = {
       }
     },
     footer: {
-      tagline: 'Với chuyên môn, sự sáng tạo và xuất sắc, Phat Dat Jewelry đồng hành cùng những khoảnh khắc hạnh phúc nhất của cuộc đời',
+      tagline: 'Với chuyên môn, sự sáng tạo và xuất sắc, Phát Đạt Jewelry đồng hành cùng những khoảnh khắc hạnh phúc nhất của cuộc đời',
       enterUniverse: 'BƯỚC VÀO VŨ TRỤ VƯỢT THỜI GIAN',
       ourCreations: 'Sáng tác của chúng tôi',
       creationsDesc: 'Khám phá sự đa dạng của các tác phẩm.',
@@ -210,20 +212,20 @@ export const locales = {
       title: 'Bạn có câu hỏi nào?',
       intro: 'Các Chuyên viên Tư vấn luôn sẵn sàng hỗ trợ bạn qua phương thức liên lạc ưa thích:',
       callUs: 'GỌI CHO CHÚNG TÔI',
-      callContent1: 'Các Chuyên viên Tư vấn của chúng tôi luôn sẵn sàng giải đáp mọi thắc mắc (đóng cửa vào các ngày lễ):',
-      callContent2: '- Malaysia, Thứ Hai - Thứ Bảy: 10 sáng đến 9 tối.',
-      callContent3: '- Việt Nam & Thái Lan, Thứ Hai - Thứ Bảy: 9 sáng đến 8 tối.',
-      callContent4: '- Đối với các địa điểm khác, Thứ Hai - Thứ Sáu: 9 sáng đến 9 tối EST & Thứ Bảy: 10 sáng đến 6:30 chiều EST.',
-      meetUs: 'GẶP CHÚNG TÔI',
-      meetContent: 'Ghé thăm một trong những cửa hàng của chúng tôi và để các Chuyên viên Tư vấn hướng dẫn bạn qua các bộ sưu tập.',
-      findBoutique: 'TÌM CỬA HÀNG',
+      callContent1: 'Chuyên viên tư vấn của chúng tôi luôn sẵn sàng giải đáp mọi thắc mắc của bạn.',
+      callContent2: '- Giờ làm việc: full time, tất cả các ngày trong tuần.',
+      callContent3: '- Hỗ trợ qua điện thoại, Zalo, Facebook và Instagram.',
+      callContent4: '',
+      meetUs: 'GHÉ CỬA HÀNG',
+      meetContent: 'Ghé thăm cửa hàng tại C3B, 96, Ấp 3B, Tân Vĩnh Lộc, TP. Hồ Chí Minh để được tư vấn trực tiếp.',
+      findBoutique: 'XEM BẢN ĐỒ CỬA HÀNG',
       writeUs: 'GỬI TIN NHẮN',
       writeContent: 'Gửi tin nhắn cho chúng tôi và các Chuyên viên Tư vấn sẽ phản hồi yêu cầu của bạn sớm nhất có thể.',
       emailUs: 'GỬI EMAIL'
     },
     hero: {
-      title: 'Vẻ đẹp thẩm mỹ đồ họa<br>tôn vinh những hạt vàng',
-      subtitle: 'Bộ sưu tập Perlée kết hợp những đường nét thanh thuần<br>và sự khéo léo tinh xảo',
+      title: 'Vẻ đẹp tinh tế<br>tôn vinh từng hạt sáng',
+      subtitle: 'Bộ sưu tập kết hợp những đường nét thanh thuần và sự khéo léo tinh xảo',
       giftsTitle: 'Quà tặng diệu kỳ'
     },
     collections: {
@@ -237,12 +239,12 @@ export const locales = {
     features: {
       'savoir-faire': {
         title: 'Truyền thống xuất sắc',
-        description: 'Hơn một thế kỷ qua, Phat Dat Jewelry đã duy trì truyền thống xuất sắc của mình thông qua các sáng tác Trang sức Cao cấp đặc biệt, mỗi tác phẩm là một minh chứng cho savoir-faire (kỹ nghệ) của Thương hiệu.',
-        cta: 'Khám phá savoir-faire'
+        description: 'Phát Đạt Jewelry theo đuổi sự tỉ mỉ trong từng chi tiết, mỗi sản phẩm đều được kiểm tra kỹ lưỡng trước khi đến tay khách hàng.',
+        cta: 'Khám phá nghệ thuật chế tác'
       },
       'stones': {
-        title: 'Những viên đá phi thường',
-        description: 'Phat Dat Jewelry lựa chọn những viên đá quý phi thường cho các bộ sưu tập Trang sức Cao cấp, tìm kiếm những mẫu vật quý hiếm nổi bật bởi màu sắc, độ tinh khiết và đặc tính riêng biệt.',
+        title: 'Những viên đá lấp lánh',
+        description: 'Chúng tôi chọn lọc đá CZ, Moissanite, xà cừ và ngọc lam với màu sắc, độ trong và độ sáng vượt trội.',
         cta: 'Khám phá đá quý của chúng tôi'
       }
     },
@@ -258,7 +260,7 @@ export const locales = {
       story2: 'Chúng tôi tin rằng trang sức đích thực phải có khả năng chạm đến cảm xúc. Chính vì vậy, từ khâu lên ý tưởng thiết kế, lựa chọn nguyên liệu cho đến khi hoàn thiện sản phẩm, mọi quy trình đều được thực hiện với sự tận tâm và tỉ mỉ cao nhất.',
       craftTitle: 'Nghệ Thuật Chế Tác',
       craft1: 'Sự xuất sắc trong chế tác (Savoir-Faire) là kim chỉ nam cho mọi hoạt động của chúng tôi. Những nghệ nhân kim hoàn lành nghề đã dành hàng nghìn giờ đồng hồ để gọt giũa, đánh bóng và nạm từng viên đá quý, đảm bảo rằng mỗi tác phẩm khi đến tay khách hàng đều đạt độ tinh xảo tuyệt đối.',
-      craft2: 'Chúng tôi chỉ sử dụng những vật liệu cao cấp nhất: vàng 18K, bạch kim và những viên kim cương, đá quý tự nhiên được tuyển chọn khắt khe theo tiêu chuẩn quốc tế. Khẳng định giá trị bền vững và vẻ đẹp vĩnh cửu.'
+      craft2: 'Chúng tôi sử dụng bạc 925 cao cấp, lớp xi vàng/bạch kim bền màu cùng đá CZ, Moissanite được tuyển chọn kỹ lưỡng — đẹp bền mà giá luôn hợp lý.'
     },
     notFound: {
       title: 'Không Tìm Thấy Trang',
@@ -297,7 +299,7 @@ export const locales = {
       services: 'SERVICES',
       followUs: 'FOLLOW US',
       legal: 'LEGAL',
-      copyright: '© 2026 Phat Dat Jewelry. All rights reserved.',
+      copyright: '© 2026 Phát Đạt Jewelry. All rights reserved.',
       contactText: 'Please fill in your details below for assistance.',
       allJewelry: 'All Jewelry',
       filter: 'FILTER',
@@ -307,11 +309,11 @@ export const locales = {
       variations: 'stone variations'
     },
     categoryDesc: {
-      necklaces: 'In a dazzling range of forms and colors, necklaces drape the neck with gold, precious, fine or hard stones. Long necklaces – like the iconic Phat Dat Jewelry\' Alhambra® model created in 1968 – can be worn in multiple ways to suit every occasion.',
-      rings: 'Phat Dat Jewelry rings are miniature works of art, celebrating flowers, nature and the poetry of life. Each creation reveals exceptional savoir-faire and a passion for precious stones.',
-      bracelets: 'From the iconic Alhambra motif to the golden beads of Perlée, Phat Dat Jewelry bracelets adorn the wrist with grace and elegance, reflecting the Maison\'s creative universe.',
-      earrings: 'Earrings by Phat Dat Jewelry illuminate the face with their radiance. From delicate studs to sculptural ear clips, each pair embodies the Maison\'s love of nature and beautiful stones.',
-      all: 'Discover the world of Phat Dat Jewelry jewelry creations. From the iconic Alhambra collection to the golden beads of Perlée, each piece reflects the Maison\'s tradition of excellence and poetic creativity.'
+      necklaces: 'In a dazzling range of forms and colors, necklaces drape the neck with gold, precious, fine or hard stones. Long necklaces – like the iconic Phát Đạt Jewelry\' Alhambra® model created in 1968 – can be worn in multiple ways to suit every occasion.',
+      rings: 'Phát Đạt Jewelry rings are miniature works of art, celebrating flowers, nature and the poetry of life. Each creation reveals exceptional savoir-faire and a passion for precious stones.',
+      bracelets: 'From the iconic Alhambra motif to the golden beads of Perlée, Phát Đạt Jewelry bracelets adorn the wrist with grace and elegance, reflecting the Maison\'s creative universe.',
+      earrings: 'Earrings by Phát Đạt Jewelry illuminate the face with their radiance. From delicate studs to sculptural ear clips, each pair embodies the Maison\'s love of nature and beautiful stones.',
+      all: 'Discover the world of Phát Đạt Jewelry jewelry creations. From the iconic Alhambra collection to the golden beads of Perlée, each piece reflects the Maison\'s tradition of excellence and poetic creativity.'
     },
     pdp: {
       notFound: 'Product not found',
@@ -324,10 +326,10 @@ export const locales = {
       orderByPhone: 'ORDER BY PHONE',
       theCreation: 'THE CREATION',
       deliveryReturns: 'DELIVERY & RETURNS',
-      deliveryDesc1: 'Phat Dat Jewelry offers complimentary delivery on all orders.',
+      deliveryDesc1: 'Phát Đạt Jewelry offers complimentary delivery on all orders.',
       deliveryDesc2: 'Items may be returned within 30 days of delivery. Please contact our Client Advisors for more information.',
       gifting: 'GIFTING',
-      giftingDesc: 'Each Phat Dat Jewelry creation is presented in the Maison\'s iconic packaging, making it the perfect gift for any occasion.',
+      giftingDesc: 'Each Phát Đạt Jewelry creation is presented in the Maison\'s iconic packaging, making it the perfect gift for any occasion.',
       collection: 'collection',
       seeAllCollection: 'SEE ALL'
     },
@@ -362,7 +364,7 @@ export const locales = {
         messagePlace: 'Enter your message here',
         messageErr: 'Please enter your message.',
         newsletter: 'I would like to receive the newsletter and agree to be contacted using any of the contact details I have provided. I may ask to unsubscribe at any time. Further information is available in the Maison Privacy Policy.',
-        legal: 'By clicking on « Send a Message », I acknowledge that I have read and accepted the <a href="#">Phat Dat Jewelry Privacy Policy</a>.',
+        legal: 'By clicking on « Send a Message », I acknowledge that I have read and accepted the <a href="#">Phát Đạt Jewelry Privacy Policy</a>.',
         mandatoryFields: '* Mandatory Fields',
         messageSent: 'MESSAGE SENT ✓'
       }
@@ -375,8 +377,8 @@ export const locales = {
       privacyDate: 'July 2026',
       termsDate: 'July 2026',
       privacy: {
-        aboutTitle: 'About Phat Dat Jewelry',
-        aboutText: 'Phat Dat Jewelry ("Phat Dat Jewelry", "we", "us" and "our") has its registered offices in Ho Chi Minh City, Vietnam. This is considered to be the "data controller" for the purposes of certain data protection laws and regulations.',
+        aboutTitle: 'About Phát Đạt Jewelry',
+        aboutText: 'Phát Đạt Jewelry ("Phát Đạt Jewelry", "we", "us" and "our") has its registered offices in Ho Chi Minh City, Vietnam. This is considered to be the "data controller" for the purposes of certain data protection laws and regulations.',
         commitmentTitle: 'Our Commitments',
         commitmentIntro: 'We are committed to protecting your privacy. This policy describes how we collect, use and protect your personal information:',
         commitment1Title: 'Transparency & Trust',
@@ -431,19 +433,19 @@ export const locales = {
       },
       terms: {
         aboutTitle: 'About',
-        aboutText: 'This website is owned and operated by Phat Dat Jewelry, headquartered in Ho Chi Minh City, Vietnam. By accessing and using this website, you agree to comply with the following terms and conditions.',
+        aboutText: 'This website is owned and operated by Phát Đạt Jewelry, headquartered in Ho Chi Minh City, Vietnam. By accessing and using this website, you agree to comply with the following terms and conditions.',
         useTitle: 'Use of Materials',
         useText: 'All content on this website is for personal, non-commercial use only. Materials (images, text, designs) are protected by copyright and trademarks. Unauthorized copying/distribution terminates permission immediately.',
         ipTitle: 'Intellectual Property',
-        ipText: 'All content, including but not limited to text, graphics, logos, images, audio and software, is the property of Phat Dat Jewelry or its content providers and is protected by international intellectual property laws.',
+        ipText: 'All content, including but not limited to text, graphics, logos, images, audio and software, is the property of Phát Đạt Jewelry or its content providers and is protected by international intellectual property laws.',
         submissionsTitle: 'Submissions',
-        submissionsText: 'Any unsolicited communications (ideas, suggestions) sent to Phat Dat Jewelry will be treated as non-confidential and non-proprietary. Phat Dat Jewelry reserves the right to use such information for any purpose.',
+        submissionsText: 'Any unsolicited communications (ideas, suggestions) sent to Phát Đạt Jewelry will be treated as non-confidential and non-proprietary. Phát Đạt Jewelry reserves the right to use such information for any purpose.',
         liabilityTitle: 'Limitation of Liability',
-        liabilityText: 'This website is provided "AS IS". Phat Dat Jewelry makes no warranty of accuracy, error-free operations, or virus-free servers. No liability for indirect or consequential damages.',
+        liabilityText: 'This website is provided "AS IS". Phát Đạt Jewelry makes no warranty of accuracy, error-free operations, or virus-free servers. No liability for indirect or consequential damages.',
         trademarksTitle: 'Trademarks & Copyrights',
-        trademarksText: 'All marks are registered/unregistered trademarks of Phat Dat Jewelry or licensed. Unauthorized use of any trademark is strictly prohibited.',
+        trademarksText: 'All marks are registered/unregistered trademarks of Phát Đạt Jewelry or licensed. Unauthorized use of any trademark is strictly prohibited.',
         linksTitle: 'Third-Party Links',
-        linksText: 'Our website may contain links to third-party websites. These links are provided for convenience and Phat Dat Jewelry is not responsible for the content or privacy policies of those websites.',
+        linksText: 'Our website may contain links to third-party websites. These links are provided for convenience and Phát Đạt Jewelry is not responsible for the content or privacy policies of those websites.',
         prohibitedTitle: 'Prohibited Activities',
         prohibitedText: 'When using this website, you must not:',
         prohibited1: 'Use automated means (scraping, bots) to collect data without prior written approval.',
@@ -458,7 +460,7 @@ export const locales = {
       }
     },
     footer: {
-      tagline: 'Thanks to the savoir-faire, creativity and excellence, Phat Dat Jewelry accompanies the happiest moments of life',
+      tagline: 'Thanks to the savoir-faire, creativity and excellence, Phát Đạt Jewelry accompanies the happiest moments of life',
       enterUniverse: 'ENTER THE TIMELESS UNIVERSE',
       ourCreations: 'Our creations',
       creationsDesc: 'Discover a variety of our pieces.',
@@ -503,12 +505,12 @@ export const locales = {
     features: {
       'savoir-faire': {
         title: 'A tradition of excellence',
-        description: 'For over a century, Phat Dat Jewelry has perpetuated its tradition of excellence through exceptional High Jewelry creations, each one a testament to the Maison\'s savoir-faire.',
+        description: 'For over a century, Phát Đạt Jewelry has perpetuated its tradition of excellence through exceptional High Jewelry creations, each one a testament to the Maison\'s savoir-faire.',
         cta: 'Discover the savoir-faire'
       },
       'stones': {
         title: 'Exceptional stones',
-        description: 'Phat Dat Jewelry selects extraordinary gemstones for its High Jewelry collections, seeking out rare specimens distinguished by their exceptional color, purity and character.',
+        description: 'Phát Đạt Jewelry selects extraordinary gemstones for its High Jewelry collections, seeking out rare specimens distinguished by their exceptional color, purity and character.',
         cta: 'Explore our stones'
       }
     },
@@ -537,7 +539,8 @@ export const locales = {
   }
 };
 
-export let currentLang = localStorage.getItem('site_lang') || 'vi';
+// Website chỉ hiển thị tiếng Việt
+export let currentLang = 'vi';
 
 export function t(key) {
   const keys = key.split('.');
@@ -554,7 +557,7 @@ export function t(key) {
 }
 
 export function setLang(lang) {
-  if (lang !== 'vi' && lang !== 'en') return;
+  if (lang !== 'vi') return;
   currentLang = lang;
   localStorage.setItem('site_lang', lang);
   window.dispatchEvent(new Event('languagechange'));

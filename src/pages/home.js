@@ -3,6 +3,9 @@
 // ============================================================
 
 import { hjCollections } from '../data/collections.js';
+import { products } from '../data/products.js';
+import { createProductCard } from '../components/product-card.js';
+import { siteInfo } from '../data/site-info.js';
 import { t } from '../i18n.js';
 
 export function renderHome(container) {
@@ -11,18 +14,16 @@ export function renderHome(container) {
 
   // ── Hero Section ──
   const hero = document.createElement('section');
-  hero.className = 'hj-hero'; // Reuse high jewelry styles for hero
+  hero.className = 'hj-hero hero';
   hero.innerHTML = `
-    <div class="hj-hero__bg" style="background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);">
-      <div style="width:100%;height:100%;"></div>
+    <div class="hj-hero__bg" style="background: linear-gradient(135deg, #f7f5f0 0%, #e6e1d6 100%);"></div>
+    <div class="hero__decoration">
+      <img src="./images/products/Daychuyen4.3-removebg-preview.png" alt="Dây chuyền Phát Đạt Jewelry">
     </div>
-    <div class="hj-hero__decoration" style="position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: 45%; max-width: 500px; z-index: 2; pointer-events: none; mix-blend-mode: multiply;">
-      <img src="./images/products/Daychuyen4.3-removebg-preview.png" style="width: 100%; height: auto; object-fit: contain; mix-blend-mode: multiply; filter: contrast(1.2) brightness(1.1);" onerror="this.onerror=null; this.style.display='none';">
-    </div>
-    <div class="hj-hero__content" style="text-align: left;">
-      <h1 class="hj-hero__title" style="font-style: normal; font-size: 3rem; margin-bottom: 20px; line-height: 1.15; text-align: left;">${t('home.heroTitle') || 'Tuyệt tác<br>Trang sức'}</h1>
-      <p class="hj-hero__subtitle" style="font-size: 1rem; margin-bottom: 32px; color: var(--color-text-primary); text-align: left; max-width: 450px; line-height: 1.5;">${t('home.heroSubtitle') || 'Khám phá thế giới lấp lánh của những bộ sưu tập trang sức tinh tế, tôn vinh vẻ đẹp vĩnh cửu.'}</p>
-      <a href="#/jewelry" class="btn">${t('home.discover') || 'KHÁM PHÁ NGAY'}</a>
+    <div class="hj-hero__content hero__content">
+      <h1 class="hero__title">${t('home.heroTitle')}</h1>
+      <p class="hero__subtitle">${t('home.heroSubtitle')}</p>
+      <a href="#/jewelry" class="btn">${t('home.discover')}</a>
     </div>
   `;
   page.appendChild(hero);
@@ -30,36 +31,61 @@ export function renderHome(container) {
   // ── Collections Grid ──
   const collectionsSection = document.createElement('section');
   collectionsSection.className = 'hj-collections container';
-  
-  const sectionTitle = document.createElement('h2');
-  sectionTitle.style.textAlign = 'center';
-  sectionTitle.style.marginBottom = '40px';
-  sectionTitle.textContent = t('home.collectionsTitle') || 'Bộ Sưu Tập Nổi Bật';
-  collectionsSection.appendChild(sectionTitle);
+  collectionsSection.innerHTML = `<h2 class="section-heading">${t('home.collectionsTitle')}</h2>`;
 
   const collectionsGrid = document.createElement('div');
   collectionsGrid.className = 'grid-3';
-
-  // Take first 3 collections
   hjCollections.slice(0, 3).forEach(collection => {
-    const card = document.createElement('a');
-    card.className = 'hj-collection-card';
-    card.href = '#/jewelry';
-    card.innerHTML = `
-      <div style="width:100%;height:100%;background: ${collection.color}; display: flex; align-items: center; justify-content: center;">
-        <svg width="120" height="160" viewBox="0 0 120 160" fill="none">
-          <path d="M60 20 C30 20, 10 50, 10 80 C10 110, 35 140, 60 155 C85 140, 110 110, 110 80 C110 50, 90 20, 60 20Z" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none"/>
-          <circle cx="60" cy="80" r="15" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/>
-        </svg>
-      </div>
-      <div class="hj-collection-card__overlay"></div>
-      <span class="hj-collection-card__name">${t(`collections.${collection.id}.name`)}</span>
-    `;
-    collectionsGrid.appendChild(card);
+    collectionsGrid.appendChild(createCollectionCard(collection));
   });
-
   collectionsSection.appendChild(collectionsGrid);
+  collectionsSection.insertAdjacentHTML('beforeend',
+    `<div class="text-center" style="margin-top: 32px;"><a href="#/high-jewelry" class="link-underline">XEM TẤT CẢ BỘ SƯU TẬP</a></div>`);
   page.appendChild(collectionsSection);
 
+  // ── Featured Products ──
+  const featured = document.createElement('section');
+  featured.className = 'container section-pad';
+  featured.innerHTML = `<h2 class="section-heading">Sản Phẩm Nổi Bật</h2>`;
+  const grid = document.createElement('div');
+  grid.className = 'grid-3';
+  products.slice(0, 6).forEach(p => grid.appendChild(createProductCard(p)));
+  featured.appendChild(grid);
+  featured.insertAdjacentHTML('beforeend',
+    `<div class="text-center" style="margin-top: 32px;"><a href="#/jewelry" class="btn">XEM TẤT CẢ TRANG SỨC</a></div>`);
+  page.appendChild(featured);
+
+  // ── Store strip ──
+  const store = document.createElement('section');
+  store.className = 'store-strip';
+  store.innerHTML = `
+    <div class="container store-strip__inner">
+      <div class="store-strip__img"><img src="./images/gallery/g9.jpg" alt="Cửa hàng Phát Đạt Jewelry" loading="lazy"></div>
+      <div class="store-strip__info">
+        <h2 class="section-heading" style="text-align:left;">Ghé thăm cửa hàng</h2>
+        <p><strong>Địa chỉ:</strong> ${siteInfo.address}</p>
+        <p><strong>Điện thoại:</strong> <a href="${siteInfo.phoneHref}">${siteInfo.phoneDisplay}</a></p>
+        <p><strong>Giờ làm việc:</strong> ${siteInfo.hours}</p>
+        <div class="store-strip__actions">
+          <a href="#/stores" class="btn">XEM BẢN ĐỒ</a>
+          <a href="${siteInfo.phoneHref}" class="link-underline">GỌI NGAY</a>
+        </div>
+      </div>
+    </div>
+  `;
+  page.appendChild(store);
+
   container.appendChild(page);
+}
+
+export function createCollectionCard(collection) {
+  const card = document.createElement('a');
+  card.className = 'hj-collection-card';
+  card.href = `#/collections/${collection.id}`;
+  card.innerHTML = `
+    <img src="${collection.image}" alt="Bộ sưu tập ${collection.name}" loading="lazy">
+    <div class="hj-collection-card__overlay"></div>
+    <span class="hj-collection-card__name">${collection.name}</span>
+  `;
+  return card;
 }
