@@ -60,6 +60,7 @@ export function createFooter() {
           <a href="#/info/cookies">${t('footer.cookies')}</a>
           <a href="#/info/accessibility">${t('footer.accessibility')}</a>
           <a href="#/sitemap">${t('footer.sitemap')}</a>
+          <a href="#/admin" style="color: var(--color-brand-primary); font-weight: 600;">🔒 Quản trị (Admin)</a>
         </div>
         <div class="footer-social">
           <a href="${siteInfo.facebook}" target="_blank" rel="noopener" aria-label="Facebook ${siteInfo.facebookName}">

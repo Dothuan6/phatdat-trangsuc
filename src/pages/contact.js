@@ -3,6 +3,7 @@
 // ============================================================
 
 import { createFormField, validateForm } from '../components/form-field.js';
+import { addCustomerContact } from '../services/supabase.js';
 import { t } from '../i18n.js';
 
 export function renderContact(container) {
@@ -159,13 +160,29 @@ export function renderContact(container) {
   form.appendChild(mandatory);
 
   // Form submit handler
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const isValid = validateForm(form);
     if (isValid) {
+      // Save to Supabase repository
+      const firstName = form.querySelector('[name="firstName"]')?.value || '';
+      const lastName = form.querySelector('[name="lastName"]')?.value || '';
+      const email = form.querySelector('[name="email"]')?.value || '';
+      const phone = form.querySelector('[name="phone"]')?.value || '';
+      const subject = form.querySelector('[name="subject"]')?.value || 'Tư vấn trang sức';
+      const message = form.querySelector('[name="message"]')?.value || '';
+
+      await addCustomerContact({
+        fullName: `${firstName} ${lastName}`.trim(),
+        email,
+        phone,
+        subject,
+        message,
+      });
+
       // Show success feedback
-      submitBtn.textContent = t('contact.form.messageSent');
-      submitBtn.style.backgroundColor = '#2B2B2B';
+      submitBtn.textContent = 'ĐÃ GỬI TIN NHẮN THÀNH CÔNG!';
+      submitBtn.style.backgroundColor = '#1E5D57';
       submitBtn.style.color = '#FFFFFF';
       submitBtn.disabled = true;
       setTimeout(() => {
@@ -174,7 +191,7 @@ export function renderContact(container) {
         submitBtn.style.color = '';
         submitBtn.disabled = false;
         form.reset();
-      }, 3000);
+      }, 3500);
     }
   });
 

@@ -1650,3 +1650,17 @@
   }
 }
 
+/* Hide client elements when in Admin Backoffice view */
+body.is-admin-view {
+  padding-bottom: 0 !important;
+}
+
+body.is-admin-view .site-header-wrapper,
+body.is-admin-view .header-spacer,
+body.is-admin-view .site-footer,
+body.is-admin-view .mobile-bottom-nav,
+body.is-admin-view .floating-contact-hub {
+  display: none !important;
+}
+
+

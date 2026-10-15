@@ -34,6 +34,8 @@ import { renderInfo } from './pages/info.js';
 import { renderStores } from './pages/stores.js';
 import { renderSitemap } from './pages/sitemap.js';
 import { renderCollection, renderSearch } from './pages/collection.js';
+import { renderAdmin } from './pages/admin/admin-dashboard.js';
+import { renderAdminLogin } from './pages/admin/admin-login.js';
 
 // ── Initialize Application ──
 function init() {
@@ -84,6 +86,8 @@ function init() {
   registerRoute('/collections/:id', renderCollection);
   registerRoute('/search', (c) => renderSearch(c, { q: '' }));
   registerRoute('/search/:q', renderSearch);
+  registerRoute('/admin', renderAdmin);
+  registerRoute('/admin/login', renderAdminLogin);
 
   // Initialize router
   initRouter(main);

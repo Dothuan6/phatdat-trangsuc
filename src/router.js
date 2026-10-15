@@ -58,6 +58,13 @@ export function initRouter(contentEl) {
       return;
     }
 
+    // Toggle admin view class on body
+    if (path.startsWith('/admin')) {
+      document.body.classList.add('is-admin-view');
+    } else {
+      document.body.classList.remove('is-admin-view');
+    }
+
     // Scroll to top
     window.scrollTo(0, 0);
   };
