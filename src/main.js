@@ -14,6 +14,8 @@ import './styles/pages.css';
 import { createHeader, createHeaderSpacer } from './components/header.js';
 import { createFooter } from './components/footer.js';
 import { createContactDrawer } from './components/contact-drawer.js';
+import { createBottomNav } from './components/bottom-nav.js';
+import { createFloatingContact } from './components/floating-contact.js';
 
 // Import router
 import { registerRoute, initRouter } from './router.js';
@@ -50,6 +52,14 @@ function init() {
 
   // Footer
   app.appendChild(createFooter());
+
+  // Mobile Bottom Navigation Bar
+  app.appendChild(createBottomNav());
+
+  // Floating Quick Contact Hub
+  const existingHub = document.getElementById('floating-contact-hub');
+  if (existingHub) existingHub.remove();
+  document.body.appendChild(createFloatingContact());
 
   // Contact Drawer (global)
   const { overlay: contactOverlay, drawer: contactDrawer } = createContactDrawer();

@@ -1,11 +1,13 @@
 // ============================================================
-// PRODUCT DETAIL PAGE (PDP)
+// PRODUCT DETAIL PAGE (PDP) — Phát Đạt Jewelry
 // ============================================================
 
 import { getProductById, getRelatedProducts, formatPrice } from '../data/products.js';
 import { createAccordion } from '../components/accordion.js';
 import { createProductCard } from '../components/product-card.js';
 import { createCarousel } from '../components/carousel.js';
+import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
+import { siteInfo } from '../data/site-info.js';
 import { t } from '../i18n.js';
 import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
 
@@ -15,10 +17,10 @@ export function renderProductDetail(container, params = {}) {
 
   if (!product) {
     container.innerHTML = `
-      <div class="container section text-center">
-        <h2 style="font-family: var(--font-display); margin-bottom: 24px;">${t('pdp.notFound')}</h2>
-        <p>${t('pdp.notFoundDesc')}</p>
-        <a href="#/jewelry" class="link-underline" style="margin-top: 24px; display: inline-block;">${t('pdp.backToJewelry')}</a>
+      <div class="container section text-center" style="padding: 80px 20px;">
+        <h2 style="font-family: var(--font-display); margin-bottom: 24px; color: var(--color-brand-primary);">Không tìm thấy sản phẩm</h2>
+        <p style="color: var(--color-text-secondary); margin-bottom: 24px;">Sản phẩm bạn đang tìm kiếm có thể đã được cập nhật hoặc ngừng kinh doanh.</p>
+        <a href="#/jewelry" class="btn" style="background-color: var(--color-brand-primary); color: #fff; border-color: var(--color-brand-primary);">KHÁM PHÁ CÁC MẪU TRANG SỨC KHÁC</a>
       </div>
     `;
     return;
@@ -27,9 +29,14 @@ export function renderProductDetail(container, params = {}) {
   const page = document.createElement('div');
   page.className = 'page-pdp';
 
+  // State
+  let selectedSize = product.availableSizes && product.availableSizes.length > 0 ? product.availableSizes[0] : '';
+  let selectedColor = product.availableColors && product.availableColors.length > 0 ? product.availableColors[0] : '';
+
   // ── Main PDP Layout ──
   const pdpLayout = document.createElement('div');
-  pdpLayout.className = 'layout-pdp';
+  pdpLayout.className = 'layout-pdp container';
+  pdpLayout.style.cssText = 'padding-top: 24px;';
 
   // ── Gallery (Left) ──
   const gallery = document.createElement('div');
@@ -38,60 +45,23 @@ export function renderProductDetail(container, params = {}) {
   const galleryInner = document.createElement('div');
   galleryInner.className = 'pdp-gallery';
 
-  // Create gallery images (product images + fallback SVGs)
-  const galleryImages = product.images.length > 0 ? product.images : [null];
+  const galleryImages = product.images.length > 0 ? product.images : ['./images/products/Daychuyen4.3-removebg-preview.png'];
 
-  // Always show at least 2 images
-  const imagesToShow = [...galleryImages];
-  if (imagesToShow.length < 2) {
-    imagesToShow.push(null); // will render a worn/lifestyle placeholder
-  }
-
-  imagesToShow.forEach((imgSrc, idx) => {
+  galleryImages.forEach((imgSrc, idx) => {
     const item = document.createElement('div');
     item.className = 'pdp-gallery__item';
     item.dataset.index = idx;
-
-    if (idx === 0) {
-      // Product on neutral background
-      item.innerHTML = `
-        <img src="${imgSrc || ''}" alt="${product.name} - View ${idx + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}"
-             onerror="this.onerror=null; this.parentElement.innerHTML = \`
-              <div style='width:100%;aspect-ratio:4/5;background:#F5F5F0;display:flex;align-items:center;justify-content:center;'>
-                <svg width='200' height='280' viewBox='0 0 200 280' fill='none'>
-                  <path d='M100 30 C60 30, 30 60, 30 100 C30 150, 65 200, 100 260 C135 200, 170 150, 170 100 C170 60, 140 30, 100 30Z' stroke='#C5A467' stroke-width='1.5' fill='none'/>
-                  <circle cx='100' cy='220' r='18' stroke='#C5A467' stroke-width='1.5' fill='none'/>
-                  <path d='M88 220 L100 208 L112 220 L100 232Z' stroke='#C5A467' stroke-width='1' fill='none'/>
-                  <circle cx='100' cy='220' r='4' fill='#C5A467' opacity='0.3'/>
-                </svg>
-              </div>
-             \`;">
-      `;
-    } else {
-      // Lifestyle / worn shot
-      item.innerHTML = `
-        <img src="${imgSrc || ''}" alt="${product.name} - Lifestyle" loading="lazy"
-             onerror="this.onerror=null; this.parentElement.innerHTML = \`
-              <div style='width:100%;aspect-ratio:4/5;background:linear-gradient(180deg,#F0EDE5 0%,#E8E4DC 100%);display:flex;align-items:center;justify-content:center;'>
-                <div style='text-align:center;opacity:0.4;'>
-                  <svg width='120' height='200' viewBox='0 0 120 200' fill='none'>
-                    <ellipse cx='60' cy='40' rx='25' ry='30' stroke='#999' stroke-width='1'/>
-                    <path d='M35 70 L25 140 L60 200 L95 140 L85 70' stroke='#999' stroke-width='1' fill='none'/>
-                    <path d='M45 90 C50 100, 55 110, 60 140 C65 110, 70 100, 75 90' stroke='#C5A467' stroke-width='1' fill='none'/>
-                    <circle cx='60' cy='140' r='10' stroke='#C5A467' stroke-width='1' fill='none'/>
-                  </svg>
-                </div>
-              </div>
-             \`;">
-      `;
-    }
+    item.innerHTML = `
+      <img src="${imgSrc}" alt="${product.name} - Hình ${idx + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}"
+           onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+    `;
     galleryInner.appendChild(item);
   });
 
   // Gallery thumbnail dots
   const thumbDots = document.createElement('div');
   thumbDots.className = 'pdp-gallery__thumbs';
-  imagesToShow.forEach((_, idx) => {
+  galleryImages.forEach((_, idx) => {
     const dot = document.createElement('button');
     dot.className = `pdp-gallery__thumb${idx === 0 ? ' is-active' : ''}`;
     dot.dataset.index = idx;
@@ -117,146 +87,376 @@ export function renderProductDetail(container, params = {}) {
   const info = document.createElement('div');
   info.className = 'pdp-info';
 
+  // Breadcrumb mini
+  const breadcrumbEl = document.createElement('div');
+  breadcrumbEl.style.cssText = 'font-size: 12px; color: var(--color-text-secondary); margin-bottom: 12px;';
+  breadcrumbEl.innerHTML = `
+    <a href="#/" style="color: inherit; text-decoration: none;">Trang chủ</a> &nbsp;/&nbsp;
+    <a href="#/jewelry/${product.category}" style="color: inherit; text-decoration: none;">${product.collection}</a> &nbsp;/&nbsp;
+    <span style="color: var(--color-brand-primary); font-weight: 500;">${product.name}</span>
+  `;
+  info.appendChild(breadcrumbEl);
+
   // Product Name
   const nameEl = document.createElement('h1');
   nameEl.className = 'pdp-info__name';
+  nameEl.style.cssText = 'font-family: var(--font-display); font-size: clamp(1.5rem, 2.5vw, 2.2rem); color: var(--color-brand-primary); margin-bottom: 8px;';
   nameEl.textContent = product.name;
   info.appendChild(nameEl);
 
-  // Materials
-  const materialsEl = document.createElement('p');
-  materialsEl.className = 'pdp-info__materials';
-  materialsEl.textContent = product.materials;
-  info.appendChild(materialsEl);
-
+  // Rating & Code Row
   const isLiked = isWishlisted(product.id);
-  const heartFill = isLiked ? 'currentColor' : 'none';
+  const heartFill = isLiked ? '#D4380D' : 'none';
   const heartColor = isLiked ? '#D4380D' : 'currentColor';
 
-  // Reference + Wishlist
-  const refRow = document.createElement('div');
-  refRow.className = 'pdp-info__ref';
-  refRow.innerHTML = `
-    <span class="pdp-info__ref-text">${product.reference} - <a href="#">${t('pdp.productDetails')}</a></span>
-    <button class="wishlist-btn" aria-label="Add to wishlist" id="wishlist-btn-${product.id}" style="color: ${heartColor}">
-      <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="currentColor" stroke-width="1.5">
+  const subRow = document.createElement('div');
+  subRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px;';
+  subRow.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+      <span style="color: #f39c12;">★★★★★</span>
+      <span style="font-weight: 600; color: var(--color-text-primary);">${product.rating}</span>
+      <span style="color: var(--color-text-secondary);">(${product.reviewsCount} đánh giá)</span>
+      <span style="color: var(--color-border);">|</span>
+      <span style="color: var(--color-text-secondary); font-family: monospace;">Mã: ${product.reference}</span>
+    </div>
+    <button class="wishlist-btn" aria-label="Thêm vào yêu thích" id="wishlist-btn-${product.id}" style="color: ${heartColor}; background:none; border:none; cursor:pointer;">
+      <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="currentColor" stroke-width="1.6" width="22" height="22">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
       </svg>
     </button>
   `;
-  info.appendChild(refRow);
+  info.appendChild(subRow);
 
   // Price
   const priceEl = document.createElement('div');
   priceEl.className = 'pdp-info__price';
-  priceEl.textContent = `${formatPrice(product.price, product.currency)} ${t('pdp.includingTaxes')}`;
+  priceEl.style.cssText = 'font-size: 26px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;';
+  priceEl.innerHTML = `
+    <span>${formatPrice(product.price)}</span>
+    <span style="font-size: 13px; font-weight: 400; color: var(--color-text-secondary);">(Đã bao gồm hộp quà & bảo hành)</span>
+  `;
   info.appendChild(priceEl);
 
-  // Variant Selector (if applicable)
-  if (product.variants.length > 0 || product.variationCount > 0) {
-    const variants = document.createElement('div');
-    variants.className = 'pdp-variants';
-    variants.innerHTML = `
-      <div class="pdp-variants__header">
-        <span class="pdp-variants__label">
-          ${t('pdp.discoverMore')}
-          <span class="pdp-variants__dot"></span>
-        </span>
-        <span class="pdp-variants__chevron">›</span>
-      </div>
+  // Variant: Sizes & Size Guide
+  if (product.availableSizes && product.availableSizes.length > 0) {
+    const sizeSection = document.createElement('div');
+    sizeSection.style.cssText = 'margin-bottom: 20px;';
+    
+    const sizeHeader = document.createElement('div');
+    sizeHeader.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;';
+    sizeHeader.innerHTML = `
+      <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">KÍCH CỠ / CHIỀU DÀI:</span>
+      <button id="open-size-guide-link" type="button" style="background: none; border: none; font-size: 13px; color: var(--color-brand-primary); cursor: pointer; text-decoration: underline; font-weight: 500; display: flex; align-items: center; gap: 4px;">
+        📏 Hướng dẫn chọn size
+      </button>
     `;
+    sizeSection.appendChild(sizeHeader);
 
-    if (product.variants.length > 0) {
-      const optionsContainer = document.createElement('div');
-      optionsContainer.className = 'pdp-variants__options';
-
-      product.variants.forEach((variant, idx) => {
-        const thumb = document.createElement('div');
-        thumb.className = `pdp-variant-thumb${idx === 0 ? ' is-active' : ''}`;
-        thumb.innerHTML = `
-          <div class="pdp-variant-thumb__img">
-            <img src="${variant.image || ''}" alt="${variant.label}"
-                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23F5F5F0%22 width=%22100%22 height=%22100%22/%3E%3Cpath d=%22M50 20 L40 40 L20 40 L35 55 L30 75 L50 63 L70 75 L65 55 L80 40 L60 40Z%22 fill=%22none%22 stroke=%22%23ccc%22 stroke-width=%221%22/%3E%3C/svg%3E';">
-          </div>
-          <span class="pdp-variant-thumb__label">${variant.label}</span>
-        `;
-        thumb.addEventListener('click', () => {
-          optionsContainer.querySelectorAll('.pdp-variant-thumb').forEach(t => t.classList.remove('is-active'));
-          thumb.classList.add('is-active');
+    const sizePills = document.createElement('div');
+    sizePills.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
+    product.availableSizes.forEach((s, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      const isSelected = idx === 0;
+      btn.style.cssText = `
+        padding: 8px 14px;
+        border-radius: 4px;
+        border: 1px solid ${isSelected ? 'var(--color-brand-primary)' : 'var(--color-border)'};
+        background: ${isSelected ? 'var(--color-brand-light)' : '#ffffff'};
+        color: ${isSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'};
+        font-weight: ${isSelected ? '600' : '400'};
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      `;
+      btn.textContent = s;
+      btn.addEventListener('click', () => {
+        selectedSize = s;
+        sizePills.querySelectorAll('button').forEach(b => {
+          b.style.borderColor = 'var(--color-border)';
+          b.style.background = '#ffffff';
+          b.style.color = 'var(--color-text-primary)';
+          b.style.fontWeight = '400';
         });
-        optionsContainer.appendChild(thumb);
+        btn.style.borderColor = 'var(--color-brand-primary)';
+        btn.style.background = 'var(--color-brand-light)';
+        btn.style.color = 'var(--color-brand-primary)';
+        btn.style.fontWeight = '600';
       });
+      sizePills.appendChild(btn);
+    });
+    sizeSection.appendChild(sizePills);
 
-      variants.appendChild(optionsContainer);
-    }
+    // Size guide click
+    sizeHeader.querySelector('#open-size-guide-link').addEventListener('click', () => {
+      openGlobalSizeGuide(product.category === 'bracelets' ? 'bracelet' : 'ring');
+    });
 
-    info.appendChild(variants);
+    info.appendChild(sizeSection);
   }
 
-  // Size Guide link
-  const sizeGuide = document.createElement('div');
-  sizeGuide.className = 'pdp-size-guide';
-  sizeGuide.innerHTML = `<a href="#">${t('pdp.sizeGuide')}</a>`;
-  info.appendChild(sizeGuide);
+  // Variant: Colors
+  if (product.availableColors && product.availableColors.length > 0) {
+    const colorSection = document.createElement('div');
+    colorSection.style.cssText = 'margin-bottom: 24px;';
+    colorSection.innerHTML = `
+      <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); display: block; margin-bottom: 8px;">MÀU SẮC XI MẠ:</span>
+    `;
 
-  // Order button
-  const orderBtn = document.createElement('button');
-  orderBtn.className = 'btn btn--full';
-  orderBtn.textContent = t('pdp.orderByPhone');
-  orderBtn.id = 'order-btn';
-  orderBtn.addEventListener('click', () => {
-    document.dispatchEvent(new CustomEvent('toggle-contact-drawer'));
-  });
-  info.appendChild(orderBtn);
+    const colorChips = document.createElement('div');
+    colorChips.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px;';
 
-  // Specifications Accordion
+    product.availableColors.forEach((c, idx) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      const isSelected = idx === 0;
+      chip.style.cssText = `
+        padding: 7px 12px;
+        border-radius: 4px;
+        border: 1px solid ${isSelected ? 'var(--color-brand-primary)' : 'var(--color-border)'};
+        background: ${isSelected ? 'var(--color-brand-light)' : '#ffffff'};
+        color: ${isSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'};
+        font-weight: ${isSelected ? '600' : '400'};
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      `;
+      const dotColor = c.includes('vàng hồng') ? '#e8a598' : (c.includes('vàng 18K') ? '#d4af37' : '#dcdde1');
+      chip.innerHTML = `<span style="width: 10px; height: 10px; border-radius: 50%; background: ${dotColor}; display: inline-block; border: 1px solid rgba(0,0,0,0.1);"></span> ${c}`;
+      chip.addEventListener('click', () => {
+        selectedColor = c;
+        colorChips.querySelectorAll('button').forEach(b => {
+          b.style.borderColor = 'var(--color-border)';
+          b.style.background = '#ffffff';
+          b.style.color = 'var(--color-text-primary)';
+          b.style.fontWeight = '400';
+        });
+        chip.style.borderColor = 'var(--color-brand-primary)';
+        chip.style.background = 'var(--color-brand-light)';
+        chip.style.color = 'var(--color-brand-primary)';
+        chip.style.fontWeight = '600';
+      });
+      colorChips.appendChild(chip);
+    });
+
+    colorSection.appendChild(colorChips);
+    info.appendChild(colorSection);
+  }
+
+  // ── Call to action buttons ──
+  const ctaContainer = document.createElement('div');
+  ctaContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;';
+
+  // Zalo Consult Button (Primary CTA)
+  const zaloBtn = document.createElement('a');
+  zaloBtn.className = 'btn btn--full';
+  zaloBtn.style.cssText = `
+    background-color: #0068FF;
+    border-color: #0068FF;
+    color: #ffffff;
+    font-weight: 600;
+    gap: 8px;
+    padding: 14px 20px;
+  `;
+  zaloBtn.href = `${siteInfo.zalo}`;
+  zaloBtn.target = '_blank';
+  zaloBtn.rel = 'noopener';
+  zaloBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+      <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.07-.17 1.15-.72 2.76-1.78 3.86 1.76.12 3.65-.63 4.94-1.57.97.26 2 .41 3 .41 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
+    </svg>
+    <span>NHẮN ZALO TƯ VẤN & XEM VIDEO THẬT</span>
+  `;
+  ctaContainer.appendChild(zaloBtn);
+
+  // Phone Call Button (Secondary CTA)
+  const phoneBtn = document.createElement('a');
+  phoneBtn.className = 'btn btn--full';
+  phoneBtn.style.cssText = `
+    background-color: var(--color-brand-primary);
+    border-color: var(--color-brand-primary);
+    color: #ffffff;
+    font-weight: 600;
+    gap: 8px;
+    padding: 14px 20px;
+  `;
+  phoneBtn.href = siteInfo.phoneHref;
+  phoneBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+    </svg>
+    <span>GỌI HOTLINE: ${siteInfo.phoneDisplay}</span>
+  `;
+  ctaContainer.appendChild(phoneBtn);
+
+  info.appendChild(ctaContainer);
+
+  // ── Brand Trust & Service Commitments ──
+  const trustBox = document.createElement('div');
+  trustBox.style.cssText = `
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.6;
+  `;
+  trustBox.innerHTML = `
+    <div style="font-weight: 600; color: var(--color-brand-primary); margin-bottom: 8px; font-size: 14px;">CAM KẾT TỪ PHÁT ĐẠT JEWELRY:</div>
+    <div style="display: grid; gap: 8px;">
+      <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <span style="color: var(--color-brand-primary); font-size: 15px;">✓</span>
+        <span><strong>Bạc 925 chuẩn kiểm định:</strong> Bề mặt sáng bóng, an toàn cho da nhạy cảm.</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <span style="color: var(--color-brand-primary); font-size: 15px;">✓</span>
+        <span><strong>Làm sáng trọn đời miễn phí:</strong> Hỗ trợ đánh bóng & làm sạch sản phẩm bất kỳ lúc nào.</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <span style="color: var(--color-brand-primary); font-size: 15px;">✓</span>
+        <span><strong>Tặng kèm trọn bộ quà:</strong> Hộp bảo quản sang trọng + khăn lau bạc chuyên dụng.</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 8px;">
+        <span style="color: var(--color-brand-primary); font-size: 15px;">✓</span>
+        <span><strong>Giao hàng toàn quốc:</strong> Khách được kiểm tra hàng trước khi thanh toán.</span>
+      </div>
+    </div>
+  `;
+  info.appendChild(trustBox);
+
+  // Specifications Accordions
   if (product.specifications && Object.keys(product.specifications).length > 0) {
     const specsSection = document.createElement('div');
     specsSection.className = 'pdp-specs';
-    specsSection.style.marginTop = '32px';
 
     const specsContent = Object.entries(product.specifications).map(([key, value]) => `
-      <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--color-border-light);">
-        <span style="color: var(--color-text-secondary); font-size: 14px;">${key}</span>
-        <span style="font-size: 14px;">${value}</span>
+      <div style="display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
+        <span style="color: var(--color-text-secondary); font-size: 13px;">${key}</span>
+        <span style="font-size: 13px; font-weight: 500; color: var(--color-text-primary);">${value}</span>
       </div>
     `).join('');
 
-    specsSection.appendChild(createAccordion(t('pdp.theCreation'), `
-      <p style="margin-bottom: 16px;">${product.description}</p>
+    specsSection.appendChild(createAccordion('CHI TIẾT CHẾ TÁC & THÔNG SỐ', `
+      <p style="margin-bottom: 14px; font-size: 14px; line-height: 1.6;">${product.description}</p>
       ${specsContent}
+    `, true));
+
+    specsSection.appendChild(createAccordion('CHÍNH SÁCH BẢO HÀNH & LÀM SÁNG', `
+      <p style="font-size: 13px; line-height: 1.7; margin-bottom: 8px;">• Bảo hành làm sáng, đánh bóng bạc miễn phí trọn đời tại cửa hàng.</p>
+      <p style="font-size: 13px; line-height: 1.7; margin-bottom: 8px;">• Đổi mới 1-1 trong 7 ngày nếu sản phẩm có lỗi từ khâu sản xuất hoặc đứt gãy trong quá trình vận chuyển.</p>
+      <p style="font-size: 13px; line-height: 1.7;">• Hỗ trợ thu đổi hoặc chỉnh sửa kích cỡ vòng/nhẫn chu đáo.</p>
     `));
 
-    specsSection.appendChild(createAccordion(t('pdp.deliveryReturns'), `
-      <p>${t('pdp.deliveryDesc1')}</p>
-      <p>${t('pdp.deliveryDesc2')}</p>
-    `));
-
-    specsSection.appendChild(createAccordion(t('pdp.gifting'), `
-      <p>${t('pdp.giftingDesc')}</p>
+    specsSection.appendChild(createAccordion('QUY CÁCH ĐÓNG GÓI & QUÀ TẶNG', `
+      <p style="font-size: 13px; line-height: 1.7;">Mỗi sản phẩm gửi đến quý khách đều được bọc cẩn thận trong hộp nhung hoặc hộp nơ Phát Đạt Jewelry, kèm túi giấy thanh lịch và khăn lau bạc cao cấp. Rất thích hợp làm quà tặng bạn bè, người thương hoặc tự thưởng cho bản thân.</p>
     `));
 
     info.appendChild(specsSection);
   }
 
+  // ── Customer Reviews & Ratings ──
+  const reviewsSection = document.createElement('div');
+  reviewsSection.style.cssText = 'margin-top: 32px; border-top: 1px solid var(--color-border); padding-top: 24px;';
+  reviewsSection.innerHTML = `
+    <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--color-brand-primary); margin-bottom: 16px;">Đánh Giá Của Khách Hàng (${product.reviews.length})</h3>
+    <div style="display: flex; flex-direction: column; gap: 14px;">
+      ${product.reviews.map(r => `
+        <div style="background: #fafaf8; border: 1px solid var(--color-border-light); border-radius: 6px; padding: 14px 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">
+              ${r.author} <span style="font-weight: 400; color: var(--color-text-secondary); font-size: 12px;">(${r.city})</span>
+            </div>
+            <div style="color: #f39c12; font-size: 12px;">★★★★★</div>
+          </div>
+          <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0;">"${r.comment}"</p>
+          <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 6px; text-align: right;">Đã mua tại Phát Đạt Jewelry · ${r.date}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  info.appendChild(reviewsSection);
+
   infoPanel.appendChild(info);
   pdpLayout.appendChild(infoPanel);
   page.appendChild(pdpLayout);
+
+  // ── Mobile Sticky Bar ──
+  const stickyBar = document.createElement('div');
+  stickyBar.className = 'pdp-mobile-sticky-bar';
+  stickyBar.style.cssText = `
+    position: fixed;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--color-border);
+    padding: 10px 16px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 700;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+  `;
+  stickyBar.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px; max-width: 60%;">
+      <img src="${galleryImages[0]}" alt="${product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--color-border-light);">
+      <div style="overflow: hidden;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.name}</div>
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary);">${formatPrice(product.price)}</div>
+      </div>
+    </div>
+    <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="
+      background-color: #0068FF;
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    ">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+        <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.07-.17 1.15-.72 2.76-1.78 3.86 1.76.12 3.65-.63 4.94-1.57.97.26 2 .41 3 .41 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
+      </svg>
+      Tư vấn Zalo
+    </a>
+  `;
+  page.appendChild(stickyBar);
+
+  // Show sticky bar on scroll on mobile
+  const handleScroll = () => {
+    if (window.innerWidth <= 768) {
+      if (window.scrollY > 400) {
+        stickyBar.style.display = 'flex';
+      } else {
+        stickyBar.style.display = 'none';
+      }
+    } else {
+      stickyBar.style.display = 'none';
+    }
+  };
+  window.addEventListener('scroll', handleScroll);
 
   // ── Related Products Carousel ──
   const related = getRelatedProducts(productId, 6);
   if (related.length > 0) {
     const relatedSection = document.createElement('section');
     relatedSection.className = 'pdp-related container';
+    relatedSection.style.cssText = 'margin-top: 48px; border-top: 1px solid var(--color-border); padding-top: 40px;';
 
     const relatedHeader = document.createElement('div');
     relatedHeader.className = 'pdp-related__header';
     relatedHeader.innerHTML = `
-      <h2 class="pdp-related__title">${product.collection} ${t('pdp.collection')}</h2>
+      <h2 class="pdp-related__title" style="font-family: var(--font-display); color: var(--color-brand-primary);">Cùng Bộ Sưu Tập ${product.collection}</h2>
     `;
     relatedSection.appendChild(relatedHeader);
 
-    // Create carousel with product cards
     const carouselItems = related.map(p => createProductCard(p));
     const carousel = createCarousel(carouselItems, {
       slidesPerView: 3,
@@ -267,45 +467,23 @@ export function renderProductDetail(container, params = {}) {
     });
     relatedSection.appendChild(carousel);
 
-    // CTA
-    const relatedCta = document.createElement('div');
-    relatedCta.className = 'pdp-related__cta';
-    relatedCta.innerHTML = `<a href="#/jewelry" class="link-underline">${t('pdp.seeAllCollection')} ${product.collection.toUpperCase()} ${t('pdp.collection').toUpperCase()}</a>`;
-    relatedSection.appendChild(relatedCta);
-
     page.appendChild(relatedSection);
   }
 
   container.appendChild(page);
 
-  // Wishlist toggle
+  // Wishlist button click
   const wishlistBtn = page.querySelector(`#wishlist-btn-${product.id}`);
   if (wishlistBtn) {
     wishlistBtn.addEventListener('click', () => {
       const isNowLiked = toggleWishlist(product.id);
       const svg = wishlistBtn.querySelector('svg');
-      svg.setAttribute('fill', isNowLiked ? 'currentColor' : 'none');
+      svg.setAttribute('fill', isNowLiked ? '#D4380D' : 'none');
       wishlistBtn.style.color = isNowLiked ? '#D4380D' : 'currentColor';
     });
   }
 
-  // Scroll-driven thumbnail dot updates
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const idx = entry.target.dataset.index;
-        thumbDots.querySelectorAll('.pdp-gallery__thumb').forEach(d => d.classList.remove('is-active'));
-        const activeDot = thumbDots.querySelector(`[data-index="${idx}"]`);
-        if (activeDot) activeDot.classList.add('is-active');
-      }
-    });
-  }, { threshold: 0.5 });
-
-  galleryInner.querySelectorAll('.pdp-gallery__item').forEach(item => {
-    observer.observe(item);
-  });
-
   return () => {
-    observer.disconnect();
+    window.removeEventListener('scroll', handleScroll);
   };
 }

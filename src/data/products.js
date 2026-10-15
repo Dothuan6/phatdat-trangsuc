@@ -6,11 +6,55 @@ const P = './images/products/';
 const G = (n) => `./images/gallery/g${n}.jpg`;
 
 function make(id, name, collection, category, materials, stones, price, images, description, specs, variationCount = 0) {
+  // Generate appropriate sizes depending on category
+  let availableSizes = [];
+  if (category === 'rings') {
+    availableSizes = ['Freesize (Tự chỉnh)', 'Size 6 (16mm)', 'Size 7 (17mm)', 'Size 8 (18mm)'];
+  } else if (category === 'necklaces') {
+    availableSizes = ['Dây 40cm (Chuẩn ôm cổ)', 'Dây 45cm (Thả nhẹ vừa vặn)'];
+  } else if (category === 'bracelets') {
+    availableSizes = ['16cm (Cổ tay nhỏ)', '17.5cm (Cổ tay vừa)', 'Freesize kèm xích phụ'];
+  } else if (category === 'earrings') {
+    availableSizes = ['Chốt đẩy cao su & bạc', 'Khóa bấm chắc chắn'];
+  }
+
+  const availableColors = ['Bạc sáng 925 nguyên bản', 'Xi mạ vàng 18K cao cấp', 'Xi mạ vàng hồng'];
+
+  const reviews = [
+    {
+      author: 'Nguyễn Thảo M.',
+      city: 'TP. Hồ Chí Minh',
+      rating: 5,
+      date: 'Gần đây',
+      comment: 'Trang sức ở ngoài sáng và tinh xảo hơn trên hình nhiều. Đóng gói hộp rất sang trọng, có cả khăn lau bạc đi kèm, 10/10!',
+    },
+    {
+      author: 'Trần Hương Giang',
+      city: 'Hà Nội',
+      rating: 5,
+      date: '1 tuần trước',
+      comment: 'Đeo đi làm ai cũng khen xinh xắn thanh lịch. Bạc chuẩn nên không bị ngứa hay dị ứng da, rất ưng ý.',
+    }
+  ];
+
   return {
     id, name, collection, category, materials, stones,
     reference: 'PD' + id.replace(/[^a-z0-9]/gi, '').slice(0, 6).toUpperCase(),
-    price, currency: '₫', images, variants: [], description,
-    specifications: { 'Chất liệu': materials, ...(stones ? { 'Đá': stones } : {}), ...specs },
+    price, currency: '₫', images,
+    availableSizes,
+    availableColors,
+    rating: 4.9,
+    reviewsCount: 18 + (id.length % 25),
+    reviews,
+    variants: [],
+    description,
+    specifications: {
+      'Chất liệu': materials,
+      ...(stones ? { 'Đá đính kèm': stones } : {}),
+      'Bảo hành': 'Làm sáng & đánh bóng miễn phí trọn đời',
+      'Đổi trả': 'Đổi mới trong 7 ngày nếu lỗi kỹ thuật',
+      ...specs
+    },
     variationCount,
   };
 }
@@ -128,10 +172,98 @@ export function getProductsByCollection(slug) {
   return products.filter(p => slugify(p.collection) === slug);
 }
 
+// Price ranges definitions
+export const priceRanges = [
+  { id: 'all', label: 'Tất cả mức giá', min: 0, max: Infinity },
+  { id: 'under-200', label: 'Dưới 200.000₫', min: 0, max: 200000 },
+  { id: '200-300', label: '200.000₫ – 300.000₫', min: 200000, max: 300000 },
+  { id: 'above-300', label: 'Trên 300.000₫', min: 300000, max: Infinity },
+];
+
+export const materialsList = [
+  'Bạc 925 xi vàng',
+  'Bạc 925 xi vàng hồng',
+  'Bạc 925 xi bạch kim',
+  'Bạc 925',
+];
+
+export const stonesList = [
+  'Xà cừ',
+  'Đá CZ',
+  'Đá Onyx',
+  'Moissanite',
+  'Đá Carnelian',
+  'Ngọc lam',
+];
+
+export const sortOptions = [
+  { id: 'featured', label: 'Nổi bật nhất' },
+  { id: 'price-asc', label: 'Giá: Thấp đến Cao' },
+  { id: 'price-desc', label: 'Giá: Cao đến Thấp' },
+  { id: 'name-asc', label: 'Tên: A – Z' },
+];
+
+export function filterProducts({
+  category = 'all',
+  collection = 'all',
+  materials = [],
+  stones = [],
+  priceRange = 'all',
+  sort = 'featured',
+  query = '',
+} = {}) {
+  let result = [...products];
+
+  // Category
+  if (category && category !== 'all') {
+    result = result.filter(p => p.category === category);
+  }
+
+  // Collection
+  if (collection && collection !== 'all') {
+    result = result.filter(p => slugify(p.collection) === slugify(collection));
+  }
+
+  // Materials
+  if (materials && materials.length > 0) {
+    result = result.filter(p => materials.some(m => p.materials.toLowerCase().includes(m.toLowerCase())));
+  }
+
+  // Stones
+  if (stones && stones.length > 0) {
+    result = result.filter(p => stones.some(s => p.stones && p.stones.toLowerCase().includes(s.toLowerCase())));
+  }
+
+  // Price range
+  if (priceRange && priceRange !== 'all') {
+    const range = priceRanges.find(r => r.id === priceRange);
+    if (range) {
+      result = result.filter(p => p.price >= range.min && p.price <= range.max);
+    }
+  }
+
+  // Query text search
+  if (query && query.trim()) {
+    const q = slugify(query);
+    result = result.filter(p => slugify(`${p.name} ${p.collection} ${p.materials} ${p.stones} ${p.reference}`).includes(q));
+  }
+
+  // Sorting
+  if (sort === 'price-asc') {
+    result.sort((a, b) => a.price - b.price);
+  } else if (sort === 'price-desc') {
+    result.sort((a, b) => b.price - a.price);
+  } else if (sort === 'name-asc') {
+    result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+  }
+
+  return result;
+}
+
 export function searchProducts(query) {
   const q = slugify(query || '');
   if (!q) return products;
-  return products.filter(p => slugify(`${p.name} ${p.collection} ${p.materials} ${p.stones}`).includes(q));
+  return products.filter(p => slugify(`${p.name} ${p.collection} ${p.materials} ${p.stones} ${p.reference}`).includes(q));
 }
 
 export function getProductById(id) {

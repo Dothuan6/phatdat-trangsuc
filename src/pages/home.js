@@ -16,17 +16,66 @@ export function renderHome(container) {
   const hero = document.createElement('section');
   hero.className = 'hj-hero hero';
   hero.innerHTML = `
-    <div class="hj-hero__bg" style="background: linear-gradient(135deg, #f7f5f0 0%, #e6e1d6 100%);"></div>
+    <div class="hj-hero__bg" style="background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%);"></div>
     <div class="hero__decoration">
       <img src="./images/products/Daychuyen4.3-removebg-preview.png" alt="Dây chuyền Phát Đạt Jewelry">
     </div>
-    <div class="hj-hero__content hero__content">
-      <h1 class="hero__title">${t('home.heroTitle')}</h1>
-      <p class="hero__subtitle">${t('home.heroSubtitle')}</p>
-      <a href="#/jewelry" class="btn">${t('home.discover')}</a>
+    <div class="hj-hero__content hero__content" style="color: #ffffff;">
+      <span style="font-size: 13px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-accent-gold); display: block; margin-bottom: 12px; font-weight: 600;">PHÁT ĐẠT JEWELRY</span>
+      <h1 class="hero__title" style="color: #ffffff; font-family: var(--font-display);">Trang Sức Bạc 925 Tinh Tế & Quý Phái</h1>
+      <p class="hero__subtitle" style="color: rgba(255,255,255,0.85); font-size: 15px; max-width: 540px; margin: 0 auto 28px;">Tuyển tập các mẫu dây chuyền cỏ ba lá, nhẫn đính đá moissanite và lắc tay xà cừ chế tác tinh xảo, giá từ 129.000₫.</p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="#/jewelry" class="btn" style="background-color: var(--color-accent-gold); border-color: var(--color-accent-gold); color: #143F3B; font-weight: 600;">XEM TẤT CẢ SẢN PHẨM</a>
+        <a href="#/collections/co-ba-la" class="btn" style="background: transparent; border-color: #ffffff; color: #ffffff;">BST CỎ BA LÁ</a>
+      </div>
     </div>
   `;
   page.appendChild(hero);
+
+  // ── USP Commitment Strip ──
+  const uspStrip = document.createElement('section');
+  uspStrip.className = 'usp-strip';
+  uspStrip.style.cssText = `
+    background: #ffffff;
+    border-bottom: 1px solid var(--color-border);
+    padding: 24px 0;
+  `;
+  uspStrip.innerHTML = `
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-brand-light); color: var(--color-brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">🛡️</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--color-brand-primary);">Bạc 925 Chuẩn Quốc Tế</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary);">Sáng bóng, an toàn cho da</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-brand-light); color: var(--color-brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">✨</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--color-brand-primary);">Làm Sáng Trọn Đời</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary);">Đánh bóng & vệ sinh miễn phí</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-brand-light); color: var(--color-brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">🎁</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--color-brand-primary);">Tặng Trọn Bộ Hộp Quà</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary);">Kèm khăn lau bạc cao cấp</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-brand-light); color: var(--color-brand-primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px;">🚚</div>
+        <div>
+          <div style="font-weight: 600; font-size: 14px; color: var(--color-brand-primary);">Giao Hàng & Đồng Kiểm</div>
+          <div style="font-size: 12px; color: var(--color-text-secondary);">Kiểm tra hàng trước nhận</div>
+        </div>
+      </div>
+    </div>
+  `;
+  page.appendChild(uspStrip);
 
   // ── Collections Grid ──
   const collectionsSection = document.createElement('section');

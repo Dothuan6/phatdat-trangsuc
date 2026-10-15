@@ -3,9 +3,23 @@
 // ============================================================
 
 import { createAccordion } from './accordion.js';
-import { collections as collectionNames } from '../data/products.js';
+import {
+  collections as collectionNames,
+  materialsList,
+  stonesList,
+  priceRanges,
+  filterProducts
+} from '../data/products.js';
 
-export function createFilterPanel(onApply = null) {
+export function createFilterPanel(initialFilters = {}, onApply = null) {
+  let state = {
+    category: initialFilters.category || 'all',
+    collection: initialFilters.collection || 'all',
+    materials: initialFilters.materials ? [...initialFilters.materials] : [],
+    stones: initialFilters.stones ? [...initialFilters.stones] : [],
+    priceRange: initialFilters.priceRange || 'all',
+  };
+
   // Overlay
   const overlay = document.createElement('div');
   overlay.className = 'filter-overlay';
@@ -20,68 +34,102 @@ export function createFilterPanel(onApply = null) {
   const header = document.createElement('div');
   header.className = 'filter-panel__header';
   header.innerHTML = `
-    <span class="filter-panel__title">Filter</span>
-    <button class="filter-panel__close" aria-label="Close filters">✕</button>
+    <span class="filter-panel__title">Bộ Lọc Sản Phẩm</span>
+    <button class="filter-panel__close" aria-label="Đóng bộ lọc">✕</button>
   `;
 
   // Body with accordion filters
   const body = document.createElement('div');
   body.className = 'filter-panel__body';
 
+  // Price Range (Radio buttons)
+  const priceContent = priceRanges.map(pr => `
+    <label style="display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; color: var(--color-text-primary);">
+      <input type="radio" name="filter-price" value="${pr.id}" class="filter-radio-price" ${state.priceRange === pr.id ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+      <span>${pr.label}</span>
+    </label>
+  `).join('');
+  body.appendChild(createAccordion('MỨC GIÁ', priceContent, true));
+
+  // Materials accordion (Checkboxes)
+  const materialsContent = materialsList.map(m => `
+    <label style="display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; color: var(--color-text-primary);">
+      <input type="checkbox" value="${m}" class="filter-checkbox-material" ${state.materials.includes(m) ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+      <span>${m}</span>
+    </label>
+  `).join('');
+  body.appendChild(createAccordion('CHẤT LIỆU', materialsContent, true));
+
+  // Stones accordion (Checkboxes)
+  const stonesContent = stonesList.map(s => `
+    <label style="display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; color: var(--color-text-primary);">
+      <input type="checkbox" value="${s}" class="filter-checkbox-stone" ${state.stones.includes(s) ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+      <span>${s}</span>
+    </label>
+  `).join('');
+  body.appendChild(createAccordion('ĐÁ ĐÍNH KÈM', stonesContent, false));
+
   // Collections accordion
-  const collectionsContent = collectionNames.map(c => `
-    <label style="display: flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; font-size: 14px; color: #6B6B6B;">
-      <input type="checkbox" value="${c}" class="filter-checkbox" data-filter="collection" style="width: 16px; height: 16px;">
-      ${c}
-    </label>
-  `).join('');
-  body.appendChild(createAccordion('COLLECTIONS', collectionsContent));
-
-  // Materials accordion
-  const materialsContent = ['Yellow Gold', 'White Gold', 'Rose Gold', 'Platinum'].map(m => `
-    <label style="display: flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; font-size: 14px; color: #6B6B6B;">
-      <input type="checkbox" value="${m}" class="filter-checkbox" data-filter="material" style="width: 16px; height: 16px;">
-      ${m}
-    </label>
-  `).join('');
-  body.appendChild(createAccordion('MATERIALS', materialsContent));
-
-  // Stones accordion
-  const stonesContent = ['Mother-of-pearl', 'Diamond', 'Onyx', 'Turquoise', 'Carnelian'].map(s => `
-    <label style="display: flex; align-items: center; gap: 8px; padding: 8px 0; cursor: pointer; font-size: 14px; color: #6B6B6B;">
-      <input type="checkbox" value="${s}" class="filter-checkbox" data-filter="stone" style="width: 16px; height: 16px;">
-      ${s}
-    </label>
-  `).join('');
-  body.appendChild(createAccordion('STONES', stonesContent));
-
-  // Price Range
-  const priceContent = `
-    <div class="price-range">
-      <div class="price-range__slider">
-        <div class="price-range__track" style="left: 0; right: 0;"></div>
-        <div class="price-range__handle" style="left: 0;"></div>
-        <div class="price-range__handle" style="left: 100%;"></div>
-      </div>
-      <div class="price-range__values">
-        <span>₫ 22,600,000</span>
-        <span>₫ 555,500,000</span>
-      </div>
-    </div>
-  `;
-  body.appendChild(createAccordion('PRICE RANGE', priceContent, true));
+  const collectionsContent = [
+    `<label style="display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; color: var(--color-text-primary);">
+      <input type="radio" name="filter-collection" value="all" class="filter-radio-collection" ${state.collection === 'all' ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+      <span>Tất cả bộ sưu tập</span>
+    </label>`,
+    ...collectionNames.map(c => `
+      <label style="display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; font-size: 14px; color: var(--color-text-primary);">
+        <input type="radio" name="filter-collection" value="${c}" class="filter-radio-collection" ${state.collection === c ? 'checked' : ''} style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+        <span>${c}</span>
+      </label>
+    `)
+  ].join('');
+  body.appendChild(createAccordion('BỘ SƯU TẬP', collectionsContent, false));
 
   // Footer
   const footer = document.createElement('div');
   footer.className = 'filter-panel__footer';
   footer.innerHTML = `
-    <button class="filter-panel__reset">Reset Filters</button>
-    <button class="btn btn--sm" id="filter-apply">Display 18 Result(s)</button>
+    <button class="filter-panel__reset" style="background: none; border: none; cursor: pointer; font-size: 13px; text-decoration: underline; color: var(--color-text-secondary);">Thiết lập lại</button>
+    <button class="btn btn--sm" id="filter-apply" style="background-color: var(--color-brand-primary); color: #fff; border-color: var(--color-brand-primary);">Áp dụng bộ lọc</button>
   `;
 
   panel.appendChild(header);
   panel.appendChild(body);
   panel.appendChild(footer);
+
+  function getActiveFilterValues() {
+    const selectedPrice = panel.querySelector('input[name="filter-price"]:checked')?.value || 'all';
+    const selectedCollection = panel.querySelector('input[name="filter-collection"]:checked')?.value || 'all';
+    const selectedMaterials = Array.from(panel.querySelectorAll('.filter-checkbox-material:checked')).map(cb => cb.value);
+    const selectedStones = Array.from(panel.querySelectorAll('.filter-checkbox-stone:checked')).map(cb => cb.value);
+
+    return {
+      priceRange: selectedPrice,
+      collection: selectedCollection,
+      materials: selectedMaterials,
+      stones: selectedStones,
+    };
+  }
+
+  function updateCountButton() {
+    const current = getActiveFilterValues();
+    const count = filterProducts({
+      category: state.category,
+      collection: current.collection,
+      materials: current.materials,
+      stones: current.stones,
+      priceRange: current.priceRange
+    }).length;
+
+    const applyBtn = footer.querySelector('#filter-apply');
+    if (applyBtn) {
+      applyBtn.textContent = `Xem ${count} sản phẩm`;
+    }
+  }
+
+  // Event listeners for inputs
+  panel.addEventListener('change', () => {
+    updateCountButton();
+  });
 
   // Close handlers
   function closePanel() {
@@ -90,7 +138,9 @@ export function createFilterPanel(onApply = null) {
     document.body.classList.remove('no-scroll');
   }
 
-  function openPanel() {
+  function openPanel(currentCategory = null) {
+    if (currentCategory) state.category = currentCategory;
+    updateCountButton();
     overlay.classList.add('is-open');
     panel.classList.add('is-open');
     document.body.classList.add('no-scroll');
@@ -101,13 +151,19 @@ export function createFilterPanel(onApply = null) {
 
   // Reset
   footer.querySelector('.filter-panel__reset').addEventListener('click', () => {
-    panel.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+    panel.querySelectorAll('.filter-checkbox-material, .filter-checkbox-stone').forEach(cb => cb.checked = false);
+    const defaultPrice = panel.querySelector('input[name="filter-price"][value="all"]');
+    if (defaultPrice) defaultPrice.checked = true;
+    const defaultCol = panel.querySelector('input[name="filter-collection"][value="all"]');
+    if (defaultCol) defaultCol.checked = true;
+    updateCountButton();
   });
 
   // Apply
   footer.querySelector('#filter-apply').addEventListener('click', () => {
     closePanel();
-    if (onApply) onApply();
+    const resultFilters = getActiveFilterValues();
+    if (onApply) onApply(resultFilters);
   });
 
   return { overlay, panel, open: openPanel, close: closePanel };

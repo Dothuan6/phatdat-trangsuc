@@ -1,9 +1,6 @@
-// ============================================================
-// HEADER COMPONENT — Site header with navigation
-// ============================================================
-
 import { navigate } from '../router.js';
 import { t, currentLang, toggleLang } from '../i18n.js';
+import { products, formatPrice, searchProducts, categories, collections } from '../data/products.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -13,6 +10,30 @@ const SVG_ICONS = {
 };
 
 export function createHeader() {
+  const headerWrapper = document.createElement('div');
+  headerWrapper.className = 'site-header-wrapper';
+
+  // Top Announcement Bar
+  const topBar = document.createElement('div');
+  topBar.className = 'top-announcement-bar';
+  topBar.style.cssText = `
+    background-color: var(--color-brand-primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    padding: 7px 16px;
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    z-index: 801;
+  `;
+  topBar.innerHTML = `
+    <span>✨ Phát Đạt Jewelry – Bạc 925 Tinh Tế · Bảo Hành Làm Sáng Trọn Đời · Hotline / Zalo: <strong>0898 025 013</strong></span>
+  `;
+
   const header = document.createElement('header');
   header.className = 'site-header';
   header.id = 'site-header';
@@ -25,12 +46,12 @@ export function createHeader() {
         </button>
         <button class="header-search-btn" aria-label="Search">
           ${SVG_ICONS.search}
-          <span>${t('nav.search')}</span>
+          <span>Tìm kiếm</span>
         </button>
       </div>
       <div class="header-center">
         <a href="#/" class="brand-logo" id="brand-logo">
-          <img src="/images/logo.png" alt="Phat Dat Jewelry" style="height: 50px; width: auto; object-fit: contain;">
+          <img src="/images/logo.png" alt="Phát Đạt Jewelry" style="height: 52px; width: auto; object-fit: contain;">
         </a>
       </div>
       <div class="header-right">
@@ -39,26 +60,27 @@ export function createHeader() {
           <span style="margin: 0 4px;">|</span>
           <span style="${currentLang === 'en' ? 'font-weight: 600;' : 'opacity: 0.5;'}">EN</span>
         </button>
-        <button class="header-icon" id="wishlist-toggle" aria-label="Wishlist" onclick="window.location.hash='#/wishlist'">
+        <button class="header-icon" id="wishlist-toggle" aria-label="Yêu thích" onclick="window.location.hash='#/wishlist'" title="Bộ sưu tập yêu thích">
           ${SVG_ICONS.wishlist}
         </button>
-        <button class="header-icon" id="contact-toggle" aria-label="Contact us">
+        <button class="header-icon" id="contact-toggle" aria-label="Tư vấn" title="Tư vấn nhanh">
           ${SVG_ICONS.phone}
         </button>
       </div>
     </div>
   `;
 
+  headerWrapper.appendChild(topBar);
+  headerWrapper.appendChild(header);
+
   // Scroll behavior
-  let lastScrollY = 0;
   window.addEventListener('scroll', () => {
     const scrollY = window.scrollY;
-    if (scrollY > 10) {
+    if (scrollY > 15) {
       header.classList.add('site-header--scrolled');
     } else {
       header.classList.remove('site-header--scrolled');
     }
-    lastScrollY = scrollY;
   });
 
   // Search toggle
@@ -85,12 +107,13 @@ export function createHeader() {
     });
   }
 
-  return header;
+  return headerWrapper;
 }
 
 export function createHeaderSpacer() {
   const spacer = document.createElement('div');
   spacer.className = 'header-spacer';
+  spacer.style.height = '105px';
   return spacer;
 }
 
@@ -109,6 +132,7 @@ function openNavDrawer() {
   drawer.className = 'nav-drawer';
   drawer.innerHTML = `
     <div class="nav-drawer__header">
+      <div style="font-weight: 600; color: var(--color-brand-primary);">DANH MỤC TRANG SỨC</div>
       <button class="nav-drawer__close" aria-label="Close menu">✕</button>
     </div>
     <div class="nav-drawer__items">
@@ -116,40 +140,44 @@ function openNavDrawer() {
         <span>${t('nav.home')}</span>
         <span class="nav-item__chevron">›</span>
       </a>
-      <a class="nav-item" href="#/high-jewelry">
-        <span>${t('nav.highJewelry')}</span>
-        <span class="nav-item__chevron">›</span>
-      </a>
       <a class="nav-item" href="#/jewelry">
-        <span>${t('nav.jewelry')}</span>
+        <span>Tất cả trang sức Bạc 925</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/necklaces">
-        <span>${t('nav.necklaces')}</span>
+        <span>Dây chuyền & Mặt dây</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/rings">
-        <span>${t('nav.rings')}</span>
+        <span>Nhẫn bạc & Nhẫn Moissanite</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/bracelets">
-        <span>${t('nav.bracelets')}</span>
+        <span>Lắc tay & Vòng tay</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/jewelry/earrings">
-        <span>${t('nav.earrings')}</span>
+        <span>Bông tai & Hoa tai</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="#/high-jewelry">
+        <span>Bộ sưu tập đặc biệt</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/about">
-        <span>${t('nav.about')}</span>
+        <span>Về Phát Đạt Jewelry</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/wishlist">
-        <span>${t('nav.wishlist')}</span>
+        <span>Danh sách yêu thích</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="#/stores">
+        <span>Hệ thống cửa hàng</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/contact">
-        <span>${t('nav.contactUs')}</span>
+        <span>Liên hệ & Tư vấn</span>
         <span class="nav-item__chevron">›</span>
       </a>
     </div>
@@ -159,13 +187,11 @@ function openNavDrawer() {
   document.body.appendChild(drawer);
   document.body.classList.add('no-scroll');
 
-  // Animate in
   requestAnimationFrame(() => {
     overlay.classList.add('is-open');
     drawer.classList.add('is-open');
   });
 
-  // Close handlers
   function closeDrawer() {
     overlay.classList.remove('is-open');
     drawer.classList.remove('is-open');
@@ -179,15 +205,14 @@ function openNavDrawer() {
   overlay.addEventListener('click', closeDrawer);
   drawer.querySelector('.nav-drawer__close').addEventListener('click', closeDrawer);
 
-  // Close on nav item click
   drawer.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', (e) => {
+    item.addEventListener('click', () => {
       closeDrawer();
     });
   });
 }
 
-// ── Search Drawer ──
+// ── Search Drawer with Realtime Dynamic Search ──
 
 function openSearchDrawer() {
   const existing = document.querySelector('.search-overlay');
@@ -204,51 +229,32 @@ function openSearchDrawer() {
     <div class="search-drawer__inner">
       <div class="search-drawer__top">
         ${SVG_ICONS.search}
-        <input type="text" class="search-drawer__input" placeholder="${t('common.searchPlaceholder')}">
+        <input type="text" class="search-drawer__input" placeholder="Tìm nhẫn, dây chuyền cỏ ba lá, đá moissanite..." autofocus>
         <button class="search-drawer__close" aria-label="Close search">✕</button>
       </div>
-      <div class="search-drawer__content">
+      <div class="search-drawer__content" id="search-drawer-content">
         <div class="search-col">
-          <h4 class="search-col__title">${t('common.categories')}</h4>
+          <h4 class="search-col__title">Danh mục</h4>
           <ul class="search-col__list">
-            <li><a href="#/jewelry/necklaces">${t('nav.necklaces')}</a></li>
-            <li><a href="#/jewelry/bracelets">${t('nav.bracelets')}</a></li>
-            <li><a href="#/jewelry/rings">${t('nav.rings')}</a></li>
-            <li><a href="#/jewelry/earrings">${t('nav.earrings')}</a></li>
+            <li><a href="#/jewelry/necklaces">Dây chuyền</a></li>
+            <li><a href="#/jewelry/bracelets">Vòng tay & Lắc tay</a></li>
+            <li><a href="#/jewelry/rings">Nhẫn thời trang</a></li>
+            <li><a href="#/jewelry/earrings">Bông tai</a></li>
           </ul>
         </div>
         <div class="search-col">
-          <h4 class="search-col__title">${t('common.collections')}</h4>
+          <h4 class="search-col__title">Bộ sưu tập</h4>
           <ul class="search-col__list">
-            <li><a href="#/jewelry">Alhambra®</a></li>
-            <li><a href="#/jewelry">Perlée®</a></li>
-            <li><a href="#/jewelry">Frivole®</a></li>
-            <li><a href="#/jewelry">Fauna</a></li>
+            <li><a href="#/collections/co-ba-la">Cỏ Ba Lá may mắn</a></li>
+            <li><a href="#/collections/hoa-xinh">Hoa Xinh đính đá</a></li>
+            <li><a href="#/collections/anh-sao">Ánh Sao Moissanite</a></li>
+            <li><a href="#/collections/hat-ngoc">Hạt Ngọc tối giản</a></li>
           </ul>
         </div>
         <div class="search-col search-col--wide">
-          <h4 class="search-col__title">${t('common.creations')}</h4>
-          <div class="search-creations-grid">
-            <a href="#/product/vintage-alhambra-pendant" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="./images/products/2.jpg" alt="Vintage Alhambra pendant">
-              <div class="search-creation-item__name">Vintage Alhambra pendant</div>
-              <div class="search-creation-item__price">₫ 96,500,000</div>
-            </a>
-            <a href="#/product/perlee-signature-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="./images/products/2.jpg" alt="Perlée signature bracelet">
-              <div class="search-creation-item__name">Perlée signature bracelet, medium model</div>
-              <div class="search-creation-item__price">₫ 215,000,000</div>
-            </a>
-            <a href="#/product/perlee-signature-ring" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="./images/products/2.jpg" alt="Perlée signature ring">
-              <div class="search-creation-item__name">Perlée signature ring</div>
-              <div class="search-creation-item__price">From ₫ 82,000,000</div>
-            </a>
-            <a href="#/product/vintage-alhambra-bracelet" class="search-creation-item" onclick="document.querySelector('.search-drawer__close').click()">
-              <img src="./images/products/2.jpg" alt="Vintage Alhambra bracelet">
-              <div class="search-creation-item__name">Vintage Alhambra bracelet, 5 motifs</div>
-              <div class="search-creation-item__price">₫ 118,000,000</div>
-            </a>
+          <h4 class="search-col__title" id="search-results-title">Sản phẩm gợi ý hôm nay</h4>
+          <div class="search-creations-grid" id="search-results-grid">
+            <!-- Will be dynamically populated -->
           </div>
         </div>
       </div>
@@ -259,13 +265,70 @@ function openSearchDrawer() {
   document.body.appendChild(drawer);
   document.body.classList.add('no-scroll');
 
+  const inputEl = drawer.querySelector('.search-drawer__input');
+  const resultsGrid = drawer.querySelector('#search-results-grid');
+  const resultsTitle = drawer.querySelector('#search-results-title');
+
+  function renderSearchResults(items) {
+    resultsGrid.innerHTML = '';
+    if (items.length === 0) {
+      resultsGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 24px 0; color: var(--color-text-secondary); text-align: center;">
+          Không tìm thấy mẫu trang sức nào. Thử tìm từ khóa khác như "cỏ ba lá", "nhẫn", "bạc"...
+        </div>
+      `;
+      return;
+    }
+
+    items.slice(0, 4).forEach(p => {
+      const itemEl = document.createElement('a');
+      itemEl.className = 'search-creation-item';
+      itemEl.href = `#/product/${p.id}`;
+      itemEl.innerHTML = `
+        <img src="${p.images[0]}" alt="${p.name}" loading="lazy" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+        <div class="search-creation-item__name">${p.name}</div>
+        <div class="search-creation-item__price">${formatPrice(p.price)}</div>
+      `;
+      itemEl.addEventListener('click', () => {
+        closeSearch();
+      });
+      resultsGrid.appendChild(itemEl);
+    });
+  }
+
+  // Render initial featured products
+  renderSearchResults(products.slice(0, 4));
+
+  // Live input listening
+  inputEl.addEventListener('input', (e) => {
+    const val = e.target.value.trim();
+    if (!val) {
+      resultsTitle.textContent = 'Sản phẩm gợi ý hôm nay';
+      renderSearchResults(products.slice(0, 4));
+    } else {
+      const matched = searchProducts(val);
+      resultsTitle.textContent = `Kết quả tìm kiếm (${matched.length})`;
+      renderSearchResults(matched);
+    }
+  });
+
+  // Enter key press navigation
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const val = inputEl.value.trim();
+      if (val) {
+        closeSearch();
+        navigate(`/search/${encodeURIComponent(val)}`);
+      }
+    }
+  });
+
   requestAnimationFrame(() => {
     overlay.classList.add('is-open');
     drawer.classList.add('is-open');
-    drawer.querySelector('.search-drawer__input').focus();
+    inputEl.focus();
   });
 
-  // Close handlers
   function closeSearch() {
     overlay.classList.remove('is-open');
     drawer.classList.remove('is-open');
@@ -278,4 +341,10 @@ function openSearchDrawer() {
 
   overlay.addEventListener('click', closeSearch);
   drawer.querySelector('.search-drawer__close').addEventListener('click', closeSearch);
+
+  drawer.querySelectorAll('.search-col__list a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeSearch();
+    });
+  });
 }

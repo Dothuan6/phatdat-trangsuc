@@ -4,36 +4,43 @@
    ============================================================ */
 
 :root {
-  /* ── Color Palette ── */
-  --color-text-primary: #2B2B2B;
-  --color-text-secondary: #6B6B6B;
-  --color-text-muted: #999999;
+  /* ── Color Palette — PD Jewelry (Emerald Teal & Warm Gold) ── */
+  --color-brand-primary: #1E5D57;
+  --color-brand-dark: #143F3B;
+  --color-brand-light: #EBF4F3;
+  --color-brand-subtle: #F3F8F7;
+  --color-accent-gold: #C99738;
+  --color-accent-gold-hover: #B58428;
+  --color-accent-gold-light: #FAF4E8;
+
+  --color-text-primary: #1A2826;
+  --color-text-secondary: #5A6A68;
+  --color-text-muted: #8B9B99;
   --color-text-inverse: #FFFFFF;
-  --color-accent-gold: #C5A467;
 
   --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F5F5F0;
-  --color-bg-tertiary: #FAFAFA;
-  --color-bg-hero-sage: #A8B09A;
-  --color-bg-hero-lavender: #D8DAE8;
-  --color-bg-contact-cream: #E8E4D4;
-  --color-bg-form: #ECEEF5;
-  --color-bg-dark: #1A1A1A;
+  --color-bg-secondary: #F6F8F7;
+  --color-bg-tertiary: #FAFCFB;
+  --color-bg-hero-sage: #D5E2DF;
+  --color-bg-hero-lavender: #E4E7F0;
+  --color-bg-contact-cream: #F5EFE6;
+  --color-bg-form: #F0F5F4;
+  --color-bg-dark: #142825;
 
-  --color-border: #D4D4D4;
-  --color-border-light: #E8E8E8;
-  --color-border-dark: #2B2B2B;
+  --color-border: #D8E2E0;
+  --color-border-light: #EBF0EF;
+  --color-border-dark: #1E5D57;
 
   --color-error: #D4380D;
-  --color-success: #389E0D;
-  --color-focus: #4A90D9;
+  --color-success: #1E824C;
+  --color-focus: #1E5D57;
 
-  --color-overlay: rgba(0, 0, 0, 0.45);
+  --color-overlay: rgba(15, 35, 32, 0.55);
 
   /* ── Typography ── */
-  --font-display: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-display: 'Playfair Display', 'Georgia', serif;
+  --font-body: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-ui: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --fs-hero: clamp(2.5rem, 5vw, 4.5rem);
   --fs-section-title: clamp(2rem, 3.5vw, 3.5rem);

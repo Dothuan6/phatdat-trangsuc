@@ -19,27 +19,27 @@ export function renderAbout(container) {
   content.style.maxWidth = '800px';
   content.style.margin = '0 auto';
   content.style.lineHeight = '1.8';
-  content.style.fontSize = '1.1rem';
+  content.style.fontSize = '1.05rem';
+  content.style.color = 'var(--color-text-primary)';
 
   content.innerHTML = `
     <div style="margin-bottom: 40px;">
-      <h2 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; text-align: center;">${t('about.storyTitle') || 'Câu Chuyện Thương Hiệu'}</h2>
-      <p style="margin-bottom: 20px;">${t('about.story1') || 'Được thành lập với niềm đam mê bất tận dành cho cái đẹp và sự hoàn mỹ, thương hiệu của chúng tôi tự hào là người bạn đồng hành trong những khoảnh khắc đáng nhớ nhất của cuộc đời bạn. Mỗi món trang sức không chỉ là một vật phẩm lấp lánh, mà còn là một câu chuyện, một lời hứa và một di sản vượt thời gian.'}</p>
-      <p>${t('about.story2') || 'Chúng tôi tin rằng trang sức đích thực phải có khả năng chạm đến cảm xúc. Chính vì vậy, từ khâu lên ý tưởng thiết kế, lựa chọn nguyên liệu cho đến khi hoàn thiện sản phẩm, mọi quy trình đều được thực hiện với sự tận tâm và tỉ mỉ cao nhất.'}</p>
+      <h2 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; text-align: center; color: var(--color-brand-primary);">Câu Chuyện Thương Hiệu Phát Đạt Jewelry</h2>
+      <p style="margin-bottom: 20px;">Được thành lập với sứ mệnh mang đến vẻ đẹp tinh tế, sang trọng nhưng gần gũi cho phụ nữ Việt Nam, <strong>Phát Đạt Jewelry</strong> tin rằng mỗi món trang sức nhỏ bé đều mang một nguồn năng lượng tích cực và may mắn riêng cho người đeo.</p>
+      <p>Từ họa tiết cỏ ba lá biểu trưng cho may mắn, những đóa hoa nhỏ đính đá rạng rỡ cho đến những viên đá Moissanite lấp lánh tựa ánh sao, chúng tôi mang đến những thiết kế trang sức bạc hiện đại, nhẹ nhàng để bạn tự tin toả sáng trong công việc hằng ngày cũng như những buổi tiệc đặc biệt.</p>
     </div>
 
     <div style="margin-bottom: 40px; text-align: center;">
-      <div style="width: 100%; height: 400px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; margin-bottom: 24px;">
-        <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-        </svg>
-      </div>
+      <img src="./images/gallery/g16.jpg" alt="Chế tác trang sức Phát Đạt Jewelry" style="width: 100%; max-height: 420px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
     </div>
 
     <div>
-      <h2 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; text-align: center;">${t('about.craftTitle') || 'Nghệ Thuật Chế Tác'}</h2>
-      <p style="margin-bottom: 20px;">${t('about.craft1') || 'Sự xuất sắc trong chế tác (Savoir-Faire) là kim chỉ nam cho mọi hoạt động của chúng tôi. Những nghệ nhân kim hoàn lành nghề đã dành hàng nghìn giờ đồng hồ để gọt giũa, đánh bóng và nạm từng viên đá quý, đảm bảo rằng mỗi tác phẩm khi đến tay khách hàng đều đạt độ tinh xảo tuyệt đối.'}</p>
-      <p>${t('about.craft2') || 'Chúng tôi chỉ sử dụng những vật liệu cao cấp nhất: vàng 18K, bạch kim và những viên kim cương, đá quý tự nhiên được tuyển chọn khắt khe theo tiêu chuẩn quốc tế. Khẳng định giá trị bền vững và vẻ đẹp vĩnh cửu.'}</p>
+      <h2 style="font-family: var(--font-display); font-size: 2rem; margin-bottom: 24px; text-align: center; color: var(--color-brand-primary);">Tiêu Chuẩn Bạc 925 & Cam Kết Trọn Đời</h2>
+      <p style="margin-bottom: 20px;">Tất cả sản phẩm tại Phát Đạt Jewelry đều được chế tác từ <strong>Bạc chuẩn 925 cao cấp</strong> (92.5% bạc nguyên chất), được phủ thêm lớp xi mạ vàng 18K hoặc bạch kim sáng bóng giúp tăng độ bền màu và chống oxy hóa vượt trội, đặc biệt tuyệt đối an toàn và êm dịu cho làn da nhạy cảm.</p>
+      <p style="margin-bottom: 20px;">Đặc biệt, Phát Đạt Jewelry cam kết chính sách <strong>bảo hành đánh bóng và làm sáng miễn phí trọn đời</strong> cho tất cả khách hàng, cùng hộp đựng quà trang nhã đi kèm cho từng sản phẩm.</p>
+      <div style="text-align: center; margin-top: 32px;">
+        <a href="#/jewelry" class="btn" style="background-color: var(--color-brand-primary); color: #fff; border-color: var(--color-brand-primary);">KHÁM PHÁ CÁC BỘ SƯU TẬP</a>
+      </div>
     </div>
   `;
 
