@@ -9,6 +9,7 @@ import './styles/base.css';
 import './styles/layout.css';
 import './styles/components.css';
 import './styles/pages.css';
+import './styles/feedback.css';
 
 // Import components
 import { createHeader, createHeaderSpacer } from './components/header.js';

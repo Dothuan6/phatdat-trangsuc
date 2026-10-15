@@ -25,6 +25,7 @@ import {
 } from '../../services/supabase.js';
 import { formatPrice } from '../../data/products.js';
 import { navigate } from '../../router.js';
+import { showToast, showConfirmModal, showAlertModal } from '../../components/feedback-modal.js';
 import './admin.css';
 
 export async function renderAdmin(container) {
@@ -355,9 +356,15 @@ export async function renderAdmin(container) {
       tableBody.querySelectorAll('.toggle-active-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const currentActive = btn.dataset.active === 'true';
-          await toggleProductActive(btn.dataset.id, !currentActive);
+          const newActive = !currentActive;
+          const item = products.find(p => p.id === btn.dataset.id);
+          await toggleProductActive(btn.dataset.id, newActive);
           products = await getAdminProducts();
           filterTable();
+          showToast(
+            newActive ? `Đã hiển thị "${item ? item.name : 'sản phẩm'}" trên website!` : `Đã ẩn "${item ? item.name : 'sản phẩm'}" khỏi website!`,
+            newActive ? 'success' : 'info'
+          );
         });
       });
 
@@ -370,11 +377,22 @@ export async function renderAdmin(container) {
 
       tableBody.querySelectorAll('.delete-product-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này vĩnh viễn không?')) {
+          const item = products.find(p => p.id === btn.dataset.id);
+          const name = item ? item.name : 'sản phẩm này';
+          const confirmed = await showConfirmModal({
+            title: 'Xác nhận xóa sản phẩm',
+            message: `Bạn có chắc chắn muốn xóa "${name}"? Sản phẩm này sẽ bị xóa hoàn toàn khỏi cơ sở dữ liệu Supabase và không thể khôi phục.`,
+            confirmText: 'Xóa vĩnh viễn',
+            cancelText: 'Hủy bỏ',
+            type: 'danger'
+          });
+
+          if (confirmed) {
             await deleteAdminProduct(btn.dataset.id);
             products = await getAdminProducts();
             updateSidebarBadges();
             filterTable();
+            showToast(`Đã xóa sản phẩm "${name}" thành công!`, 'success');
           }
         });
       });
@@ -559,6 +577,10 @@ export async function renderAdmin(container) {
       updateSidebarBadges();
       closeModal();
       renderProductsTab();
+      showToast(
+        isEdit ? `Đã cập nhật sản phẩm "${updatedItem.name}" thành công!` : `Đã thêm sản phẩm mới "${updatedItem.name}" thành công!`,
+        'success'
+      );
     });
   }
 
@@ -612,11 +634,22 @@ export async function renderAdmin(container) {
 
     contentArea.querySelectorAll('.delete-col-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (confirm('Bạn có chắc chắn muốn xóa bộ sưu tập này không?')) {
+        const item = collections.find(c => c.id === btn.dataset.id);
+        const name = item ? item.name : 'bộ sưu tập này';
+        const confirmed = await showConfirmModal({
+          title: 'Xóa bộ sưu tập?',
+          message: `Bạn có chắc chắn muốn xóa bộ sưu tập "${name}" không? Lưu ý: Các sản phẩm thuộc BST này sẽ không bị xóa.`,
+          confirmText: 'Xóa bộ sưu tập',
+          cancelText: 'Hủy bỏ',
+          type: 'danger'
+        });
+
+        if (confirmed) {
           await deleteAdminCollection(btn.dataset.id);
           collections = await getAdminCollections();
           updateSidebarBadges();
           renderCollectionsTab();
+          showToast(`Đã xóa bộ sưu tập "${name}" thành công!`, 'success');
         }
       });
     });
@@ -712,6 +745,10 @@ export async function renderAdmin(container) {
       updateSidebarBadges();
       closeModal();
       renderCollectionsTab();
+      showToast(
+        isEdit ? `Đã cập nhật BST "${updated.name}" thành công!` : `Đã tạo bộ sưu tập mới "${updated.name}"!`,
+        'success'
+      );
     });
   }
 
@@ -797,17 +834,29 @@ export async function renderAdmin(container) {
           contacts = await getAdminContacts();
           updateSidebarBadges();
           renderList();
+          showToast('Đã đánh dấu là "Đã liên hệ tư vấn" thành công!', 'success');
         });
       });
 
       // Delete listeners
       contentArea.querySelectorAll('.delete-contact-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (confirm('Xóa yêu cầu tư vấn này?')) {
+          const item = contacts.find(c => c.id === btn.dataset.id);
+          const name = item ? item.fullName : 'yêu cầu này';
+          const confirmed = await showConfirmModal({
+            title: 'Xóa yêu cầu tư vấn?',
+            message: `Bạn có chắc chắn muốn xóa yêu cầu tư vấn của khách hàng "${name}" không?`,
+            confirmText: 'Xác nhận xóa',
+            cancelText: 'Hủy bỏ',
+            type: 'danger'
+          });
+
+          if (confirmed) {
             await deleteAdminContact(btn.dataset.id);
             contacts = await getAdminContacts();
             updateSidebarBadges();
             renderList();
+            showToast('Đã xóa yêu cầu tư vấn thành công!', 'success');
           }
         });
       });
@@ -926,12 +975,14 @@ export async function renderAdmin(container) {
         feedback.textContent = res.message;
         page.querySelector('#admin-db-status-pill').className = 'admin-db-status admin-db-status--online';
         page.querySelector('#admin-db-status-text').textContent = 'Supabase Online';
+        showToast(res.message, 'success');
       } else {
         feedback.style.background = '#FFEBEE';
         feedback.style.color = '#C62828';
         feedback.textContent = 'Lỗi kết nối: ' + res.message;
         page.querySelector('#admin-db-status-pill').className = 'admin-db-status admin-db-status--offline';
         page.querySelector('#admin-db-status-text').textContent = 'Chế độ Lưu Cục Bộ (Offline)';
+        showToast('Lỗi kết nối Supabase: ' + res.message, 'error');
       }
       saveBtn.textContent = 'Lưu & Kiểm tra kết nối';
       saveBtn.disabled = false;
@@ -952,11 +1003,13 @@ export async function renderAdmin(container) {
         products = await getAdminProducts();
         collections = await getAdminCollections();
         updateSidebarBadges();
+        showToast(`Đồng bộ thành công ${res.productsCount} sản phẩm lên Supabase!`, 'success');
       } catch (err) {
         seedFeedback.style.display = 'block';
         seedFeedback.style.background = '#FFEBEE';
         seedFeedback.style.color = '#C62828';
         seedFeedback.textContent = 'Lỗi đồng bộ: ' + err.message;
+        showToast('Lỗi đồng bộ: ' + err.message, 'error');
       }
       seedBtn.textContent = '✨ Đồng bộ 20 Sản Phẩm Mẫu lên Supabase';
       seedBtn.disabled = false;
@@ -973,9 +1026,9 @@ export async function renderAdmin(container) {
         contacts = await getAdminContacts();
         siteSettings = await getAdminSiteSettings();
         updateSidebarBadges();
-        alert(`Đã làm mới dữ liệu thành công từ Supabase: ${products.length} sản phẩm.`);
+        showToast(`Đã làm mới dữ liệu thành công từ Supabase: ${products.length} sản phẩm.`, 'success');
       } catch (e) {
-        alert('Lỗi làm mới: ' + e.message);
+        showToast('Lỗi làm mới: ' + e.message, 'error');
       }
       refreshBtn.textContent = '🔄 Tải lại dữ liệu từ Supabase';
       refreshBtn.disabled = false;
@@ -1002,6 +1055,7 @@ export async function renderAdmin(container) {
       storeFeedback.textContent = 'Đã cập nhật thông tin cửa hàng thành công lên Supabase!';
       storeBtn.textContent = 'Lưu thông tin cửa hàng';
       storeBtn.disabled = false;
+      showToast('Đã lưu thông tin cửa hàng thành công!', 'success');
       setTimeout(() => { storeFeedback.style.display = 'none'; }, 4000);
     });
   }
@@ -1011,10 +1065,20 @@ export async function renderAdmin(container) {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
 
-  // Logout click
-  page.querySelector('#admin-logout-trigger').addEventListener('click', () => {
-    logout();
-    navigate('/admin/login');
+  // Logout click with confirm modal
+  page.querySelector('#admin-logout-trigger').addEventListener('click', async () => {
+    const confirmed = await showConfirmModal({
+      title: 'Đăng xuất khỏi Backoffice?',
+      message: 'Bạn có chắc chắn muốn đăng xuất khỏi phiên làm việc quản trị Phát Đạt Jewelry không?',
+      confirmText: 'Đăng xuất',
+      cancelText: 'Ở lại',
+      type: 'warning'
+    });
+    if (confirmed) {
+      logout();
+      showToast('Đã đăng xuất thành công!', 'info');
+      navigate('/admin/login');
+    }
   });
 
   // Initial render Overview

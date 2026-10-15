@@ -1,0 +1,354 @@
+/* ============================================================
+   TOAST NOTIFICATIONS & CONFIRM MODALS — PHÁT ĐẠT JEWELRY
+   ============================================================ */
+
+/* ── Toast Container ── */
+.pd-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 420px;
+  width: calc(100% - 48px);
+}
+
+@media (max-width: 600px) {
+  .pd-toast-container {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+/* ── Toast Item ── */
+.pd-toast {
+  pointer-events: auto;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(15, 42, 39, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-left-width: 5px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transform: translateX(120%);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+.pd-toast.is-visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.pd-toast.is-leaving {
+  transform: translateX(120%);
+  opacity: 0;
+}
+
+/* Toast Type Variations */
+.pd-toast--success {
+  border-left-color: #10B981;
+}
+.pd-toast--success .pd-toast-icon {
+  color: #10B981;
+  background: #ECFDF5;
+}
+
+.pd-toast--error {
+  border-left-color: #EF4444;
+}
+.pd-toast--error .pd-toast-icon {
+  color: #EF4444;
+  background: #FEF2F2;
+}
+
+.pd-toast--warning {
+  border-left-color: #F59E0B;
+}
+.pd-toast--warning .pd-toast-icon {
+  color: #F59E0B;
+  background: #FFFBEB;
+}
+
+.pd-toast--info {
+  border-left-color: var(--color-brand-primary, #1E5D57);
+}
+.pd-toast--info .pd-toast-icon {
+  color: var(--color-brand-primary, #1E5D57);
+  background: #EBF4F3;
+}
+
+/* Toast Icon */
+.pd-toast-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pd-toast-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Toast Content */
+.pd-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.pd-toast-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1B2A4A;
+  margin-bottom: 2px;
+  line-height: 1.3;
+}
+
+.pd-toast-message {
+  font-size: 13px;
+  color: #4A5568;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+/* Toast Close Button */
+.pd-toast-close {
+  background: none;
+  border: none;
+  color: #A0AEC0;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  margin-top: -2px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.pd-toast-close:hover {
+  color: #2D3748;
+  background: #EDF2F7;
+}
+
+.pd-toast-close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Progress Bar */
+.pd-toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: currentColor;
+  opacity: 0.35;
+  width: 100%;
+  transform-origin: left;
+  animation: pd-toast-shrink linear forwards;
+}
+
+@keyframes pd-toast-shrink {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONFIRM & ALERT MODAL DIALOG
+   ══════════════════════════════════════════════════════════════ */
+
+.pd-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 42, 39, 0.6);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100001;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pd-dialog-overlay.is-visible {
+  opacity: 1;
+}
+
+.pd-dialog-card {
+  background: #ffffff;
+  border-radius: 14px;
+  max-width: 440px;
+  width: 100%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+  transform: scale(0.92) translateY(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+}
+
+.pd-dialog-overlay.is-visible .pd-dialog-card {
+  transform: scale(1) translateY(0);
+}
+
+/* Dialog Top Bar */
+.pd-dialog-bar {
+  height: 5px;
+  width: 100%;
+}
+
+.pd-dialog-bar--danger {
+  background: linear-gradient(90deg, #EF4444 0%, #DC2626 100%);
+}
+
+.pd-dialog-bar--warning {
+  background: linear-gradient(90deg, #F59E0B 0%, #D97706 100%);
+}
+
+.pd-dialog-bar--success {
+  background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+}
+
+.pd-dialog-bar--primary,
+.pd-dialog-bar--info {
+  background: linear-gradient(90deg, var(--color-brand-primary, #1E5D57) 0%, var(--color-accent-gold, #C99738) 100%);
+}
+
+/* Dialog Body */
+.pd-dialog-body {
+  padding: 28px 24px 20px 24px;
+  text-align: center;
+}
+
+.pd-dialog-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-dialog-icon-wrap--danger {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.pd-dialog-icon-wrap--warning {
+  background: #FEF3C7;
+  color: #D97706;
+}
+
+.pd-dialog-icon-wrap--success {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+.pd-dialog-icon-wrap--primary,
+.pd-dialog-icon-wrap--info {
+  background: #E8F4F3;
+  color: var(--color-brand-primary, #1E5D57);
+}
+
+.pd-dialog-icon-wrap svg {
+  width: 28px;
+  height: 28px;
+}
+
+.pd-dialog-title {
+  font-family: var(--font-display, "Playfair Display", Georgia, serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: #1B2A4A;
+  margin: 0 0 8px 0;
+  line-height: 1.35;
+}
+
+.pd-dialog-message {
+  font-size: 14px;
+  color: #4A5568;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Dialog Footer */
+.pd-dialog-footer {
+  padding: 16px 24px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.pd-dialog-btn {
+  flex: 1;
+  padding: 11px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pd-dialog-btn--cancel {
+  background: #F3F4F6;
+  color: #4B5563;
+  border-color: #E5E7EB;
+}
+
+.pd-dialog-btn--cancel:hover {
+  background: #E5E7EB;
+  color: #1F2937;
+}
+
+.pd-dialog-btn--danger {
+  background: #DC2626;
+  color: #ffffff;
+}
+
+.pd-dialog-btn--danger:hover {
+  background: #B91C1C;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.pd-dialog-btn--primary {
+  background: var(--color-brand-primary, #1E5D57);
+  color: #ffffff;
+}
+
+.pd-dialog-btn--primary:hover {
+  background: #154540;
+  box-shadow: 0 4px 12px rgba(30, 93, 87, 0.3);
+}
+
+.pd-dialog-btn--warning {
+  background: #D97706;
+  color: #ffffff;
+}
+
+.pd-dialog-btn--warning:hover {
+  background: #B45309;
+}

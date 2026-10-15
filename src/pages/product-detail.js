@@ -10,6 +10,7 @@ import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
 import { siteInfo } from '../data/site-info.js';
 import { t } from '../i18n.js';
 import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
+import { showToast } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -480,6 +481,11 @@ export function renderProductDetail(container, params = {}) {
       const svg = wishlistBtn.querySelector('svg');
       svg.setAttribute('fill', isNowLiked ? '#D4380D' : 'none');
       wishlistBtn.style.color = isNowLiked ? '#D4380D' : 'currentColor';
+      showToast(
+        isNowLiked ? `Đã thêm "${product.name}" vào danh sách yêu thích!` : `Đã xóa "${product.name}" khỏi danh sách yêu thích`,
+        isNowLiked ? 'success' : 'info',
+        2500
+      );
     });
   }
 

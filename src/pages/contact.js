@@ -4,6 +4,7 @@
 
 import { createFormField, validateForm } from '../components/form-field.js';
 import { addCustomerContact } from '../services/supabase.js';
+import { showToast } from '../components/feedback-modal.js';
 import { t } from '../i18n.js';
 
 export function renderContact(container) {
@@ -179,6 +180,8 @@ export function renderContact(container) {
         subject,
         message,
       });
+
+      showToast('Gửi yêu cầu tư vấn thành công! Nhân viên Phát Đạt sẽ liên hệ lại với bạn sớm.', 'success', 4000);
 
       // Show success feedback
       submitBtn.textContent = 'ĐÃ GỬI TIN NHẮN THÀNH CÔNG!';

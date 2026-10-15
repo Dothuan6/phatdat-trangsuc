@@ -4,6 +4,7 @@
 
 import { login, isAuthenticated } from '../../services/auth.js';
 import { navigate } from '../../router.js';
+import { showToast } from '../../components/feedback-modal.js';
 import './admin.css';
 
 export function renderAdminLogin(container) {
@@ -72,14 +73,17 @@ export function renderAdminLogin(container) {
     if (result.success) {
       submitBtn.textContent = 'Đăng nhập thành công!';
       submitBtn.style.backgroundColor = '#1E824C';
+      showToast('Chào mừng trở lại Quản trị viên Phát Đạt!', 'success');
       setTimeout(() => {
         navigate('/admin');
       }, 400);
     } else {
-      errorAlert.textContent = result.message || 'Đăng nhập không thành công';
+      const msg = result.message || 'Đăng nhập không thành công';
+      errorAlert.textContent = msg;
       errorAlert.style.display = 'block';
       submitBtn.textContent = 'ĐĂNG NHẬP BACKOFFICE';
       submitBtn.disabled = false;
+      showToast(msg, 'error');
     }
   });
 

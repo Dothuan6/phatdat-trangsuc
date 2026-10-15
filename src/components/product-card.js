@@ -5,6 +5,7 @@
 import { formatPrice } from '../data/products.js';
 import { t } from '../i18n.js';
 import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
+import { showToast } from './feedback-modal.js';
 
 export function createProductCard(product) {
   const card = document.createElement('a');
@@ -43,6 +44,11 @@ export function createProductCard(product) {
     const isNowLiked = toggleWishlist(product.id);
     wishlistBtn.style.color = isNowLiked ? '#D4380D' : 'currentColor';
     wishlistBtn.querySelector('svg').setAttribute('fill', isNowLiked ? 'currentColor' : 'none');
+    showToast(
+      isNowLiked ? `Đã thêm "${product.name}" vào danh sách yêu thích!` : `Đã xóa "${product.name}" khỏi danh sách yêu thích`,
+      isNowLiked ? 'success' : 'info',
+      2500
+    );
   });
 
   return card;
