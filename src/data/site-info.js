@@ -2,7 +2,7 @@
 // SITE INFO — Thông tin liên hệ cửa hàng (dùng chung toàn site)
 // ============================================================
 
-export const siteInfo = {
+const defaultSiteInfo = {
   name: 'Phát Đạt Jewelry',
   phone: '0898025013',
   phoneDisplay: '0898 025 013',
@@ -17,3 +17,21 @@ export const siteInfo = {
   mapsEmbed: 'https://www.google.com/maps?q=Tan%20Vinh%20Loc%2C%20Ho%20Chi%20Minh%20City%2C%20Vietnam&output=embed',
   hours: 'Mở cửa cả ngày (full time) — tất cả các ngày trong tuần',
 };
+
+function getLiveSiteInfo() {
+  try {
+    const saved = localStorage.getItem('phatdat_admin_settings');
+    if (saved) {
+      return { ...defaultSiteInfo, ...JSON.parse(saved) };
+    }
+  } catch (e) {}
+  return defaultSiteInfo;
+}
+
+export const siteInfo = new Proxy(defaultSiteInfo, {
+  get(target, prop) {
+    const live = getLiveSiteInfo();
+    return live[prop] || target[prop];
+  }
+});
+

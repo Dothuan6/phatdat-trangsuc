@@ -457,6 +457,11 @@
   color: #2E7D32;
 }
 
+.admin-badge--inactive {
+  background: #EEEEEE;
+  color: #757575;
+}
+
 .admin-badge--pending {
   background: #FFF3E0;
   color: #E65100;
@@ -465,6 +470,44 @@
 .admin-badge--completed {
   background: #E3F2FD;
   color: #1565C0;
+}
+
+.admin-img-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.admin-img-preview-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: #fff;
+}
+
+.admin-color-swatches {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.admin-color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #ccc;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.admin-color-swatch:hover,
+.admin-color-swatch.is-selected {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 2px var(--color-brand-primary);
 }
 
 /* Action Buttons */

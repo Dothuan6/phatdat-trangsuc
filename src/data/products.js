@@ -59,7 +59,7 @@ function make(id, name, collection, category, materials, stones, price, images, 
   };
 }
 
-export const products = [
+export const defaultProducts = [
   make('day-chuyen-co-ba-la', 'Dây chuyền cỏ ba lá', 'Cỏ Ba Lá', 'necklaces', 'Bạc 925 xi vàng', 'Xà cừ', 289000,
     [P + 'daychuyen3-removebg-preview.png', G(15), G(16)],
     'Mặt cỏ ba lá xà cừ biểu tượng của may mắn, phù hợp đeo hằng ngày hoặc làm quà tặng.',
@@ -142,6 +142,40 @@ export const products = [
     { 'Độ dài dây': '40 + 5 cm' }),
 ];
 
+// Get live products from localStorage if available, fallback to defaultProducts
+export function getLiveProducts(includeHidden = false) {
+  try {
+    const local = typeof localStorage !== 'undefined' ? localStorage.getItem('phatdat_admin_products') : null;
+    if (local) {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return includeHidden ? parsed : parsed.filter(p => p.is_active !== false);
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading live products:', e);
+  }
+  return includeHidden ? defaultProducts : defaultProducts.filter(p => p.is_active !== false);
+}
+
+// Reactive products proxy so any import of `products` automatically gets updated admin list
+export const products = new Proxy(defaultProducts, {
+  get(target, prop, receiver) {
+    const live = getLiveProducts();
+    if (prop === 'length') return live.length;
+    if (typeof prop === 'string' && /^\d+$/.test(prop)) {
+      return live[Number(prop)];
+    }
+    if (prop in live && typeof live[prop] === 'function') {
+      return live[prop].bind(live);
+    }
+    if (prop === Symbol.iterator) {
+      return live[Symbol.iterator].bind(live);
+    }
+    return Reflect.get(live, prop, receiver);
+  }
+});
+
 // Categories for the PLP page
 export const categories = [
   { id: 'necklaces', name: 'Dây chuyền & Mặt dây chuyền', slug: 'necklaces' },
@@ -150,8 +184,28 @@ export const categories = [
   { id: 'earrings', name: 'Hoa tai', slug: 'earrings' },
 ];
 
-// Collections filter
-export const collections = [...new Set(products.map(p => p.collection))];
+export function getLiveCollections() {
+  const prods = getLiveProducts();
+  const set = new Set();
+  prods.forEach(p => {
+    if (p.collection && p.collection.trim()) {
+      set.add(p.collection.trim());
+    }
+  });
+  return [...set];
+}
+
+// Collections filter proxy
+export const collections = new Proxy([], {
+  get(target, prop, receiver) {
+    const live = getLiveCollections();
+    if (prop === 'length') return live.length;
+    if (typeof prop === 'string' && /^\d+$/.test(prop)) return live[Number(prop)];
+    if (prop in live && typeof live[prop] === 'function') return live[prop].bind(live);
+    if (prop === Symbol.iterator) return live[Symbol.iterator].bind(live);
+    return Reflect.get(live, prop, receiver);
+  }
+});
 
 export function slugify(str) {
   return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')

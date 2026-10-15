@@ -12,10 +12,14 @@ import {
   getAdminProducts,
   saveAdminProduct,
   deleteAdminProduct,
+  toggleProductActive,
+  syncAllProductsToSupabase,
   getAdminCollections,
   saveAdminCollection,
+  deleteAdminCollection,
   getAdminContacts,
   updateContactStatus,
+  deleteAdminContact,
   getAdminSiteSettings,
   saveAdminSiteSettings
 } from '../../services/supabase.js';
@@ -38,7 +42,7 @@ export async function renderAdmin(container) {
   let collections = await getAdminCollections();
   let contacts = await getAdminContacts();
   let siteSettings = await getAdminSiteSettings();
-  let activeTab = 'overview'; // 'overview', 'products', 'collections', 'contacts', 'settings'
+  let activeTab = 'overview';
 
   // Test connection status
   let dbStatus = await testSupabaseConnection();
@@ -125,6 +129,12 @@ export async function renderAdmin(container) {
   const contentArea = page.querySelector('#admin-tab-content');
   const pageTitle = page.querySelector('#admin-page-title');
 
+  function updateSidebarBadges() {
+    page.querySelector('#sidebar-products-count').textContent = products.length;
+    page.querySelector('#sidebar-collections-count').textContent = collections.length;
+    page.querySelector('#sidebar-contacts-count').textContent = contacts.filter(c => c.status === 'pending').length;
+  }
+
   // Switch Tab Handler
   function switchTab(tabName) {
     activeTab = tabName;
@@ -184,17 +194,29 @@ export async function renderAdmin(container) {
         <div class="admin-stat-card">
           <div class="admin-stat-icon" style="background: #E8F8F5; color: #1ABC9C;">🗄️</div>
           <div class="admin-stat-info">
-            <h4>Cơ sở dữ liệu</h4>
-            <div class="admin-stat-number" style="font-size: 16px; margin-top: 4px;">${SUPABASE_PROJECT_ID}</div>
+            <h4>Supabase Project</h4>
+            <div class="admin-stat-number" style="font-size: 15px; margin-top: 4px;">${SUPABASE_PROJECT_ID}</div>
           </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Bar -->
+      <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--color-brand-primary);">Thao tác nhanh Backoffice</h4>
+          <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Thêm sản phẩm mới, cập nhật kho hoặc kiểm tra thông tin liên hệ của khách hàng.</p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button class="admin-btn admin-btn--primary" id="btn-quick-add-prod">+ Thêm Sản Phẩm Mới</button>
+          <button class="admin-btn admin-btn--outline" id="btn-quick-inquiries">Xem ${pendingContacts.length} Yêu Cầu Tư Vấn</button>
         </div>
       </div>
 
       <!-- Recent Products Preview -->
       <div class="admin-card">
         <div class="admin-card-header">
-          <h3 class="admin-card-title">Mẫu trang sức nổi bật gần đây</h3>
-          <button class="admin-btn admin-btn--primary admin-btn-sm" id="btn-goto-products">Quản lý toàn bộ sản phẩm →</button>
+          <h3 class="admin-card-title">Mẫu trang sức nổi bật trong hệ thống</h3>
+          <button class="admin-btn admin-btn--primary admin-btn-sm" id="btn-goto-products">Quản lý toàn bộ ${products.length} sản phẩm →</button>
         </div>
         <div class="admin-table-responsive">
           <table class="admin-table">
@@ -205,18 +227,26 @@ export async function renderAdmin(container) {
                 <th>Mã SP</th>
                 <th>Danh mục</th>
                 <th>Giá bán</th>
-                <th>Chất liệu</th>
+                <th>Trạng thái</th>
+                <th style="text-align: right;">Xem</th>
               </tr>
             </thead>
             <tbody>
-              ${products.slice(0, 5).map(p => `
+              ${products.slice(0, 6).map(p => `
                 <tr>
                   <td><img src="${p.images[0]}" alt="${p.name}" class="admin-product-thumb" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'"></td>
                   <td><strong>${p.name}</strong></td>
                   <td><code style="background:#eef2f3;padding:2px 6px;border-radius:3px;">${p.reference}</code></td>
                   <td>${p.collection}</td>
                   <td style="color:var(--color-brand-primary);font-weight:600;">${formatPrice(p.price)}</td>
-                  <td style="color:var(--color-text-secondary);">${p.materials}</td>
+                  <td>
+                    <span class="admin-badge ${p.is_active !== false ? 'admin-badge--active' : 'admin-badge--inactive'}">
+                      ${p.is_active !== false ? 'Hiển thị' : 'Đang ẩn'}
+                    </span>
+                  </td>
+                  <td style="text-align: right;">
+                    <a href="#/product/${p.id}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm">Xem PDP ↗</a>
+                  </td>
                 </tr>
               `).join('')}
             </tbody>
@@ -226,6 +256,11 @@ export async function renderAdmin(container) {
     `;
 
     contentArea.querySelector('#btn-goto-products').addEventListener('click', () => switchTab('products'));
+    contentArea.querySelector('#btn-quick-add-prod').addEventListener('click', () => {
+      switchTab('products');
+      setTimeout(() => openProductModal(), 100);
+    });
+    contentArea.querySelector('#btn-quick-inquiries').addEventListener('click', () => switchTab('contacts'));
   }
 
   // ════════════════════════════════════════════════════════════
@@ -235,7 +270,7 @@ export async function renderAdmin(container) {
     contentArea.innerHTML = `
       <div class="admin-card">
         <div class="admin-card-header">
-          <div style="display: flex; align-items: center; gap: 14px; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 14px; flex: 1; flex-wrap: wrap;">
             <input type="text" id="product-search-input" class="admin-form-input" style="max-width: 280px; padding: 8px 12px;" placeholder="Tìm tên hoặc mã SP...">
             <select id="product-filter-cat" class="admin-form-input" style="max-width: 180px; padding: 8px 12px;">
               <option value="all">Tất cả danh mục</option>
@@ -243,6 +278,11 @@ export async function renderAdmin(container) {
               <option value="rings">Nhẫn</option>
               <option value="bracelets">Vòng & Lắc tay</option>
               <option value="earrings">Bông tai</option>
+            </select>
+            <select id="product-filter-status" class="admin-form-input" style="max-width: 160px; padding: 8px 12px;">
+              <option value="all">Tất cả trạng thái</option>
+              <option value="active">Đang hiển thị</option>
+              <option value="hidden">Đã ẩn</option>
             </select>
           </div>
           <button class="admin-btn admin-btn--primary" id="btn-add-product">
@@ -254,13 +294,13 @@ export async function renderAdmin(container) {
           <table class="admin-table" id="products-table">
             <thead>
               <tr>
-                <th style="width: 60px;">Ảnh</th>
+                <th style="width: 50px;">Ảnh</th>
                 <th>Tên sản phẩm</th>
                 <th>Mã SP</th>
                 <th>Danh mục</th>
                 <th>Bộ sưu tập</th>
                 <th>Giá</th>
-                <th>Chất liệu / Đá</th>
+                <th>Trạng thái</th>
                 <th style="text-align: right;">Thao tác</th>
               </tr>
             </thead>
@@ -275,35 +315,52 @@ export async function renderAdmin(container) {
     const tableBody = contentArea.querySelector('#products-table-body');
     const searchInput = contentArea.querySelector('#product-search-input');
     const filterCat = contentArea.querySelector('#product-filter-cat');
+    const filterStatus = contentArea.querySelector('#product-filter-status');
 
     function renderProductRows(items) {
       if (items.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không tìm thấy sản phẩm nào.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không tìm thấy sản phẩm nào phù hợp.</td></tr>`;
         return;
       }
-      tableBody.innerHTML = items.map(p => `
-        <tr>
-          <td><img src="${p.images[0]}" class="admin-product-thumb" alt="${p.name}" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'"></td>
-          <td>
-            <div style="font-weight:600;color:var(--color-text-primary);">${p.name}</div>
-            <div style="font-size:11px;color:var(--color-text-secondary);">${p.specifications ? Object.keys(p.specifications).length + ' thông số' : ''}</div>
-          </td>
-          <td><code style="background:#eef2f3;padding:2px 6px;border-radius:3px;">${p.reference}</code></td>
-          <td>${p.category}</td>
-          <td><span class="admin-badge admin-badge--active">${p.collection}</span></td>
-          <td style="font-weight:700;color:var(--color-brand-primary);">${formatPrice(p.price)}</td>
-          <td style="font-size:12px;color:var(--color-text-secondary);">
-            <div>${p.materials}</div>
-            ${p.stones ? `<div style="color:var(--color-accent-gold);">${p.stones}</div>` : ''}
-          </td>
-          <td style="text-align: right; white-space: nowrap;">
-            <button class="admin-btn admin-btn--outline admin-btn-sm edit-product-btn" data-id="${p.id}" style="margin-right: 6px;">Sửa</button>
-            <button class="admin-btn admin-btn--danger admin-btn-sm delete-product-btn" data-id="${p.id}">Xóa</button>
-          </td>
-        </tr>
-      `).join('');
+      tableBody.innerHTML = items.map(p => {
+        const isActive = p.is_active !== false;
+        return `
+          <tr style="${isActive ? '' : 'opacity: 0.7; background: #fafafa;'}">
+            <td><img src="${p.images[0]}" class="admin-product-thumb" alt="${p.name}" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'"></td>
+            <td>
+              <div style="font-weight:600;color:var(--color-text-primary);">${p.name}</div>
+              <div style="font-size:11px;color:var(--color-text-secondary);">${p.materials} ${p.stones ? '• ' + p.stones : ''}</div>
+            </td>
+            <td><code style="background:#eef2f3;padding:2px 6px;border-radius:3px;font-size:12px;">${p.reference}</code></td>
+            <td>${p.category}</td>
+            <td><span class="admin-badge admin-badge--active">${p.collection}</span></td>
+            <td style="font-weight:700;color:var(--color-brand-primary);">${formatPrice(p.price)}</td>
+            <td>
+              <span class="admin-badge ${isActive ? 'admin-badge--active' : 'admin-badge--inactive'}">
+                ${isActive ? 'Đang hiện' : 'Đã ẩn'}
+              </span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <button class="admin-btn admin-btn--outline admin-btn-sm toggle-active-btn" data-id="${p.id}" data-active="${isActive ? 'true' : 'false'}" title="${isActive ? 'Ẩn sản phẩm khỏi website' : 'Hiện sản phẩm lên website'}">
+                ${isActive ? 'Ẩn' : 'Hiện'}
+              </button>
+              <button class="admin-btn admin-btn--outline admin-btn-sm edit-product-btn" data-id="${p.id}" style="margin: 0 4px;">Sửa</button>
+              <button class="admin-btn admin-btn--danger admin-btn-sm delete-product-btn" data-id="${p.id}">Xóa</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
 
       // Attach row action listeners
+      tableBody.querySelectorAll('.toggle-active-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const currentActive = btn.dataset.active === 'true';
+          await toggleProductActive(btn.dataset.id, !currentActive);
+          products = await getAdminProducts();
+          filterTable();
+        });
+      });
+
       tableBody.querySelectorAll('.edit-product-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           const item = products.find(p => p.id === btn.dataset.id);
@@ -313,11 +370,11 @@ export async function renderAdmin(container) {
 
       tableBody.querySelectorAll('.delete-product-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
+          if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này vĩnh viễn không?')) {
             await deleteAdminProduct(btn.dataset.id);
             products = await getAdminProducts();
-            page.querySelector('#sidebar-products-count').textContent = products.length;
-            renderProductRows(products);
+            updateSidebarBadges();
+            filterTable();
           }
         });
       });
@@ -326,14 +383,25 @@ export async function renderAdmin(container) {
     function filterTable() {
       const q = searchInput.value.toLowerCase().trim();
       const cat = filterCat.value;
+      const st = filterStatus.value;
       let res = products;
+
       if (cat !== 'all') res = res.filter(p => p.category === cat);
-      if (q) res = res.filter(p => p.name.toLowerCase().includes(q) || p.reference.toLowerCase().includes(q));
+      if (st === 'active') res = res.filter(p => p.is_active !== false);
+      if (st === 'hidden') res = res.filter(p => p.is_active === false);
+      if (q) {
+        res = res.filter(p =>
+          (p.name && p.name.toLowerCase().includes(q)) ||
+          (p.reference && p.reference.toLowerCase().includes(q)) ||
+          (p.collection && p.collection.toLowerCase().includes(q))
+        );
+      }
       renderProductRows(res);
     }
 
     searchInput.addEventListener('input', filterTable);
     filterCat.addEventListener('change', filterTable);
+    filterStatus.addEventListener('change', filterTable);
     contentArea.querySelector('#btn-add-product').addEventListener('click', () => openProductModal());
 
     renderProductRows(products);
@@ -345,18 +413,22 @@ export async function renderAdmin(container) {
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'admin-modal-overlay';
 
+    const defaultImg = prod && prod.images && prod.images[0]
+      ? prod.images[0]
+      : './images/products/daychuyen3-removebg-preview.png';
+
     modalOverlay.innerHTML = `
       <div class="admin-modal">
         <div class="admin-modal-header">
           <h3>${isEdit ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</h3>
-          <button id="modal-close-btn" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+          <button id="modal-close-btn" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);">✕</button>
         </div>
         <form id="product-modal-form">
           <div class="admin-modal-body">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;">
               <div class="admin-form-group">
                 <label>Tên sản phẩm *</label>
-                <input type="text" id="m-name" class="admin-form-input" required value="${prod ? prod.name : ''}">
+                <input type="text" id="m-name" class="admin-form-input" required value="${prod ? prod.name : ''}" placeholder="VD: Dây chuyền cỏ ba lá xà cừ">
               </div>
               <div class="admin-form-group">
                 <label>Mã sản phẩm (SKU) *</label>
@@ -382,7 +454,7 @@ export async function renderAdmin(container) {
               </div>
               <div class="admin-form-group">
                 <label>Giá bán (VNĐ) *</label>
-                <input type="number" id="m-price" class="admin-form-input" required value="${prod ? prod.price : 249000}">
+                <input type="number" id="m-price" class="admin-form-input" required value="${prod ? prod.price : 249000}" step="1000">
               </div>
             </div>
 
@@ -393,18 +465,33 @@ export async function renderAdmin(container) {
               </div>
               <div class="admin-form-group">
                 <label>Đá đính kèm</label>
-                <input type="text" id="m-stones" class="admin-form-input" value="${prod ? prod.stones : 'Xà cừ'}">
+                <input type="text" id="m-stones" class="admin-form-input" value="${prod ? prod.stones : 'Xà cừ, Đá CZ'}">
               </div>
             </div>
 
             <div class="admin-form-group">
-              <label>Link ảnh sản phẩm chính (URL hoặc đường dẫn)</label>
-              <input type="text" id="m-image" class="admin-form-input" required value="${prod && prod.images ? prod.images[0] : './images/products/Daychuyen4.3-removebg-preview.png'}">
+              <label>Link ảnh sản phẩm chính</label>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <input type="text" id="m-image" class="admin-form-input" style="flex: 1;" required value="${defaultImg}">
+                <img id="m-img-preview" src="${defaultImg}" class="admin-img-preview-thumb" alt="Preview" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 6px;">
+                Gợi ý ảnh mẫu: 
+                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/daychuyen3-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Dây chuyền 3]</a>
+                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/4-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Nhẫn/Lắc cỏ 4]</a>
+                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/6-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Vòng hạt 6]</a>
+                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/bongtay1.1-removebg-preview.png" style="color:var(--color-brand-primary);">[Bông tai 1.1]</a>
+              </div>
             </div>
 
             <div class="admin-form-group">
-              <label>Mô tả chi tiết</label>
+              <label>Mô tả chi tiết sản phẩm</label>
               <textarea id="m-description" class="admin-form-input" rows="3">${prod ? prod.description : 'Trang sức bạc 925 cao cấp chế tác tinh xảo, quà tặng may mắn cho nàng.'}</textarea>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; background: #f8faf9; border-radius: 6px;">
+              <input type="checkbox" id="m-active" ${!prod || prod.is_active !== false ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--color-brand-primary); cursor: pointer;">
+              <label for="m-active" style="margin: 0; font-size: 13px; font-weight: 600; cursor: pointer;">Hiển thị công khai sản phẩm trên website</label>
             </div>
           </div>
           <div class="admin-modal-footer">
@@ -421,30 +508,55 @@ export async function renderAdmin(container) {
     modalOverlay.querySelector('#modal-close-btn').addEventListener('click', closeModal);
     modalOverlay.querySelector('#m-cancel').addEventListener('click', closeModal);
 
+    // Live preview input listener
+    const imgInput = modalOverlay.querySelector('#m-image');
+    const imgPreview = modalOverlay.querySelector('#m-img-preview');
+    imgInput.addEventListener('input', () => {
+      imgPreview.src = imgInput.value.trim() || './images/products/Daychuyen4.3-removebg-preview.png';
+    });
+
+    // Preset button click
+    modalOverlay.querySelectorAll('.preset-img-btn').forEach(a => {
+      a.addEventListener('click', () => {
+        imgInput.value = a.dataset.url;
+        imgPreview.src = a.dataset.url;
+      });
+    });
+
+    // Form submit
     modalOverlay.querySelector('#product-modal-form').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const saveBtn = modalOverlay.querySelector('button[type="submit"]');
+      saveBtn.textContent = 'Đang lưu...';
+      saveBtn.disabled = true;
+
       const updatedItem = {
         id: prod ? prod.id : 'pd-' + Date.now(),
-        name: modalOverlay.querySelector('#m-name').value,
-        reference: modalOverlay.querySelector('#m-ref').value,
+        name: modalOverlay.querySelector('#m-name').value.trim(),
+        reference: modalOverlay.querySelector('#m-ref').value.trim(),
         category: modalOverlay.querySelector('#m-category').value,
         collection: modalOverlay.querySelector('#m-collection').value,
         price: parseInt(modalOverlay.querySelector('#m-price').value, 10),
         currency: '₫',
-        materials: modalOverlay.querySelector('#m-materials').value,
-        stones: modalOverlay.querySelector('#m-stones').value,
-        images: [modalOverlay.querySelector('#m-image').value],
-        description: modalOverlay.querySelector('#m-description').value,
-        specifications: prod && prod.specifications ? prod.specifications : { 'Chất liệu': modalOverlay.querySelector('#m-materials').value },
-        availableSizes: prod ? prod.availableSizes : ['Freesize'],
-        availableColors: prod ? prod.availableColors : ['Bạc sáng 925', 'Xi vàng 18K'],
-        rating: 4.9,
-        reviewsCount: 20
+        materials: modalOverlay.querySelector('#m-materials').value.trim(),
+        stones: modalOverlay.querySelector('#m-stones').value.trim(),
+        images: [modalOverlay.querySelector('#m-image').value.trim()],
+        description: modalOverlay.querySelector('#m-description').value.trim(),
+        specifications: prod && prod.specifications ? prod.specifications : {
+          'Chất liệu': modalOverlay.querySelector('#m-materials').value.trim(),
+          'Đá đính kèm': modalOverlay.querySelector('#m-stones').value.trim()
+        },
+        availableSizes: prod && prod.availableSizes ? prod.availableSizes : ['Freesize'],
+        availableColors: prod && prod.availableColors ? prod.availableColors : ['Bạc sáng 925', 'Xi vàng 18K'],
+        is_active: modalOverlay.querySelector('#m-active').checked,
+        isActive: modalOverlay.querySelector('#m-active').checked,
+        rating: prod ? prod.rating : 4.9,
+        reviewsCount: prod ? prod.reviewsCount : 20
       };
 
       await saveAdminProduct(updatedItem);
       products = await getAdminProducts();
-      page.querySelector('#sidebar-products-count').textContent = products.length;
+      updateSidebarBadges();
       closeModal();
       renderProductsTab();
     });
@@ -457,21 +569,30 @@ export async function renderAdmin(container) {
     contentArea.innerHTML = `
       <div class="admin-card">
         <div class="admin-card-header">
-          <h3 class="admin-card-title">Danh sách Bộ Sưu Tập Phát Đạt Jewelry</h3>
-          <button class="admin-btn admin-btn--primary admin-btn-sm" id="btn-add-col">+ Thêm BST</button>
+          <div>
+            <h3 class="admin-card-title">Danh sách Bộ Sưu Tập Phát Đạt Jewelry</h3>
+            <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">Quản lý các dòng sản phẩm đặc trưng của thương hiệu</div>
+          </div>
+          <button class="admin-btn admin-btn--primary" id="btn-add-col">+ Thêm Bộ Sưu Tập</button>
         </div>
         <div style="padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
           ${collections.map(c => `
-            <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
-              <img src="${c.image}" alt="${c.name}" style="width: 100%; height: 160px; object-fit: cover;">
-              <div style="padding: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <h4 style="font-size: 16px; margin: 0; color: var(--color-brand-primary);">${c.name}</h4>
-                  <span style="font-size: 11px; background: ${c.color || '#1B2A4A'}; color: #fff; padding: 2px 8px; border-radius: 4px;">Màu chủ đạo</span>
+            <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; flex-direction: column;">
+              <img src="${c.image}" alt="${c.name}" style="width: 100%; height: 160px; object-fit: cover;" onerror="this.src='./images/gallery/g15.jpg'">
+              <div style="padding: 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="font-size: 16px; margin: 0; color: var(--color-brand-primary);">${c.name}</h4>
+                    <span style="font-size: 11px; background: ${c.color || '#1E5D57'}; color: #fff; padding: 2px 8px; border-radius: 4px;">Màu chủ đạo</span>
+                  </div>
+                  <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 12px 0;">${c.description || 'Bộ sưu tập trang sức tinh tuyển từ Phát Đạt.'}</p>
                 </div>
-                <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 12px 0;">${c.description}</p>
-                <div style="display: flex; justify-content: flex-end;">
-                  <a href="#/collections/${c.id}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm">Xem trang BST ↗</a>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 12px; margin-top: 12px;">
+                  <a href="#/collections/${c.id}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm">Xem BST ↗</a>
+                  <div style="display: flex; gap: 6px;">
+                    <button class="admin-btn admin-btn--outline admin-btn-sm edit-col-btn" data-id="${c.id}">Sửa</button>
+                    <button class="admin-btn admin-btn--danger admin-btn-sm delete-col-btn" data-id="${c.id}">Xóa</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -480,21 +601,117 @@ export async function renderAdmin(container) {
       </div>
     `;
 
-    contentArea.querySelector('#btn-add-col').addEventListener('click', () => {
-      const name = prompt('Nhập tên bộ sưu tập mới:');
-      if (name) {
-        const desc = prompt('Nhập mô tả ngắn:') || '';
-        const newCol = {
-          id: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-          name,
-          description: desc,
-          image: './images/gallery/g1.jpg',
-          color: '#1E5D57'
-        };
-        saveAdminCollection(newCol);
-        collections.push(newCol);
-        renderCollectionsTab();
-      }
+    contentArea.querySelector('#btn-add-col').addEventListener('click', () => openCollectionModal());
+
+    contentArea.querySelectorAll('.edit-col-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = collections.find(c => c.id === btn.dataset.id);
+        if (item) openCollectionModal(item);
+      });
+    });
+
+    contentArea.querySelectorAll('.delete-col-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (confirm('Bạn có chắc chắn muốn xóa bộ sưu tập này không?')) {
+          await deleteAdminCollection(btn.dataset.id);
+          collections = await getAdminCollections();
+          updateSidebarBadges();
+          renderCollectionsTab();
+        }
+      });
+    });
+  }
+
+  // Collection Modal
+  function openCollectionModal(col = null) {
+    const isEdit = !!col;
+    const modalOverlay = document.createElement('div');
+    modalOverlay.className = 'admin-modal-overlay';
+
+    const defaultImg = col ? col.image : './images/gallery/g16.jpg';
+    let selectedColor = col ? (col.color || '#1E5D57') : '#1E5D57';
+
+    modalOverlay.innerHTML = `
+      <div class="admin-modal" style="max-width: 520px;">
+        <div class="admin-modal-header">
+          <h3>${isEdit ? 'Chỉnh Sửa Bộ Sưu Tập' : 'Thêm Bộ Sưu Tập Mới'}</h3>
+          <button id="col-close-btn" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);">✕</button>
+        </div>
+        <form id="col-modal-form">
+          <div class="admin-modal-body">
+            <div class="admin-form-group">
+              <label>Tên bộ sưu tập *</label>
+              <input type="text" id="col-name" class="admin-form-input" required value="${col ? col.name : ''}" placeholder="VD: Hoa Xinh, Ánh Sao...">
+            </div>
+
+            <div class="admin-form-group">
+              <label>Mô tả ngắn</label>
+              <textarea id="col-desc" class="admin-form-input" rows="3" placeholder="Thông điệp hoặc ý nghĩa của bộ sưu tập...">${col ? col.description : ''}</textarea>
+            </div>
+
+            <div class="admin-form-group">
+              <label>Link ảnh đại diện BST</label>
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <input type="text" id="col-image" class="admin-form-input" required value="${defaultImg}">
+                <img id="col-img-preview" src="${defaultImg}" class="admin-img-preview-thumb" alt="Preview">
+              </div>
+            </div>
+
+            <div class="admin-form-group">
+              <label>Màu sắc chủ đạo nhận diện</label>
+              <div class="admin-color-swatches" id="col-swatches">
+                <div class="admin-color-swatch ${selectedColor === '#1E5D57' ? 'is-selected' : ''}" data-color="#1E5D57" style="background: #1E5D57;" title="Xanh Ngọc Lục Bảo"></div>
+                <div class="admin-color-swatch ${selectedColor === '#C99738' ? 'is-selected' : ''}" data-color="#C99738" style="background: #C99738;" title="Vàng Hoàng Gia"></div>
+                <div class="admin-color-swatch ${selectedColor === '#1B2A4A' ? 'is-selected' : ''}" data-color="#1B2A4A" style="background: #1B2A4A;" title="Xanh Đêm"></div>
+                <div class="admin-color-swatch ${selectedColor === '#8C1D40' ? 'is-selected' : ''}" data-color="#8C1D40" style="background: #8C1D40;" title="Đỏ Ruby"></div>
+                <div class="admin-color-swatch ${selectedColor === '#2C3E50' ? 'is-selected' : ''}" data-color="#2C3E50" style="background: #2C3E50;" title="Xám Đen"></div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-modal-footer">
+            <button type="button" class="admin-btn admin-btn--outline" id="col-cancel">Hủy</button>
+            <button type="submit" class="admin-btn admin-btn--primary">Lưu Bộ Sưu Tập</button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(modalOverlay);
+
+    const closeModal = () => modalOverlay.remove();
+    modalOverlay.querySelector('#col-close-btn').addEventListener('click', closeModal);
+    modalOverlay.querySelector('#col-cancel').addEventListener('click', closeModal);
+
+    const imgInput = modalOverlay.querySelector('#col-image');
+    const imgPreview = modalOverlay.querySelector('#col-img-preview');
+    imgInput.addEventListener('input', () => {
+      imgPreview.src = imgInput.value.trim() || './images/gallery/g15.jpg';
+    });
+
+    modalOverlay.querySelectorAll('.admin-color-swatch').forEach(sw => {
+      sw.addEventListener('click', () => {
+        modalOverlay.querySelectorAll('.admin-color-swatch').forEach(s => s.classList.remove('is-selected'));
+        sw.classList.add('is-selected');
+        selectedColor = sw.dataset.color;
+      });
+    });
+
+    modalOverlay.querySelector('#col-modal-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = modalOverlay.querySelector('#col-name').value.trim();
+      const updated = {
+        id: col ? col.id : name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        name,
+        description: modalOverlay.querySelector('#col-desc').value.trim(),
+        image: imgInput.value.trim(),
+        color: selectedColor
+      };
+
+      await saveAdminCollection(updated);
+      collections = await getAdminCollections();
+      updateSidebarBadges();
+      closeModal();
+      renderCollectionsTab();
     });
   }
 
@@ -502,60 +719,101 @@ export async function renderAdmin(container) {
   // TAB 4: CONTACTS & INQUIRIES
   // ════════════════════════════════════════════════════════════
   function renderContactsTab() {
-    contentArea.innerHTML = `
-      <div class="admin-card">
-        <div class="admin-card-header">
-          <h3 class="admin-card-title">Khách hàng yêu cầu tư vấn & liên hệ</h3>
-          <span style="font-size: 13px; color: var(--color-text-secondary);">${contacts.length} yêu cầu</span>
-        </div>
-        <div class="admin-table-responsive">
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Thời gian</th>
-                <th>Khách hàng</th>
-                <th>Số điện thoại</th>
-                <th>Chủ đề tư vấn</th>
-                <th>Nội dung tin nhắn</th>
-                <th>Trạng thái</th>
-                <th style="text-align: right;">Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${contacts.map(c => `
-                <tr>
-                  <td style="font-size: 12px; color: var(--color-text-muted);">${new Date(c.created_at).toLocaleString('vi-VN')}</td>
-                  <td><strong>${c.fullName}</strong></td>
-                  <td><a href="tel:${c.phone}" style="color:var(--color-brand-primary);font-weight:600;">${c.phone}</a></td>
-                  <td><span class="admin-badge admin-badge--active">${c.subject || 'Tư vấn sản phẩm'}</span></td>
-                  <td style="max-width: 280px; font-size: 13px;">${c.message || ''}</td>
-                  <td>
-                    <span class="admin-badge ${c.status === 'completed' ? 'admin-badge--completed' : 'admin-badge--pending'}">
-                      ${c.status === 'completed' ? 'Đã liên hệ' : 'Chờ xử lý'}
-                    </span>
-                  </td>
-                  <td style="text-align: right; white-space: nowrap;">
-                    <a href="https://zalo.me/${(c.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm" style="margin-right: 6px;">Chat Zalo</a>
-                    ${c.status === 'pending' ? `
-                      <button class="admin-btn admin-btn--primary admin-btn-sm mark-done-btn" data-id="${c.id}">Đã tư vấn</button>
-                    ` : ''}
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+    let currentFilter = 'all';
 
-    contentArea.querySelectorAll('.mark-done-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        await updateContactStatus(btn.dataset.id, 'completed');
-        contacts = await getAdminContacts();
-        page.querySelector('#sidebar-contacts-count').textContent = contacts.filter(c => c.status === 'pending').length;
-        renderContactsTab();
+    function renderList() {
+      let filtered = contacts;
+      if (currentFilter === 'pending') filtered = contacts.filter(c => c.status === 'pending');
+      if (currentFilter === 'completed') filtered = contacts.filter(c => c.status === 'completed');
+
+      contentArea.innerHTML = `
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <h3 class="admin-card-title">Khách hàng yêu cầu tư vấn & liên hệ</h3>
+              <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">Các câu hỏi từ form liên hệ và nút tư vấn trên website</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="admin-btn ${currentFilter === 'all' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="all">Tất cả (${contacts.length})</button>
+              <button class="admin-btn ${currentFilter === 'pending' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="pending">Chờ xử lý (${contacts.filter(c => c.status === 'pending').length})</button>
+              <button class="admin-btn ${currentFilter === 'completed' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="completed">Đã tư vấn (${contacts.filter(c => c.status === 'completed').length})</button>
+            </div>
+          </div>
+          <div class="admin-table-responsive">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Chủ đề tư vấn</th>
+                  <th>Nội dung tin nhắn</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: right;">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filtered.length === 0 ? `
+                  <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không có yêu cầu tư vấn nào trong mục này.</td></tr>
+                ` : filtered.map(c => `
+                  <tr>
+                    <td style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">${new Date(c.created_at).toLocaleString('vi-VN')}</td>
+                    <td><strong>${c.fullName}</strong></td>
+                    <td><a href="tel:${c.phone}" style="color:var(--color-brand-primary);font-weight:600;">${c.phone}</a></td>
+                    <td><span class="admin-badge admin-badge--active">${c.subject || 'Tư vấn sản phẩm'}</span></td>
+                    <td style="max-width: 260px; font-size: 13px; line-height: 1.4;">${c.message || ''}</td>
+                    <td>
+                      <span class="admin-badge ${c.status === 'completed' ? 'admin-badge--completed' : 'admin-badge--pending'}">
+                        ${c.status === 'completed' ? 'Đã liên hệ' : 'Chờ xử lý'}
+                      </span>
+                    </td>
+                    <td style="text-align: right; white-space: nowrap;">
+                      <a href="https://zalo.me/${(c.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm" style="margin-right: 4px;">Chat Zalo</a>
+                      ${c.status === 'pending' ? `
+                        <button class="admin-btn admin-btn--primary admin-btn-sm mark-done-btn" data-id="${c.id}" style="margin-right: 4px;">Đã tư vấn</button>
+                      ` : ''}
+                      <button class="admin-btn admin-btn--danger admin-btn-sm delete-contact-btn" data-id="${c.id}">Xóa</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      // Filter tabs
+      contentArea.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentFilter = btn.dataset.filter;
+          renderList();
+        });
       });
-    });
+
+      // Mark done listeners
+      contentArea.querySelectorAll('.mark-done-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          await updateContactStatus(btn.dataset.id, 'completed');
+          contacts = await getAdminContacts();
+          updateSidebarBadges();
+          renderList();
+        });
+      });
+
+      // Delete listeners
+      contentArea.querySelectorAll('.delete-contact-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (confirm('Xóa yêu cầu tư vấn này?')) {
+            await deleteAdminContact(btn.dataset.id);
+            contacts = await getAdminContacts();
+            updateSidebarBadges();
+            renderList();
+          }
+        });
+      });
+    }
+
+    renderList();
   }
 
   // ════════════════════════════════════════════════════════════
@@ -584,17 +842,34 @@ export async function renderAdmin(container) {
 
             <div class="admin-form-group">
               <label for="input-anon-key">Supabase Anon Key (Public Key):</label>
-              <textarea id="input-anon-key" class="admin-form-input" rows="3" placeholder="Dán anon key (eyJhbGciOi...) từ Dashboard vào đây...">${currentKey}</textarea>
+              <textarea id="input-anon-key" class="admin-form-input" rows="3" placeholder="Dán anon key (eyJhbGciOi...)">${currentKey}</textarea>
               <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 6px;">
-                Lấy tại: <a href="https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}/settings/api" target="_blank" style="color: var(--color-brand-primary);">Dashboard > Project Settings > API > anon public key</a>
+                Dùng kết nối API công khai (RLS) cho website và quản trị.
               </div>
             </div>
 
             <div id="connection-test-feedback" style="margin-bottom: 16px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
               <button class="admin-btn admin-btn--primary" id="btn-save-key">Lưu & Kiểm tra kết nối</button>
               <a href="https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}/sql/new" target="_blank" class="admin-btn admin-btn--outline">Mở SQL Editor Supabase ↗</a>
+            </div>
+
+            <!-- Database Sync & Seeding Tools -->
+            <div style="border-top: 1px solid #eef2f3; padding-top: 20px;">
+              <h4 style="font-size: 14px; color: var(--color-brand-primary); margin: 0 0 8px 0;">Công cụ Đồng bộ Dữ liệu</h4>
+              <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px 0;">
+                Đồng bộ nhanh 20 sản phẩm mẫu và các bộ sưu tập gốc lên Supabase để lưu trữ trên đám mây.
+              </p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="admin-btn admin-btn--outline" id="btn-seed-supabase" style="border-color: var(--color-accent-gold); color: var(--color-brand-primary);">
+                  ✨ Đồng bộ 20 Sản Phẩm Mẫu lên Supabase
+                </button>
+                <button class="admin-btn admin-btn--outline" id="btn-refresh-from-db">
+                  🔄 Tải lại dữ liệu từ Supabase
+                </button>
+              </div>
+              <div id="seed-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
             </div>
           </div>
         </div>
@@ -611,21 +886,22 @@ export async function renderAdmin(container) {
             </div>
 
             <div class="admin-form-group">
-              <label>Số Hotline</label>
+              <label>Số Hotline hiển thị</label>
               <input type="text" id="s-phone" class="admin-form-input" value="${siteSettings.phoneDisplay || '0898 025 013'}">
             </div>
 
             <div class="admin-form-group">
-              <label>Link Zalo Chat</label>
+              <label>Link Zalo Chat tư vấn</label>
               <input type="text" id="s-zalo" class="admin-form-input" value="${siteSettings.zalo || 'https://zalo.me/0898025013'}">
             </div>
 
             <div class="admin-form-group">
               <label>Địa chỉ cửa hàng</label>
-              <input type="text" id="s-address" class="admin-form-input" value="${siteSettings.address || ''}">
+              <input type="text" id="s-address" class="admin-form-input" value="${siteSettings.address || 'C3B, 96, Ấp 3B, Tân Vĩnh Lộc, TP. Hồ Chí Minh, Việt Nam'}">
             </div>
 
             <button class="admin-btn admin-btn--primary" id="btn-save-store">Lưu thông tin cửa hàng</button>
+            <div id="store-save-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
           </div>
         </div>
       </div>
@@ -661,17 +937,72 @@ export async function renderAdmin(container) {
       saveBtn.disabled = false;
     });
 
+    // Seed to Supabase
+    const seedBtn = contentArea.querySelector('#btn-seed-supabase');
+    const seedFeedback = contentArea.querySelector('#seed-feedback');
+    seedBtn.addEventListener('click', async () => {
+      seedBtn.textContent = 'Đang đồng bộ lên Supabase...';
+      seedBtn.disabled = true;
+      try {
+        const res = await syncAllProductsToSupabase();
+        seedFeedback.style.display = 'block';
+        seedFeedback.style.background = '#E8F5E9';
+        seedFeedback.style.color = '#2E7D32';
+        seedFeedback.textContent = `Đồng bộ thành công! Đã lưu ${res.productsCount} sản phẩm và ${res.collectionsCount} bộ sưu tập lên Supabase.`;
+        products = await getAdminProducts();
+        collections = await getAdminCollections();
+        updateSidebarBadges();
+      } catch (err) {
+        seedFeedback.style.display = 'block';
+        seedFeedback.style.background = '#FFEBEE';
+        seedFeedback.style.color = '#C62828';
+        seedFeedback.textContent = 'Lỗi đồng bộ: ' + err.message;
+      }
+      seedBtn.textContent = '✨ Đồng bộ 20 Sản Phẩm Mẫu lên Supabase';
+      seedBtn.disabled = false;
+    });
+
+    // Refresh from DB
+    const refreshBtn = contentArea.querySelector('#btn-refresh-from-db');
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.textContent = 'Đang tải...';
+      refreshBtn.disabled = true;
+      try {
+        products = await getAdminProducts();
+        collections = await getAdminCollections();
+        contacts = await getAdminContacts();
+        siteSettings = await getAdminSiteSettings();
+        updateSidebarBadges();
+        alert(`Đã làm mới dữ liệu thành công từ Supabase: ${products.length} sản phẩm.`);
+      } catch (e) {
+        alert('Lỗi làm mới: ' + e.message);
+      }
+      refreshBtn.textContent = '🔄 Tải lại dữ liệu từ Supabase';
+      refreshBtn.disabled = false;
+    });
+
     // Save Store Settings
-    contentArea.querySelector('#btn-save-store').addEventListener('click', async () => {
+    const storeBtn = contentArea.querySelector('#btn-save-store');
+    const storeFeedback = contentArea.querySelector('#store-save-feedback');
+    storeBtn.addEventListener('click', async () => {
+      storeBtn.textContent = 'Đang lưu...';
+      storeBtn.disabled = true;
       const updated = {
-        name: contentArea.querySelector('#s-name').value,
-        phoneDisplay: contentArea.querySelector('#s-phone').value,
+        name: contentArea.querySelector('#s-name').value.trim(),
+        phoneDisplay: contentArea.querySelector('#s-phone').value.trim(),
         phoneHref: 'tel:' + contentArea.querySelector('#s-phone').value.replace(/[^0-9]/g, ''),
-        zalo: contentArea.querySelector('#s-zalo').value,
-        address: contentArea.querySelector('#s-address').value,
+        zalo: contentArea.querySelector('#s-zalo').value.trim(),
+        address: contentArea.querySelector('#s-address').value.trim(),
       };
       await saveAdminSiteSettings(updated);
-      alert('Đã cập nhật thông tin cửa hàng thành công!');
+      siteSettings = updated;
+      storeFeedback.style.display = 'block';
+      storeFeedback.style.background = '#E8F5E9';
+      storeFeedback.style.color = '#2E7D32';
+      storeFeedback.textContent = 'Đã cập nhật thông tin cửa hàng thành công lên Supabase!';
+      storeBtn.textContent = 'Lưu thông tin cửa hàng';
+      storeBtn.disabled = false;
+      setTimeout(() => { storeFeedback.style.display = 'none'; }, 4000);
     });
   }
 

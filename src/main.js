@@ -36,6 +36,7 @@ import { renderSitemap } from './pages/sitemap.js';
 import { renderCollection, renderSearch } from './pages/collection.js';
 import { renderAdmin } from './pages/admin/admin-dashboard.js';
 import { renderAdminLogin } from './pages/admin/admin-login.js';
+import { initDataSync } from './services/supabase.js';
 
 // ── Initialize Application ──
 function init() {
@@ -91,6 +92,9 @@ function init() {
 
   // Initialize router
   initRouter(main);
+
+  // Synchronize initial data in background
+  initDataSync();
 }
 
 // Start
