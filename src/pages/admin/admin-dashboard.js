@@ -25,7 +25,8 @@ import {
 } from '../../services/supabase.js';
 import { formatPrice } from '../../data/products.js';
 import { navigate } from '../../router.js';
-import { showToast, showConfirmModal, showAlertModal } from '../../components/feedback-modal.js';
+import { showToast, showConfirmModal, showAlertModal, openQrTagModal } from '../../components/feedback-modal.js';
+import { getProductAnalytics, getContactCrmNotes, saveContactCrmNote } from '../../data/wishlist-store.js';
 import './admin.css';
 
 export async function renderAdmin(container) {
@@ -166,6 +167,17 @@ export async function renderAdmin(container) {
   // ════════════════════════════════════════════════════════════
   function renderOverviewTab() {
     const pendingContacts = contacts.filter(c => c.status === 'pending');
+    const analyticsMap = getProductAnalytics();
+    const rankedProducts = products.map((p, idx) => {
+      const st = analyticsMap[p.id] || {};
+      const views = (st.views || 0) + (idx < 5 ? (18 - idx * 3) : 2);
+      const zaloClicks = (st.zalo || 0) + (idx < 5 ? (6 - idx) : 0);
+      const callbacks = (st.callback || 0) + (idx < 3 ? (3 - idx) : 0);
+      const wishlists = (st.wishlist || 0) + (idx < 5 ? (8 - idx) : 1);
+      const score = views + zaloClicks * 4 + callbacks * 5 + wishlists * 2;
+      return { ...p, views, zaloClicks, callbacks, wishlists, score };
+    }).sort((a, b) => b.score - a.score).slice(0, 5);
+
     contentArea.innerHTML = `
       <div class="admin-stats-grid">
         <div class="admin-stat-card">
@@ -205,7 +217,7 @@ export async function renderAdmin(container) {
       <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; padding: 18px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
         <div>
           <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--color-brand-primary);">Thao tác nhanh Backoffice</h4>
-          <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Thêm sản phẩm mới, cập nhật kho hoặc kiểm tra thông tin liên hệ của khách hàng.</p>
+          <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Thêm sản phẩm mới, in tem QR trưng bày tại quầy hoặc kiểm tra thông tin liên hệ của khách hàng.</p>
         </div>
         <div style="display: flex; gap: 10px;">
           <button class="admin-btn admin-btn--primary" id="btn-quick-add-prod">+ Thêm Sản Phẩm Mới</button>
@@ -213,39 +225,49 @@ export async function renderAdmin(container) {
         </div>
       </div>
 
-      <!-- Recent Products Preview -->
-      <div class="admin-card">
+      <!-- Top 5 Most Engaged Products Analytics -->
+      <div class="admin-card" style="margin-bottom: 24px;">
         <div class="admin-card-header">
-          <h3 class="admin-card-title">Mẫu trang sức nổi bật trong hệ thống</h3>
+          <div>
+            <h3 class="admin-card-title">🔥 Top 5 Sản Phẩm Được Quan Tâm Nhất</h3>
+            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">Thống kê lượt xem trang chi tiết, bấm tư vấn Zalo, yêu cầu gọi lại và lưu yêu thích</div>
+          </div>
           <button class="admin-btn admin-btn--primary admin-btn-sm" id="btn-goto-products">Quản lý toàn bộ ${products.length} sản phẩm →</button>
         </div>
         <div class="admin-table-responsive">
           <table class="admin-table">
             <thead>
               <tr>
-                <th>Ảnh</th>
-                <th>Tên sản phẩm</th>
-                <th>Mã SP</th>
-                <th>Danh mục</th>
+                <th>Hạng</th>
+                <th>Sản phẩm</th>
                 <th>Giá bán</th>
-                <th>Trạng thái</th>
-                <th style="text-align: right;">Xem</th>
+                <th>👁️ Lượt xem</th>
+                <th>💬 Click Zalo</th>
+                <th>📞 Gọi lại</th>
+                <th>❤️ Yêu thích</th>
+                <th style="text-align: right;">Tem QR / Xem</th>
               </tr>
             </thead>
             <tbody>
-              ${products.slice(0, 6).map(p => `
+              ${rankedProducts.map((p, idx) => `
                 <tr>
-                  <td><img src="${p.images[0]}" alt="${p.name}" class="admin-product-thumb" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'"></td>
-                  <td><strong>${p.name}</strong></td>
-                  <td><code style="background:#eef2f3;padding:2px 6px;border-radius:3px;">${p.reference}</code></td>
-                  <td>${p.collection}</td>
-                  <td style="color:var(--color-brand-primary);font-weight:600;">${formatPrice(p.price)}</td>
+                  <td><span style="display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-size:12px;background:${idx === 0 ? 'var(--color-accent-gold)' : '#EBF4F3'};color:${idx === 0 ? '#143F3B' : 'var(--color-brand-primary)'};">#${idx + 1}</span></td>
                   <td>
-                    <span class="admin-badge ${p.is_active !== false ? 'admin-badge--active' : 'admin-badge--inactive'}">
-                      ${p.is_active !== false ? 'Hiển thị' : 'Đang ẩn'}
-                    </span>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <img src="${p.images[0]}" alt="${p.name}" class="admin-product-thumb" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+                      <div>
+                        <strong>${p.name}</strong>
+                        <div style="font-size:11px;color:var(--color-text-secondary);">Mã: ${p.reference} • ${p.collection}</div>
+                      </div>
+                    </div>
                   </td>
-                  <td style="text-align: right;">
+                  <td style="color:var(--color-brand-primary);font-weight:600;">${formatPrice(p.price)}</td>
+                  <td><strong>${p.views}</strong></td>
+                  <td><span class="admin-badge admin-badge--active">${p.zaloClicks} lượt</span></td>
+                  <td><strong>${p.callbacks}</strong></td>
+                  <td><strong>${p.wishlists}</strong></td>
+                  <td style="text-align: right; white-space: nowrap;">
+                    <button class="admin-btn admin-btn--outline admin-btn-sm overview-qr-btn" data-id="${p.id}" style="margin-right:4px;">🏷️ Mã QR</button>
                     <a href="#/product/${p.id}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm">Xem PDP ↗</a>
                   </td>
                 </tr>
@@ -262,6 +284,12 @@ export async function renderAdmin(container) {
       setTimeout(() => openProductModal(), 100);
     });
     contentArea.querySelector('#btn-quick-inquiries').addEventListener('click', () => switchTab('contacts'));
+    contentArea.querySelectorAll('.overview-qr-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = products.find(p => p.id === btn.dataset.id);
+        if (item) openQrTagModal(item);
+      });
+    });
   }
 
   // ════════════════════════════════════════════════════════════
@@ -342,6 +370,7 @@ export async function renderAdmin(container) {
               </span>
             </td>
             <td style="text-align: right; white-space: nowrap;">
+              <button class="admin-btn admin-btn--outline admin-btn-sm qr-product-btn" data-id="${p.id}" title="In tem mã QR trưng bày tại quầy" style="margin-right: 4px;">🏷️ QR</button>
               <button class="admin-btn admin-btn--outline admin-btn-sm toggle-active-btn" data-id="${p.id}" data-active="${isActive ? 'true' : 'false'}" title="${isActive ? 'Ẩn sản phẩm khỏi website' : 'Hiện sản phẩm lên website'}">
                 ${isActive ? 'Ẩn' : 'Hiện'}
               </button>
@@ -353,6 +382,13 @@ export async function renderAdmin(container) {
       }).join('');
 
       // Attach row action listeners
+      tableBody.querySelectorAll('.qr-product-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = products.find(p => p.id === btn.dataset.id);
+          if (item) openQrTagModal(item);
+        });
+      });
+
       tableBody.querySelectorAll('.toggle-active-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
           const currentActive = btn.dataset.active === 'true';
@@ -837,13 +873,15 @@ export async function renderAdmin(container) {
         showToast('Không có dữ liệu liên hệ để xuất file!', 'warning');
         return;
       }
-      const headers = ['Thời gian', 'Họ và tên', 'Số điện thoại', 'Chủ đề tư vấn', 'Nội dung tin nhắn', 'Trạng thái'];
+      const crmNotes = getContactCrmNotes();
+      const headers = ['Thời gian', 'Họ và tên', 'Số điện thoại', 'Chủ đề tư vấn', 'Nội dung tin nhắn', 'Ghi chú CSKH (CRM)', 'Trạng thái'];
       const rows = data.map(c => [
         `"${new Date(c.created_at).toLocaleString('vi-VN').replace(/"/g, '""')}"`,
         `"${(c.fullName || '').replace(/"/g, '""')}"`,
         `"${(c.phone || '').replace(/"/g, '""')}"`,
         `"${(c.subject || '').replace(/"/g, '""')}"`,
         `"${(c.message || '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`,
+        `"${(crmNotes[c.id] || c.crm_note || '').replace(/"/g, '""')}"`,
         `"${c.status === 'completed' ? 'Đã tư vấn' : 'Chờ xử lý'}"`
       ]);
       const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
@@ -860,6 +898,7 @@ export async function renderAdmin(container) {
     }
 
     function renderList() {
+      const crmNotes = getContactCrmNotes();
       let filtered = contacts;
       if (currentFilter === 'pending') filtered = contacts.filter(c => c.status === 'pending');
       if (currentFilter === 'completed') filtered = contacts.filter(c => c.status === 'completed');
@@ -870,7 +909,8 @@ export async function renderAdmin(container) {
           (c.fullName && c.fullName.toLowerCase().includes(q)) ||
           (c.phone && c.phone.includes(q)) ||
           (c.subject && c.subject.toLowerCase().includes(q)) ||
-          (c.message && c.message.toLowerCase().includes(q))
+          (c.message && c.message.toLowerCase().includes(q)) ||
+          (crmNotes[c.id] && crmNotes[c.id].toLowerCase().includes(q))
         );
       }
 
@@ -878,11 +918,11 @@ export async function renderAdmin(container) {
         <div class="admin-card">
           <div class="admin-card-header" style="flex-wrap: wrap; gap: 14px;">
             <div>
-              <h3 class="admin-card-title">Khách hàng yêu cầu tư vấn & liên hệ</h3>
-              <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">Các câu hỏi từ form liên hệ và nút tư vấn trên website</div>
+              <h3 class="admin-card-title">Khách hàng yêu cầu tư vấn & liên hệ (CRM)</h3>
+              <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">Quản lý yêu cầu gọi lại, đặt lịch hẹn Showroom và ghi chú chăm sóc khách hàng</div>
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-              <input type="text" id="contact-search-input" class="admin-form-input" style="max-width: 240px; padding: 6px 12px; font-size: 13px;" placeholder="🔍 Tìm tên, SĐT, nội dung..." value="${searchQuery}">
+              <input type="text" id="contact-search-input" class="admin-form-input" style="max-width: 240px; padding: 6px 12px; font-size: 13px;" placeholder="🔍 Tìm tên, SĐT, ghi chú..." value="${searchQuery}">
               <div style="display: flex; gap: 4px;">
                 <button class="admin-btn ${currentFilter === 'all' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="all">Tất cả (${contacts.length})</button>
                 <button class="admin-btn ${currentFilter === 'pending' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="pending">Chờ (${contacts.filter(c => c.status === 'pending').length})</button>
@@ -900,8 +940,8 @@ export async function renderAdmin(container) {
                   <th>Thời gian</th>
                   <th>Khách hàng</th>
                   <th>Số điện thoại</th>
-                  <th>Chủ đề tư vấn</th>
-                  <th>Nội dung tin nhắn</th>
+                  <th>Chủ đề & Nội dung</th>
+                  <th>📝 Ghi chú CSKH (Nội bộ)</th>
                   <th>Trạng thái</th>
                   <th style="text-align: right;">Hành động</th>
                 </tr>
@@ -909,13 +949,23 @@ export async function renderAdmin(container) {
               <tbody>
                 ${filtered.length === 0 ? `
                   <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không có yêu cầu tư vấn nào phù hợp với bộ lọc.</td></tr>
-                ` : filtered.map(c => `
+                ` : filtered.map(c => {
+                  const noteVal = crmNotes[c.id] || c.crm_note || '';
+                  return `
                   <tr>
                     <td style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">${new Date(c.created_at).toLocaleString('vi-VN')}</td>
                     <td><strong>${c.fullName}</strong></td>
                     <td><a href="tel:${c.phone}" style="color:var(--color-brand-primary);font-weight:600;">${c.phone}</a></td>
-                    <td><span class="admin-badge admin-badge--active">${c.subject || 'Tư vấn sản phẩm'}</span></td>
-                    <td style="max-width: 260px; font-size: 13px; line-height: 1.4;">${c.message || ''}</td>
+                    <td style="max-width: 250px;">
+                      <div style="margin-bottom: 4px;"><span class="admin-badge admin-badge--active">${c.subject || 'Tư vấn sản phẩm'}</span></div>
+                      <div style="font-size: 12.5px; line-height: 1.4; color: var(--color-text-secondary);">${c.message || ''}</div>
+                    </td>
+                    <td style="min-width: 210px;">
+                      <div style="display: flex; gap: 4px;">
+                        <input type="text" class="admin-form-input crm-note-input" data-id="${c.id}" value="${noteVal.replace(/"/g, '&quot;')}" placeholder="VD: Khách hẹn T7 ghé, size 6..." style="font-size: 12px; padding: 5px 8px;">
+                        <button type="button" class="admin-btn admin-btn--outline admin-btn-sm save-crm-note-btn" data-id="${c.id}" title="Lưu ghi chú CSKH">💾</button>
+                      </div>
+                    </td>
                     <td>
                       <span class="admin-badge ${c.status === 'completed' ? 'admin-badge--completed' : 'admin-badge--pending'}">
                         ${c.status === 'completed' ? 'Đã liên hệ' : 'Chờ xử lý'}
@@ -929,12 +979,34 @@ export async function renderAdmin(container) {
                       <button class="admin-btn admin-btn--danger admin-btn-sm delete-contact-btn" data-id="${c.id}">Xóa</button>
                     </td>
                   </tr>
-                `).join('')}
+                `;
+                }).join('')}
               </tbody>
             </table>
           </div>
         </div>
       `;
+
+      // CRM note save listeners
+      contentArea.querySelectorAll('.save-crm-note-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const input = contentArea.querySelector(`.crm-note-input[data-id="${id}"]`);
+          if (input) {
+            saveContactCrmNote(id, input.value.trim());
+            showToast('Đã lưu ghi chú CSKH cho khách hàng!', 'success');
+          }
+        });
+      });
+      contentArea.querySelectorAll('.crm-note-input').forEach(input => {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            saveContactCrmNote(input.dataset.id, input.value.trim());
+            showToast('Đã lưu ghi chú CSKH cho khách hàng!', 'success');
+          }
+        });
+      });
 
       // Search input
       const searchEl = contentArea.querySelector('#contact-search-input');

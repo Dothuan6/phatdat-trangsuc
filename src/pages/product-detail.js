@@ -9,8 +9,22 @@ import { createCarousel } from '../components/carousel.js';
 import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
 import { siteInfo } from '../data/site-info.js';
 import { t } from '../i18n.js';
-import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
-import { showToast, openLightboxModal, openQuickCallbackModal } from '../components/feedback-modal.js';
+import {
+  isWishlisted,
+  toggleWishlist,
+  addRecentlyViewed,
+  getRecentlyViewedProductIds,
+  isCompared,
+  toggleCompareProduct,
+  trackProductEvent
+} from '../data/wishlist-store.js';
+import {
+  showToast,
+  openLightboxModal,
+  openQuickCallbackModal,
+  shareProductLink,
+  openQrTagModal
+} from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -26,6 +40,44 @@ export function renderProductDetail(container, params = {}) {
     `;
     return;
   }
+
+  // Track Recently Viewed & Analytics View
+  addRecentlyViewed(product.id);
+  trackProductEvent(product.id, 'view');
+
+  // Inject JSON-LD Structured Data for Google Rich Snippets
+  let jsonLdEl = document.getElementById('pd-jsonld-product');
+  if (!jsonLdEl) {
+    jsonLdEl = document.createElement('script');
+    jsonLdEl.id = 'pd-jsonld-product';
+    jsonLdEl.type = 'application/ld+json';
+    document.head.appendChild(jsonLdEl);
+  }
+  jsonLdEl.textContent = JSON.stringify({
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.name,
+    sku: product.reference,
+    image: product.images,
+    description: product.description,
+    brand: {
+      '@type': 'Brand',
+      name: 'Phát Đạt Jewelry'
+    },
+    offers: {
+      '@type': 'Offer',
+      url: window.location.href,
+      priceCurrency: 'VND',
+      price: product.price,
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition'
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: product.rating || 4.9,
+      reviewCount: product.reviewsCount || 20
+    }
+  });
 
   const page = document.createElement('div');
   page.className = 'page-pdp';
@@ -110,13 +162,14 @@ export function renderProductDetail(container, params = {}) {
   nameEl.textContent = product.name;
   info.appendChild(nameEl);
 
-  // Rating & Code Row
+  // Rating, Code & Quick Utility Row (Share, QR, Compare, Wishlist)
   const isLiked = isWishlisted(product.id);
   const heartFill = isLiked ? '#D4380D' : 'none';
   const heartColor = isLiked ? '#D4380D' : 'currentColor';
+  const inCompare = isCompared(product.id);
 
   const subRow = document.createElement('div');
-  subRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px;';
+  subRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px;';
   subRow.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
       <span style="color: #f39c12;">★★★★★</span>
@@ -125,13 +178,43 @@ export function renderProductDetail(container, params = {}) {
       <span style="color: var(--color-border);">|</span>
       <span style="color: var(--color-text-secondary); font-family: monospace;">Mã: ${product.reference}</span>
     </div>
-    <button class="wishlist-btn" aria-label="Thêm vào yêu thích" id="wishlist-btn-${product.id}" style="color: ${heartColor}; background:none; border:none; cursor:pointer;">
-      <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="currentColor" stroke-width="1.6" width="22" height="22">
-        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-      </svg>
-    </button>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button type="button" id="pdp-compare-btn" style="background: ${inCompare ? 'var(--color-brand-primary)' : '#f4f7f6'}; color: ${inCompare ? '#fff' : 'var(--color-text-primary)'}; border: 1px solid var(--color-border); border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;" title="So sánh sản phẩm">
+        ${inCompare ? '✓ Đang so sánh' : '⚖️ So sánh'}
+      </button>
+      <button type="button" id="pdp-qr-btn" style="background: #f4f7f6; color: var(--color-text-primary); border: 1px solid var(--color-border); border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;" title="Xem Mã QR & Thẻ giá">
+        🏷️ Mã QR
+      </button>
+      <button type="button" id="pdp-share-btn" style="background: #f4f7f6; color: var(--color-text-primary); border: 1px solid var(--color-border); border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;" title="Chia sẻ sản phẩm">
+        🔗 Chia sẻ
+      </button>
+      <button class="wishlist-btn" aria-label="Thêm vào yêu thích" id="wishlist-btn-${product.id}" style="color: ${heartColor}; background:none; border:none; cursor:pointer; display:flex; align-items:center;">
+        <svg viewBox="0 0 24 24" fill="${heartFill}" stroke="currentColor" stroke-width="1.6" width="22" height="22">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+        </svg>
+      </button>
+    </div>
   `;
   info.appendChild(subRow);
+
+  subRow.querySelector('#pdp-share-btn').addEventListener('click', () => shareProductLink(product));
+  subRow.querySelector('#pdp-qr-btn').addEventListener('click', () => openQrTagModal(product));
+  subRow.querySelector('#pdp-compare-btn').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const res = toggleCompareProduct(product.id);
+    if (res.limitReached) {
+      showToast('Chỉ có thể so sánh tối đa 3 mẫu trang sức cùng lúc!', 'warning');
+      return;
+    }
+    btn.textContent = res.added ? '✓ Đang so sánh' : '⚖️ So sánh';
+    btn.style.background = res.added ? 'var(--color-brand-primary)' : '#f4f7f6';
+    btn.style.color = res.added ? '#fff' : 'var(--color-text-primary)';
+    showToast(
+      res.added ? `Đã thêm "${product.name}" vào bảng so sánh (${res.list.length}/3)!` : `Đã bỏ "${product.name}" khỏi bảng so sánh`,
+      res.added ? 'success' : 'info',
+      2200
+    );
+  });
 
   // Price
   const priceEl = document.createElement('div');
@@ -152,8 +235,8 @@ export function renderProductDetail(container, params = {}) {
     sizeHeader.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;';
     sizeHeader.innerHTML = `
       <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">KÍCH CỠ / CHIỀU DÀI:</span>
-      <button id="open-size-guide-link" type="button" style="background: none; border: none; font-size: 13px; color: var(--color-brand-primary); cursor: pointer; text-decoration: underline; font-weight: 500; display: flex; align-items: center; gap: 4px;">
-        📏 Hướng dẫn chọn size
+      <button id="open-size-guide-link" type="button" style="background: none; border: none; font-size: 13px; color: var(--color-brand-primary); cursor: pointer; text-decoration: underline; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+        📏 ${product.category === 'necklaces' ? 'Xem dáng dây trên cổ & đo size' : 'Đo nhẫn trực tiếp trên màn hình'}
       </button>
     `;
     sizeSection.appendChild(sizeHeader);
@@ -195,7 +278,8 @@ export function renderProductDetail(container, params = {}) {
 
     // Size guide click
     sizeHeader.querySelector('#open-size-guide-link').addEventListener('click', () => {
-      openGlobalSizeGuide(product.category === 'bracelets' ? 'bracelet' : 'ring');
+      const targetTab = product.category === 'necklaces' ? 'necklace' : (product.category === 'bracelets' ? 'care' : 'ruler');
+      openGlobalSizeGuide(targetTab);
     });
 
     info.appendChild(sizeSection);
@@ -204,7 +288,7 @@ export function renderProductDetail(container, params = {}) {
   // Variant: Colors
   if (product.availableColors && product.availableColors.length > 0) {
     const colorSection = document.createElement('div');
-    colorSection.style.cssText = 'margin-bottom: 24px;';
+    colorSection.style.cssText = 'margin-bottom: 20px;';
     colorSection.innerHTML = `
       <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); display: block; margin-bottom: 8px;">MÀU SẮC XI MẠ:</span>
     `;
@@ -251,11 +335,49 @@ export function renderProductDetail(container, params = {}) {
     info.appendChild(colorSection);
   }
 
+  // ── Gift Card Message Box (Viết thiệp quà tặng miễn phí) ──
+  const giftBox = document.createElement('div');
+  giftBox.style.cssText = `
+    background: #FAF6EE;
+    border: 1px dashed var(--color-accent-gold);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+  `;
+  giftBox.innerHTML = `
+    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #8A6218; cursor: pointer;">
+      <input type="checkbox" id="pdp-gift-toggle" style="accent-color: var(--color-brand-primary); width: 16px; height: 16px; cursor: pointer;">
+      <span>🎁 Kèm thiệp chúc mừng viết tay miễn phí (Quà tặng)</span>
+    </label>
+    <div id="pdp-gift-pane" style="display: none; margin-top: 10px;">
+      <input type="text" id="pdp-gift-note-input" style="width: 100%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; background: #fff;" placeholder="Nhập lời chúc trên thiệp (VD: Chúc mừng sinh nhật em yêu!)...">
+      <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
+        <button type="button" class="gift-preset-chip" data-msg="Chúc mừng sinh nhật người thương, luôn rạng rỡ và hạnh phúc!" style="background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); cursor: pointer;">+ Sinh nhật người yêu</button>
+        <button type="button" class="gift-preset-chip" data-msg="Chúc Mẹ yêu luôn mạnh khỏe, bình an và tươi trẻ!" style="background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); cursor: pointer;">+ Tặng Mẹ</button>
+        <button type="button" class="gift-preset-chip" data-msg="Gửi ngàn điều may mắn và yêu thương đến bạn!" style="background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); cursor: pointer;">+ Lời chúc may mắn</button>
+      </div>
+    </div>
+  `;
+  info.appendChild(giftBox);
+
+  const giftToggle = giftBox.querySelector('#pdp-gift-toggle');
+  const giftPane = giftBox.querySelector('#pdp-gift-pane');
+  const giftNoteInput = giftBox.querySelector('#pdp-gift-note-input');
+  giftToggle.addEventListener('change', () => {
+    giftPane.style.display = giftToggle.checked ? 'block' : 'none';
+    if (giftToggle.checked) giftNoteInput.focus();
+  });
+  giftBox.querySelectorAll('.gift-preset-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      giftNoteInput.value = chip.dataset.msg;
+    });
+  });
+
   // ── Call to action buttons ──
   const ctaContainer = document.createElement('div');
   ctaContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;';
 
-  // 1. Zalo Consult Button with Auto-copy Product Info
+  // 1. Zalo Consult Button with Auto-copy Product Info + Gift Note
   const zaloBtn = document.createElement('button');
   zaloBtn.type = 'button';
   zaloBtn.className = 'btn btn--full';
@@ -279,10 +401,15 @@ export function renderProductDetail(container, params = {}) {
   `;
 
   zaloBtn.addEventListener('click', () => {
-    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}\n- Link xem: ${window.location.href}`;
+    trackProductEvent(product.id, 'zalo');
+    const giftText = giftToggle.checked && giftNoteInput.value.trim()
+      ? `\n- 🎁 Thiệp quà tặng: "${giftNoteInput.value.trim()}"`
+      : '';
+    const variantText = `\n- Tùy chọn: ${selectedSize || 'Freesize'} | ${selectedColor || 'Chuẩn'}`;
+    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}${variantText}${giftText}\n- Link xem: ${window.location.href}`;
     try {
       navigator.clipboard.writeText(infoText);
-      showToast('Đã sao chép mã và link sản phẩm! Bạn chỉ cần Dán (Paste) vào khung chat Zalo.', 'success', 4000);
+      showToast('Đã sao chép thông tin sản phẩm & lời chúc! Bạn chỉ cần Dán (Paste) vào khung chat Zalo.', 'success', 4000);
     } catch (e) {}
     setTimeout(() => {
       window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
@@ -314,7 +441,10 @@ export function renderProductDetail(container, params = {}) {
     <span>YÊU CẦU GỌI LẠI TƯ VẤN (MIỄN PHÍ)</span>
   `;
   callbackBtn.addEventListener('click', () => {
-    openQuickCallbackModal(product);
+    openQuickCallbackModal(product, {
+      selectedInfo: `Size: ${selectedSize || 'Freesize'}, Màu: ${selectedColor || 'Bạc 925'}`,
+      giftCardNote: giftToggle.checked ? giftNoteInput.value.trim() : ''
+    });
   });
   ctaContainer.appendChild(callbackBtn);
 
@@ -543,6 +673,24 @@ export function renderProductDetail(container, params = {}) {
     relatedSection.appendChild(carousel);
 
     page.appendChild(relatedSection);
+  }
+
+  // ── Recently Viewed Products ──
+  const recentIds = getRecentlyViewedProductIds(productId);
+  const recentProducts = recentIds.map(id => getProductById(id)).filter(Boolean).slice(0, 4);
+  if (recentProducts.length > 0) {
+    const recentSection = document.createElement('section');
+    recentSection.className = 'pdp-recent container';
+    recentSection.style.cssText = 'margin-top: 40px; border-top: 1px solid var(--color-border-light); padding-top: 32px; padding-bottom: 24px;';
+    recentSection.innerHTML = `
+      <h2 class="pdp-related__title" style="font-family: var(--font-display); font-size: 20px; color: var(--color-brand-primary); margin-bottom: 20px; text-align: center;">
+        Sản Phẩm Bạn Vừa Xem
+      </h2>
+      <div class="jewelry-grid" id="pdp-recent-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;"></div>
+    `;
+    const recentGrid = recentSection.querySelector('#pdp-recent-grid');
+    recentProducts.forEach(rp => recentGrid.appendChild(createProductCard(rp)));
+    page.appendChild(recentSection);
   }
 
   container.appendChild(page);

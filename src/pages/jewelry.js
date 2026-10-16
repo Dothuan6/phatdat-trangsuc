@@ -109,10 +109,42 @@ export function renderJewelry(container, params = {}) {
   `;
   page.appendChild(filterBar);
 
+  // ── 1-Tap Quick Filter Pills (Mobile & Desktop Friendly) ──
+  const quickFilterStrip = document.createElement('div');
+  quickFilterStrip.className = 'container';
+  quickFilterStrip.style.cssText = 'display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 10px 0 6px 0; scrollbar-width: none;';
+  quickFilterStrip.innerHTML = `
+    <span style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); white-space: nowrap;">Lọc nhanh:</span>
+    <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="under-200" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">💰 Dưới 200k</button>
+    <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="200-300" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">💎 200k – 300k</button>
+    <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="above-300" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">👑 Trên 300k</button>
+    <button type="button" class="plp-quick-chip" data-qf-type="collection" data-qf-val="Cỏ Ba Lá" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">🍀 Cỏ Ba Lá</button>
+    <button type="button" class="plp-quick-chip" data-qf-type="stone" data-qf-val="Moissanite" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">🌟 Đá Moissanite</button>
+    <button type="button" class="plp-quick-chip" data-qf-type="material" data-qf-val="Bạc 925 xi vàng" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">✨ Bạc xi vàng</button>
+  `;
+  page.appendChild(quickFilterStrip);
+
+  quickFilterStrip.querySelectorAll('.plp-quick-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.qfType;
+      const val = btn.dataset.qfVal;
+      if (type === 'price') {
+        filters.priceRange = filters.priceRange === val ? 'all' : val;
+      } else if (type === 'collection') {
+        filters.collection = filters.collection === val ? 'all' : val;
+      } else if (type === 'stone') {
+        filters.stones = filters.stones.includes(val) ? filters.stones.filter(s => s !== val) : [...filters.stones, val];
+      } else if (type === 'material') {
+        filters.materials = filters.materials.includes(val) ? filters.materials.filter(m => m !== val) : [...filters.materials, val];
+      }
+      renderProducts();
+    });
+  });
+
   // ── Active Filter Tags Bar ──
   const activeChipsContainer = document.createElement('div');
   activeChipsContainer.className = 'active-filter-chips container';
-  activeChipsContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; margin-bottom: 20px;';
+  activeChipsContainer.style.cssText = 'display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 20px;';
   page.appendChild(activeChipsContainer);
 
   // ── Product Grid ──

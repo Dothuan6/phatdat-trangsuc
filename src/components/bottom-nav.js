@@ -3,6 +3,7 @@
 // ============================================================
 
 import { openGlobalSizeGuide } from './size-guide-modal.js';
+import { getWishlistedProductIds } from '../data/wishlist-store.js';
 
 export function createBottomNav() {
   const nav = document.createElement('nav');
@@ -27,10 +28,13 @@ export function createBottomNav() {
       <span>Sản phẩm</span>
     </a>
 
-    <a href="#/wishlist" class="bottom-nav-item" id="bnav-wishlist">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20">
-        <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
-      </svg>
+    <a href="#/wishlist" class="bottom-nav-item" id="bnav-wishlist" style="position: relative;">
+      <div style="position: relative; display: inline-flex;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="20" height="20">
+          <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+        </svg>
+        <span class="wishlist-count-badge" id="bnav-wishlist-badge" style="display: none; top: -6px; right: -10px;">0</span>
+      </div>
       <span>Yêu thích</span>
     </a>
 
@@ -55,10 +59,26 @@ export function createBottomNav() {
     </a>
   `;
 
+  // Wishlist badge updater
+  const bnavBadge = nav.querySelector('#bnav-wishlist-badge');
+  function updateBottomNavBadge() {
+    const count = getWishlistedProductIds().length;
+    if (count > 0) {
+      bnavBadge.textContent = count;
+      bnavBadge.style.display = 'inline-flex';
+      bnavBadge.classList.add('is-bouncing');
+      setTimeout(() => bnavBadge.classList.remove('is-bouncing'), 300);
+    } else {
+      bnavBadge.style.display = 'none';
+    }
+  }
+  updateBottomNavBadge();
+  window.addEventListener('wishlist-updated', updateBottomNavBadge);
+
   // Size guide button listener
   nav.querySelector('#bnav-sizeguide').addEventListener('click', (e) => {
     e.preventDefault();
-    openGlobalSizeGuide('ring');
+    openGlobalSizeGuide('ruler');
   });
 
   // Highlight active tab

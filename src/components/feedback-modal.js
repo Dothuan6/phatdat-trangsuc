@@ -4,6 +4,14 @@
 
 import '../styles/feedback.css';
 import { addCustomerContact } from '../services/supabase.js';
+import {
+  getCompareProductIds,
+  toggleCompareProduct,
+  clearCompareList,
+  trackProductEvent
+} from '../data/wishlist-store.js';
+import { products, getProductById, formatPrice } from '../data/products.js';
+import { siteInfo } from '../data/site-info.js';
 
 // SVG Icons
 const ICONS = {
@@ -398,15 +406,27 @@ export function openLightboxModal(images = [], initialIndex = 0) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 5. QUICK CALLBACK REQUEST MODAL (Yêu cầu gọi lại tư vấn)
+// 5. QUICK CALLBACK REQUEST MODAL (Hỗ trợ 1 SP hoặc trọn bộ Wishlist + Thiệp quà tặng)
 // ══════════════════════════════════════════════════════════════
 
-export function openQuickCallbackModal(product) {
+export function openQuickCallbackModal(product, options = {}) {
   const overlay = document.createElement('div');
   overlay.className = 'pd-callback-overlay';
 
-  const defaultImg = (product && product.images && product.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
-  const priceDisplay = product ? `${(product.price || 0).toLocaleString('vi-VN')} ₫` : '';
+  const isMulti = Array.isArray(options.productsList) && options.productsList.length > 0;
+  const listItems = isMulti ? options.productsList : (product ? [product] : []);
+  const firstProd = listItems[0] || product;
+  const defaultImg = (firstProd && firstProd.images && firstProd.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  const totalAmount = listItems.reduce((sum, p) => sum + (Number(p?.price) || 0), 0);
+  const priceDisplay = totalAmount > 0 ? `${totalAmount.toLocaleString('vi-VN')} ₫` : '';
+  const initialGiftNote = options.giftCardNote || '';
+
+  const previewTitle = isMulti
+    ? `Tư vấn bộ ${listItems.length} mẫu trang sức yêu thích`
+    : (firstProd?.name || 'Trang sức Phát Đạt');
+  const previewSub = isMulti
+    ? `Tổng tham khảo: ${priceDisplay} (${listItems.map(p => p.reference).join(', ')})`
+    : `${priceDisplay} <span style="color: var(--color-text-secondary); font-weight: normal; margin-left: 6px;">Mã: ${firstProd?.reference || ''}</span>`;
 
   overlay.innerHTML = `
     <div class="pd-callback-card" role="dialog" aria-modal="true">
@@ -419,11 +439,11 @@ export function openQuickCallbackModal(product) {
       </div>
 
       <div class="pd-callback-product-preview">
-        <img src="${defaultImg}" alt="${product?.name || ''}">
+        <img src="${defaultImg}" alt="${previewTitle}">
         <div>
-          <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">${product?.name || 'Trang sức Phát Đạt'}</div>
+          <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">${previewTitle}</div>
           <div style="font-size: 12px; color: var(--color-brand-primary); font-weight: 600; margin-top: 2px;">
-            ${priceDisplay} <span style="color: var(--color-text-secondary); font-weight: normal; margin-left: 6px;">Mã: ${product?.reference || ''}</span>
+            ${previewSub}
           </div>
         </div>
       </div>
@@ -441,8 +461,15 @@ export function openQuickCallbackModal(product) {
           </div>
 
           <div class="pd-callback-group">
-            <label for="cb-note">Ghi chú yêu cầu tư vấn</label>
-            <input type="text" id="cb-note" class="pd-callback-input" placeholder="VD: Cần tư vấn size tay, hoặc quà sinh nhật...">
+            <label for="cb-note">Ghi chú tư vấn (Size tay, màu xi mạ...)</label>
+            <input type="text" id="cb-note" class="pd-callback-input" value="${options.selectedInfo || ''}" placeholder="VD: Cần tư vấn size tay, hoặc giao hàng gấp...">
+          </div>
+
+          <div class="pd-callback-group" style="background: #FAF6EE; border: 1px dashed var(--color-accent-gold); border-radius: 6px; padding: 10px 12px; margin-bottom: 4px;">
+            <label for="cb-gift-card" style="color: #8A6218; display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+              <span>🎁 Viết thiệp quà tặng miễn phí (Tùy chọn)</span>
+            </label>
+            <input type="text" id="cb-gift-card" class="pd-callback-input" style="background: #fff; font-size: 13px; padding: 8px 10px;" value="${initialGiftNote}" placeholder="Nhập lời chúc để tiệm viết thiệp tay kèm hộp nhung...">
           </div>
         </div>
 
@@ -473,23 +500,37 @@ export function openQuickCallbackModal(product) {
     if (e.target === overlay) close();
   });
 
-  // Submit Handler
   overlay.querySelector('#pd-callback-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const phone = overlay.querySelector('#cb-phone').value.trim();
     const name = overlay.querySelector('#cb-name').value.trim();
     const note = overlay.querySelector('#cb-note').value.trim();
+    const giftCard = overlay.querySelector('#cb-gift-card').value.trim();
     const submitBtn = overlay.querySelector('#cb-submit-btn');
 
     submitBtn.textContent = 'Đang gửi...';
     submitBtn.disabled = true;
 
+    listItems.forEach(p => {
+      if (p?.id) trackProductEvent(p.id, 'callback');
+    });
+
+    const subjectText = isMulti
+      ? `Tư vấn trọn bộ Wishlist (${listItems.length} mẫu)`
+      : `Tư vấn SP: ${firstProd?.name || ''} (${firstProd?.reference || ''})`;
+
+    const itemsSummary = isMulti
+      ? listItems.map(p => `${p.name} (${p.reference} - ${formatPrice(p.price)})`).join('; ')
+      : `${firstProd?.name || ''} - Giá: ${priceDisplay}`;
+
+    const giftSummary = giftCard ? ` | 🎁 Lời chúc thiệp quà tặng: "${giftCard}"` : '';
+
     try {
       await addCustomerContact({
-        fullName: name || 'Khách hàng quan tâm ' + (product?.name || 'sản phẩm'),
+        fullName: name || 'Khách hàng quan tâm ' + (firstProd?.name || 'trang sức'),
         phone: phone,
-        subject: `Tư vấn SP: ${product?.name || ''} (${product?.reference || ''})`,
-        message: `Khách yêu cầu gọi lại tư vấn mẫu: ${product?.name || ''} - Giá: ${priceDisplay}. Ghi chú: ${note || 'Không có'}`
+        subject: subjectText,
+        message: `Khách yêu cầu gọi lại tư vấn: ${itemsSummary}. Ghi chú: ${note || 'Không có'}${giftSummary}`
       });
 
       close();
@@ -507,7 +548,486 @@ export function openQuickCallbackModal(product) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 6. CONVENIENCE SHORTCUTS
+// 6. SOCIAL SHARE & QR CODE SHOWROOM TAG MODAL
+// ══════════════════════════════════════════════════════════════
+
+export async function shareProductLink(product) {
+  const shareUrl = `${window.location.origin}${window.location.pathname}#/product/${product.id}`;
+  const shareTitle = `${product.name} | Phát Đạt Jewelry`;
+  const shareText = `✨ Xem mẫu trang sức Bạc 925 "${product.name}" (Mã: ${product.reference}) - Giá: ${formatPrice(product.price)} tại Phát Đạt Jewelry:`;
+
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      });
+      showToast('Cảm ơn bạn đã chia sẻ sản phẩm!', 'success', 2500);
+      return;
+    } catch (err) {
+      // User cancelled or fallback to clipboard
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+    showToast('Đã sao chép link & thông tin sản phẩm! Bạn có thể dán gửi cho bạn bè qua Zalo/Messenger.', 'success', 3800);
+  } catch (e) {
+    showToast('Link sản phẩm: ' + shareUrl, 'info', 4000);
+  }
+}
+
+export function openQrTagModal(product) {
+  if (!product) return;
+  const prodUrl = `${window.location.origin}${window.location.pathname}#/product/${product.id}`;
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&color=143F3B&data=${encodeURIComponent(prodUrl)}`;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 400px; text-align: center;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>Thẻ Giá & Mã QR Showroom</h3>
+          <div style="font-size: 12px; opacity: 0.85;">Quét mã để xem chi tiết & bảo hành trên điện thoại</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 24px;" id="qr-printable-area">
+        <div style="border: 2px solid var(--color-brand-primary); border-radius: 10px; padding: 20px 16px; background: #fff; position: relative;">
+          <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: var(--color-accent-gold); text-transform: uppercase; margin-bottom: 4px;">
+            PHÁT ĐẠT JEWELRY · BẠC 925
+          </div>
+          <div style="font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+            ${product.name}
+          </div>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 12px;">
+            Mã SP: <strong>${product.reference}</strong> · ${product.materials}
+          </div>
+
+          <div style="display: inline-block; padding: 10px; border: 1px solid var(--color-border-light); border-radius: 8px; background: #fff; margin-bottom: 12px;">
+            <img src="${qrApiUrl}" alt="QR ${product.reference}" style="width: 170px; height: 170px; display: block; margin: 0 auto;"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div style="display:none; width:170px; height:170px; align-items:center; justify-content:center; flex-direction:column; background:#f8faf9; color:var(--color-brand-primary); font-size:12px; padding:12px;">
+              <strong>MÃ: ${product.reference}</strong>
+              <span style="margin-top:6px; word-break:break-all; font-size:10px;">${prodUrl}</span>
+            </div>
+          </div>
+
+          <div style="font-size: 22px; font-weight: 700; color: var(--color-brand-primary); margin-top: 4px;">
+            ${formatPrice(product.price)}
+          </div>
+          <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 4px;">
+            Bảo hành làm sáng miễn phí trọn đời · Hotline: ${siteInfo.phoneDisplay}
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: center;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="qr-copy-btn">🔗 Copy Link SP</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="qr-print-btn">🖨️ In Thẻ QR</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  overlay.querySelector('#qr-copy-btn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(prodUrl);
+      showToast('Đã sao chép đường dẫn sản phẩm!', 'success');
+    } catch (e) {}
+  });
+
+  overlay.querySelector('#qr-print-btn').addEventListener('click', () => {
+    const content = overlay.querySelector('#qr-printable-area').innerHTML;
+    const win = window.open('', '_blank', 'width=480,height=620');
+    if (win) {
+      win.document.write(`
+        <html>
+          <head>
+            <title>Thẻ QR - ${product.reference} - ${product.name}</title>
+            <style>
+              body { font-family: Arial, sans-serif; text-align: center; padding: 24px; color: #1A2423; }
+              @media print { body { padding: 0; } }
+            </style>
+          </head>
+          <body>
+            ${content}
+            <script>setTimeout(() => { window.print(); }, 500);</script>
+          </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 7. SIDE-BY-SIDE PRODUCT COMPARISON MODAL & FLOATING BAR
+// ══════════════════════════════════════════════════════════════
+
+export function openCompareModal() {
+  const ids = getCompareProductIds();
+  const items = ids.map(id => getProductById(id)).filter(Boolean);
+
+  if (items.length === 0) {
+    showToast('Chưa có sản phẩm nào trong danh sách so sánh!', 'info');
+    return;
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 900px; width: 100%; max-height: 90vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>So Sánh Chi Tiết Trang Sức (${items.length}/3)</h3>
+          <div style="font-size: 12px; opacity: 0.85;">Đối chiếu chất liệu, đá đính kèm, kích thước và mức giá</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 20px; overflow-x: auto; overflow-y: auto; flex: 1;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 540px; font-size: 13px; text-align: center;">
+          <thead>
+            <tr>
+              <th style="width: 130px; text-align: left; padding: 12px; border-bottom: 1px solid var(--color-border); color: var(--color-text-secondary);">Tiêu chí</th>
+              ${items.map(p => `
+                <th style="padding: 12px; border-bottom: 1px solid var(--color-border); vertical-align: top; width: ${Math.floor(80 / items.length)}%;">
+                  <div style="position: relative; display: inline-block;">
+                    <img src="${p.images[0]}" alt="${p.name}" style="width: 90px; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid var(--color-border-light); margin-bottom: 8px;">
+                  </div>
+                  <div style="font-weight: 700; color: var(--color-brand-primary); font-size: 14px; margin-bottom: 4px;">
+                    <a href="#/product/${p.id}" class="compare-prod-link" style="color: inherit; text-decoration: none;">${p.name}</a>
+                  </div>
+                  <button type="button" class="remove-compare-item" data-id="${p.id}" style="background: none; border: none; color: #c0392b; font-size: 11px; cursor: pointer; text-decoration: underline;">Bỏ khỏi so sánh</button>
+                </th>
+              `).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background: #f9fbfb;">
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Giá bán</td>
+              ${items.map(p => `<td style="padding: 10px 12px; font-size: 16px; font-weight: 700; color: var(--color-brand-primary);">${formatPrice(p.price)}</td>`).join('')}
+            </tr>
+            <tr>
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Mã SKU</td>
+              ${items.map(p => `<td style="padding: 10px 12px; font-family: monospace;">${p.reference}</td>`).join('')}
+            </tr>
+            <tr style="background: #f9fbfb;">
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Bộ sưu tập</td>
+              ${items.map(p => `<td style="padding: 10px 12px;">${p.collection}</td>`).join('')}
+            </tr>
+            <tr>
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Chất liệu</td>
+              ${items.map(p => `<td style="padding: 10px 12px;">${p.materials}</td>`).join('')}
+            </tr>
+            <tr style="background: #f9fbfb;">
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Đá đính kèm</td>
+              ${items.map(p => `<td style="padding: 10px 12px;">${p.stones || 'Bạc trơn bóng'}</td>`).join('')}
+            </tr>
+            <tr>
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Kích cỡ hỗ trợ</td>
+              ${items.map(p => `<td style="padding: 10px 12px;">${(p.availableSizes || ['Freesize']).join(', ')}</td>`).join('')}
+            </tr>
+            <tr style="background: #f9fbfb;">
+              <td style="text-align: left; padding: 10px 12px; font-weight: 600;">Đánh giá</td>
+              ${items.map(p => `<td style="padding: 10px 12px; color: #f39c12; font-weight: 600;">★ ${p.rating || 4.9} (${p.reviewsCount || 20} nhận xét)</td>`).join('')}
+            </tr>
+            <tr>
+              <td style="text-align: left; padding: 12px; font-weight: 600;">Tư vấn mẫu này</td>
+              ${items.map(p => `
+                <td style="padding: 12px;">
+                  <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                    <button type="button" class="pd-dialog-btn pd-dialog-btn--primary compare-callback-btn" data-id="${p.id}" style="width: 100%; max-width: 160px; padding: 8px 10px; font-size: 12px;">
+                      📞 Yêu cầu gọi lại
+                    </button>
+                    <a href="#/product/${p.id}" class="compare-prod-link" style="font-size: 12px; color: var(--color-brand-primary); font-weight: 600; text-decoration: underline;">Xem chi tiết →</a>
+                  </div>
+                </td>
+              `).join('')}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="compare-clear-all">Xóa tất cả</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="compare-close-btn">Đóng bảng so sánh</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#compare-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  overlay.querySelectorAll('.compare-prod-link').forEach(a => {
+    a.addEventListener('click', close);
+  });
+
+  overlay.querySelector('#compare-clear-all').addEventListener('click', () => {
+    clearCompareList();
+    close();
+    showToast('Đã xóa danh sách so sánh!', 'info');
+  });
+
+  overlay.querySelectorAll('.remove-compare-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      toggleCompareProduct(btn.dataset.id);
+      close();
+      if (getCompareProductIds().length > 0) {
+        openCompareModal();
+      }
+    });
+  });
+
+  overlay.querySelectorAll('.compare-callback-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const prod = getProductById(btn.dataset.id);
+      close();
+      if (prod) openQuickCallbackModal(prod);
+    });
+  });
+}
+
+export function initCompareFloatingBar() {
+  let bar = document.getElementById('pd-compare-floating-bar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'pd-compare-floating-bar';
+    bar.className = 'pd-compare-bar';
+    document.body.appendChild(bar);
+  }
+
+  function renderBar() {
+    // Hide on admin pages
+    if (window.location.hash.startsWith('#/admin')) {
+      bar.style.display = 'none';
+      return;
+    }
+
+    const ids = getCompareProductIds();
+    const items = ids.map(id => getProductById(id)).filter(Boolean);
+    if (items.length === 0) {
+      bar.style.display = 'none';
+      return;
+    }
+
+    bar.style.display = 'flex';
+    bar.innerHTML = `
+      <div class="pd-compare-bar__items">
+        ${items.map(p => `
+          <div class="pd-compare-bar__thumb" title="${p.name}">
+            <img src="${p.images[0]}" alt="${p.name}">
+            <button type="button" class="pd-compare-bar__remove" data-id="${p.id}" aria-label="Xóa">✕</button>
+          </div>
+        `).join('')}
+        <span class="pd-compare-bar__label">So sánh (${items.length}/3 mẫu)</span>
+      </div>
+      <div class="pd-compare-bar__actions">
+        <button type="button" class="pd-compare-bar__clear" id="bar-clear-compare">Xóa</button>
+        <button type="button" class="pd-compare-bar__open" id="bar-open-compare">⚖️ So sánh ngay</button>
+      </div>
+    `;
+
+    bar.querySelectorAll('.pd-compare-bar__remove').forEach(btn => {
+      btn.addEventListener('click', () => toggleCompareProduct(btn.dataset.id));
+    });
+    bar.querySelector('#bar-clear-compare').addEventListener('click', () => clearCompareList());
+    bar.querySelector('#bar-open-compare').addEventListener('click', () => openCompareModal());
+  }
+
+  window.addEventListener('compare-updated', renderBar);
+  window.addEventListener('hashchange', renderBar);
+  renderBar();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 8. GIFT FINDER QUIZ MODAL (Trình Chọn Quà Tặng 3 Bước)
+// ══════════════════════════════════════════════════════════════
+
+export function openGiftFinderModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+
+  let state = {
+    recipient: 'Người thương / Bạn gái',
+    style: 'all',
+    budget: 'all'
+  };
+
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 620px; width: 100%; max-height: 92vh; overflow-y: auto;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header" style="background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%);">
+        <div>
+          <h3>🎁 Trợ Lý Chọn Quà Tặng Trang Sức</h3>
+          <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">Tìm món trang sức Bạc 925 ý nghĩa nhất chỉ trong 30 giây</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 20px 24px;" id="gift-quiz-body">
+        <!-- Step 1 -->
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); display: block; margin-bottom: 8px;">
+            1. Bạn đang tìm quà tặng cho ai?
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;" id="quiz-recipient-group">
+            <button type="button" class="gift-quiz-pill is-selected" data-val="Người thương / Bạn gái">💖 Người thương / Bạn gái</button>
+            <button type="button" class="gift-quiz-pill" data-val="Mẹ / Chị gái">🌸 Mẹ / Chị gái kính yêu</button>
+            <button type="button" class="gift-quiz-pill" data-val="Bạn thân">✨ Bạn thân kỷ niệm</button>
+            <button type="button" class="gift-quiz-pill" data-val="Tự thưởng bản thân">👑 Tự thưởng bản thân</button>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="margin-bottom: 18px;">
+          <label style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); display: block; margin-bottom: 8px;">
+            2. Phong cách trang sức người nhận yêu thích?
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;" id="quiz-style-group">
+            <button type="button" class="gift-quiz-pill is-selected" data-val="all">🌟 Tất cả phong cách nổi bật</button>
+            <button type="button" class="gift-quiz-pill" data-val="Cỏ Ba Lá">🍀 Cỏ Ba Lá may mắn</button>
+            <button type="button" class="gift-quiz-pill" data-val="Ánh Sao">💎 Đá Moissanite lấp lánh</button>
+            <button type="button" class="gift-quiz-pill" data-val="Hoa Xinh">🌷 Hoa Xinh & Ngọc trai</button>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); display: block; margin-bottom: 8px;">
+            3. Ngân sách quà tặng dự kiến?
+          </label>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;" id="quiz-budget-group">
+            <button type="button" class="gift-quiz-pill is-selected" data-val="all">Mọi mức giá</button>
+            <button type="button" class="gift-quiz-pill" data-val="under200">Dưới 200.000₫</button>
+            <button type="button" class="gift-quiz-pill" data-val="over200">200.000₫ – 400.000₫</button>
+          </div>
+        </div>
+
+        <!-- Recommendations Result -->
+        <div style="border-top: 1px solid var(--color-border); padding-top: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 14px; font-weight: 700; color: var(--color-brand-primary);" id="quiz-result-heading">Gợi ý hoàn hảo nhất:</span>
+            <span style="font-size: 11px; color: #8A6218; background: #FAF4E8; padding: 3px 8px; border-radius: 12px; font-weight: 600;">🎁 Tặng kèm hộp nhung & thiệp viết tay</span>
+          </div>
+          <div id="quiz-recommendations-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="quiz-close-btn">Đóng</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="quiz-consult-btn">💬 Nhắn Zalo Tư Vấn Chọn Quà</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#quiz-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  function updateRecommendations() {
+    let matched = [...products];
+    if (state.style !== 'all') {
+      matched = matched.filter(p => p.collection === state.style);
+    }
+    if (state.budget === 'under200') {
+      matched = matched.filter(p => p.price <= 200000);
+    } else if (state.budget === 'over200') {
+      matched = matched.filter(p => p.price > 200000);
+    }
+    if (matched.length === 0) matched = products.slice(0, 4);
+
+    const top4 = matched.slice(0, 4);
+    const grid = overlay.querySelector('#quiz-recommendations-grid');
+    overlay.querySelector('#quiz-result-heading').textContent = `Gợi ý quà tặng cho ${state.recipient} (${matched.length} mẫu):`;
+
+    grid.innerHTML = top4.map((p, idx) => `
+      <div style="border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: center; background: #fff;">
+        <img src="${p.images[0]}" alt="${p.name}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+        <div style="overflow: hidden; flex: 1;">
+          <div style="font-size: 10px; color: var(--color-brand-primary); font-weight: 700;">★ ${99 - idx}% Phù hợp</div>
+          <a href="#/product/${p.id}" class="quiz-prod-link" style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); text-decoration: none; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</a>
+          <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-top: 2px;">${formatPrice(p.price)}</div>
+          <button type="button" class="quiz-pick-callback" data-id="${p.id}" style="margin-top: 4px; background: var(--color-brand-light); color: var(--color-brand-primary); border: none; border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">Đặt kèm thiệp →</button>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.quiz-prod-link').forEach(a => a.addEventListener('click', close));
+    grid.querySelectorAll('.quiz-pick-callback').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prod = getProductById(btn.dataset.id);
+        close();
+        if (prod) {
+          openQuickCallbackModal(prod, {
+            giftCardNote: `Quà tặng ${state.recipient} - Nhờ shop gói hộp quà và kèm thiệp viết tay.`
+          });
+        }
+      });
+    });
+  }
+
+  function setupPillGroup(groupId, stateKey) {
+    const container = overlay.querySelector(groupId);
+    container.querySelectorAll('.gift-quiz-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.gift-quiz-pill').forEach(b => b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        state[stateKey] = btn.dataset.val;
+        updateRecommendations();
+      });
+    });
+  }
+
+  setupPillGroup('#quiz-recipient-group', 'recipient');
+  setupPillGroup('#quiz-style-group', 'style');
+  setupPillGroup('#quiz-budget-group', 'budget');
+  updateRecommendations();
+
+  overlay.querySelector('#quiz-consult-btn').addEventListener('click', () => {
+    const msg = `[Phát Đạt Jewelry] Nhờ shop tư vấn chọn quà tặng:\n- Người nhận: ${state.recipient}\n- Phong cách: ${state.style === 'all' ? 'Tất cả' : state.style}\n- Ngân sách: ${state.budget === 'under200' ? 'Dưới 200k' : state.budget === 'over200' ? '200k - 400k' : 'Linh hoạt'}`;
+    try {
+      navigator.clipboard.writeText(msg);
+      showToast('Đã sao chép tiêu chí quà tặng! Đang mở Zalo tư vấn...', 'success', 3500);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 500);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 9. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -521,6 +1041,10 @@ export const modal = {
   confirm: showConfirmModal,
   alert: showAlertModal,
   lightbox: openLightboxModal,
-  callback: openQuickCallbackModal
+  callback: openQuickCallbackModal,
+  qrTag: openQrTagModal,
+  compare: openCompareModal,
+  giftFinder: openGiftFinderModal
 };
+
 

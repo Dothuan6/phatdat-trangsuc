@@ -1,8 +1,9 @@
 // ============================================================
-// FLOATING QUICK CONTACT WIDGET
+// FLOATING QUICK CONTACT WIDGET & SMART ZALO ENGAGEMENT BUBBLE
 // ============================================================
 
 import { siteInfo } from '../data/site-info.js';
+import { openGiftFinderModal } from './feedback-modal.js';
 
 export function createFloatingContact() {
   const container = document.createElement('div');
@@ -10,6 +11,44 @@ export function createFloatingContact() {
   container.id = 'floating-contact-hub';
 
   container.innerHTML = `
+    <!-- Smart Engagement Greeting Bubble -->
+    <div id="smart-zalo-bubble" style="
+      display: none;
+      position: absolute;
+      bottom: 120px;
+      right: 0;
+      width: 260px;
+      background: #ffffff;
+      border: 1px solid var(--color-accent-gold);
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      font-family: var(--font-body);
+      z-index: 860;
+    ">
+      <button type="button" id="close-smart-bubble" style="position: absolute; top: 6px; right: 8px; background: none; border: none; font-size: 13px; color: #888; cursor: pointer;" aria-label="Đóng">✕</button>
+      <div style="font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 4px;">
+        ✨ Phát Đạt Jewelry xin chào!
+      </div>
+      <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.45; margin-bottom: 10px;">
+        Bạn đang tìm quà tặng hay cần tư vấn mẫu Bạc 925 hợp mệnh & vừa size?
+      </div>
+      <div style="display: flex; gap: 6px;">
+        <button type="button" id="bubble-open-gift" style="flex: 1; background: #FAF4E8; color: #8A6218; border: 1px solid var(--color-accent-gold); border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; cursor: pointer;">
+          🎁 Chọn quà
+        </button>
+        <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="flex: 1; background: #0068FF; color: #fff; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; text-decoration: none; text-align: center;">
+          💬 Chat Zalo
+        </a>
+      </div>
+    </div>
+
+    <!-- Floating Gift Assistant Button -->
+    <button type="button" id="floating-gift-btn" class="floating-btn" style="background: linear-gradient(135deg, #C99738, #A87922); color: #fff; border: none; cursor: pointer;" title="Trợ lý chọn quà tặng 30 giây" aria-label="Chọn quà tặng">
+      <span class="floating-btn__tooltip">Chọn quà tặng</span>
+      <div class="floating-btn__icon" style="font-size: 18px;">🎁</div>
+    </button>
+
     <!-- Floating Zalo Button -->
     <a href="${siteInfo.zalo}" target="_blank" rel="noopener" class="floating-btn floating-btn--zalo" title="Chat Zalo tư vấn 0898 025 013" aria-label="Zalo">
       <span class="floating-btn__tooltip">Tư vấn Zalo</span>
@@ -30,6 +69,33 @@ export function createFloatingContact() {
       </div>
     </a>
   `;
+
+  const bubble = container.querySelector('#smart-zalo-bubble');
+  container.querySelector('#floating-gift-btn').addEventListener('click', () => {
+    bubble.style.display = 'none';
+    openGiftFinderModal();
+  });
+
+  container.querySelector('#bubble-open-gift').addEventListener('click', () => {
+    bubble.style.display = 'none';
+    sessionStorage.setItem('pd_bubble_dismissed', '1');
+    openGiftFinderModal();
+  });
+
+  container.querySelector('#close-smart-bubble').addEventListener('click', () => {
+    bubble.style.display = 'none';
+    sessionStorage.setItem('pd_bubble_dismissed', '1');
+  });
+
+  // Show smart greeting bubble after 9 seconds if not dismissed
+  setTimeout(() => {
+    if (
+      !sessionStorage.getItem('pd_bubble_dismissed') &&
+      !window.location.hash.startsWith('#/admin')
+    ) {
+      bubble.style.display = 'block';
+    }
+  }, 9000);
 
   return container;
 }

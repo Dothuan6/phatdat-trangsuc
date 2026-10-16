@@ -1,6 +1,8 @@
 import { navigate } from '../router.js';
 import { t, currentLang, toggleLang } from '../i18n.js';
 import { products, formatPrice, searchProducts, categories, collections } from '../data/products.js';
+import { getWishlistedProductIds, getRecentSearches, addRecentSearch } from '../data/wishlist-store.js';
+import { openGiftFinderModal } from './feedback-modal.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -55,13 +57,17 @@ export function createHeader() {
         </a>
       </div>
       <div class="header-right">
+        <button type="button" class="header-region hide-mobile" id="gift-finder-header-btn" style="background: var(--color-brand-light); color: var(--color-brand-primary); border: 1px solid var(--color-border); border-radius: 16px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Trợ lý chọn quà tặng">
+          <span>🎁 Chọn quà</span>
+        </button>
         <button class="header-region hide-mobile" id="lang-toggle" aria-label="Toggle language">
           <span style="${currentLang === 'vi' ? 'font-weight: 600;' : 'opacity: 0.5;'}">VN</span>
           <span style="margin: 0 4px;">|</span>
           <span style="${currentLang === 'en' ? 'font-weight: 600;' : 'opacity: 0.5;'}">EN</span>
         </button>
-        <button class="header-icon" id="wishlist-toggle" aria-label="Yêu thích" onclick="window.location.hash='#/wishlist'" title="Bộ sưu tập yêu thích">
+        <button class="header-icon" id="wishlist-toggle" style="position: relative;" aria-label="Yêu thích" onclick="window.location.hash='#/wishlist'" title="Bộ sưu tập yêu thích">
           ${SVG_ICONS.wishlist}
+          <span class="wishlist-count-badge" id="header-wishlist-badge" style="display: none;">0</span>
         </button>
         <button class="header-icon" id="contact-toggle" aria-label="Tư vấn" title="Tư vấn nhanh">
           ${SVG_ICONS.phone}
@@ -72,6 +78,28 @@ export function createHeader() {
 
   headerWrapper.appendChild(topBar);
   headerWrapper.appendChild(header);
+
+  // Wishlist badge updater
+  const wishlistBadge = header.querySelector('#header-wishlist-badge');
+  function updateHeaderWishlistBadge() {
+    const count = getWishlistedProductIds().length;
+    if (count > 0) {
+      wishlistBadge.textContent = count;
+      wishlistBadge.style.display = 'inline-flex';
+      wishlistBadge.classList.add('is-bouncing');
+      setTimeout(() => wishlistBadge.classList.remove('is-bouncing'), 300);
+    } else {
+      wishlistBadge.style.display = 'none';
+    }
+  }
+  updateHeaderWishlistBadge();
+  window.addEventListener('wishlist-updated', updateHeaderWishlistBadge);
+
+  // Gift finder button
+  const giftBtn = header.querySelector('#gift-finder-header-btn');
+  if (giftBtn) {
+    giftBtn.addEventListener('click', () => openGiftFinderModal());
+  }
 
   // Scroll behavior
   window.addEventListener('scroll', () => {
@@ -223,6 +251,10 @@ function openSearchDrawer() {
   const overlay = document.createElement('div');
   overlay.className = 'search-overlay';
 
+  const recentTerms = getRecentSearches();
+  const hotKeywords = ['Cỏ ba lá', 'Nhẫn Moissanite', 'Lắc tay xà cừ', 'Bông tai nụ', 'Dây chuyền bạc 925'];
+  const allSuggestions = Array.from(new Set([...recentTerms, ...hotKeywords])).slice(0, 6);
+
   const drawer = document.createElement('div');
   drawer.className = 'search-drawer';
   drawer.innerHTML = `
@@ -232,6 +264,20 @@ function openSearchDrawer() {
         <input type="text" class="search-drawer__input" placeholder="Tìm nhẫn, dây chuyền cỏ ba lá, đá moissanite..." autofocus>
         <button class="search-drawer__close" aria-label="Close search">✕</button>
       </div>
+
+      <!-- Recent & Hot Search Chips -->
+      <div style="padding: 10px 0 14px 0; border-bottom: 1px solid var(--color-border-light); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-size: 12px; color: var(--color-text-secondary); font-weight: 600;">🔥 Tìm nhanh:</span>
+        ${allSuggestions.map(kw => `
+          <button type="button" class="search-quick-keyword" data-kw="${kw}" style="background: #f4f7f6; border: 1px solid var(--color-border); border-radius: 16px; padding: 4px 12px; font-size: 12px; color: var(--color-brand-primary); cursor: pointer;">
+            ${kw}
+          </button>
+        `).join('')}
+        <button type="button" id="search-open-gift-quiz" style="background: #FAF4E8; border: 1px solid var(--color-accent-gold); border-radius: 16px; padding: 4px 12px; font-size: 12px; color: #8A6218; font-weight: 600; cursor: pointer;">
+          🎁 Trợ lý chọn quà tặng
+        </button>
+      </div>
+
       <div class="search-drawer__content" id="search-drawer-content">
         <div class="search-col">
           <h4 class="search-col__title">Danh mục</h4>
@@ -290,6 +336,7 @@ function openSearchDrawer() {
         <div class="search-creation-item__price">${formatPrice(p.price)}</div>
       `;
       itemEl.addEventListener('click', () => {
+        if (inputEl.value.trim()) addRecentSearch(inputEl.value.trim());
         closeSearch();
       });
       resultsGrid.appendChild(itemEl);
@@ -298,6 +345,24 @@ function openSearchDrawer() {
 
   // Render initial featured products
   renderSearchResults(products.slice(0, 4));
+
+  // Quick keyword click
+  drawer.querySelectorAll('.search-quick-keyword').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const kw = btn.dataset.kw;
+      inputEl.value = kw;
+      addRecentSearch(kw);
+      const matched = searchProducts(kw);
+      resultsTitle.textContent = `Kết quả cho "${kw}" (${matched.length})`;
+      renderSearchResults(matched);
+    });
+  });
+
+  // Gift quiz trigger in search
+  drawer.querySelector('#search-open-gift-quiz').addEventListener('click', () => {
+    closeSearch();
+    openGiftFinderModal();
+  });
 
   // Live input listening
   inputEl.addEventListener('input', (e) => {
@@ -317,6 +382,7 @@ function openSearchDrawer() {
     if (e.key === 'Enter') {
       const val = inputEl.value.trim();
       if (val) {
+        addRecentSearch(val);
         closeSearch();
         navigate(`/search/${encodeURIComponent(val)}`);
       }

@@ -17,6 +17,7 @@ import { createFooter } from './components/footer.js';
 import { createContactDrawer } from './components/contact-drawer.js';
 import { createBottomNav } from './components/bottom-nav.js';
 import { createFloatingContact } from './components/floating-contact.js';
+import { initCompareFloatingBar } from './components/feedback-modal.js';
 
 // Import router
 import { registerRoute, initRouter } from './router.js';
@@ -64,6 +65,9 @@ function init() {
   const existingHub = document.getElementById('floating-contact-hub');
   if (existingHub) existingHub.remove();
   document.body.appendChild(createFloatingContact());
+
+  // Product Comparison Floating Bar
+  initCompareFloatingBar();
 
   // Contact Drawer (global)
   const { overlay: contactOverlay, drawer: contactDrawer } = createContactDrawer();

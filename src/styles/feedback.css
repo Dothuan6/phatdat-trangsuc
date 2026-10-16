@@ -575,3 +575,161 @@
   display: flex;
   gap: 10px;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   FLOATING PRODUCT COMPARE BAR & GIFT QUIZ PILLS
+   ══════════════════════════════════════════════════════════════ */
+
+.pd-compare-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #143F3B;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 50px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(201, 151, 56, 0.5);
+  z-index: 880;
+  display: none;
+  align-items: center;
+  gap: 16px;
+  max-width: 94vw;
+}
+
+.pd-compare-bar__items {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pd-compare-bar__thumb {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-gold);
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.pd-compare-bar__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.pd-compare-bar__remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: #ffffff;
+  border: none;
+  font-size: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pd-compare-bar__label {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pd-compare-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pd-compare-bar__clear {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pd-compare-bar__open {
+  background: var(--color-accent-gold);
+  color: #143F3B;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .pd-compare-bar {
+    bottom: 68px;
+    padding: 8px 14px;
+    gap: 10px;
+  }
+  .pd-compare-bar__label {
+    display: none;
+  }
+}
+
+.gift-quiz-pill {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #fafaf8;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.gift-quiz-pill:hover {
+  border-color: var(--color-brand-primary);
+}
+
+.gift-quiz-pill.is-selected {
+  background: var(--color-brand-light);
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  box-shadow: 0 0 0 1px var(--color-brand-primary);
+}
+
+.wishlist-count-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: #D4380D;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(212, 56, 13, 0.35);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-count-badge.is-bouncing {
+  transform: scale(1.35);
+}
+
