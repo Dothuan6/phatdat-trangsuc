@@ -5,6 +5,8 @@
 import { getSupabaseClient } from './supabase.js';
 
 const ADMIN_SESSION_KEY = 'phatdat_admin_auth_session';
+const ADMIN_EMAIL_KEY = 'phatdat_admin_email';
+const ADMIN_PASS_KEY = 'phatdat_admin_password';
 
 // Designated default credentials
 export const DEFAULT_ADMIN = {
@@ -13,16 +15,33 @@ export const DEFAULT_ADMIN = {
   role: 'super_admin'
 };
 
+export function getAdminCredentials() {
+  const email = (typeof localStorage !== 'undefined' && localStorage.getItem(ADMIN_EMAIL_KEY)) || 'admin@gmail.com';
+  const password = (typeof localStorage !== 'undefined' && localStorage.getItem(ADMIN_PASS_KEY)) || 'admin';
+  return { email, password };
+}
+
+export function updateAdminCredentials(newEmail, newPassword) {
+  if (newEmail && newEmail.trim()) {
+    localStorage.setItem(ADMIN_EMAIL_KEY, newEmail.trim().toLowerCase());
+  }
+  if (newPassword && newPassword.trim()) {
+    localStorage.setItem(ADMIN_PASS_KEY, newPassword.trim());
+  }
+  return true;
+}
+
 export async function login(email, password) {
   const cleanEmail = (email || '').trim().toLowerCase();
   const cleanPass = (password || '').trim();
+  const currentCreds = getAdminCredentials();
 
-  // Check designated credentials: admin@gmail.com / admin
-  if (cleanEmail === 'admin@gmail.com' && cleanPass === 'admin') {
+  // Check admin credentials
+  if (cleanEmail === currentCreds.email && cleanPass === currentCreds.password) {
     const session = {
       user: {
         id: 'admin-master',
-        email: 'admin@gmail.com',
+        email: currentCreds.email,
         name: 'Quản Trị Viên Phát Đạt',
         role: 'super_admin'
       },

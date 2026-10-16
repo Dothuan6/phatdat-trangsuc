@@ -2,7 +2,7 @@
 // ADMIN DASHBOARD (BACKOFFICE) — Phát Đạt Jewelry
 // ============================================================
 
-import { isAuthenticated, logout, getAdminUser } from '../../services/auth.js';
+import { isAuthenticated, logout, getAdminUser, getAdminCredentials, updateAdminCredentials } from '../../services/auth.js';
 import {
   SUPABASE_PROJECT_ID,
   SUPABASE_URL,
@@ -91,7 +91,7 @@ export async function renderAdmin(container) {
 
       <div class="admin-sidebar-footer">
         <div style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 6px;">
-          Đăng nhập: <strong>admin@gmail.com</strong>
+          Đăng nhập: <strong>${getAdminCredentials().email}</strong>
         </div>
         <button id="admin-logout-trigger" class="admin-logout-btn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -431,12 +431,13 @@ export async function renderAdmin(container) {
     const modalOverlay = document.createElement('div');
     modalOverlay.className = 'admin-modal-overlay';
 
-    const defaultImg = prod && prod.images && prod.images[0]
-      ? prod.images[0]
-      : './images/products/daychuyen3-removebg-preview.png';
+    const existingImages = prod && Array.isArray(prod.images) ? prod.images : [];
+    const img1 = existingImages[0] || (prod ? '' : './images/products/daychuyen3-removebg-preview.png');
+    const img2 = existingImages[1] || '';
+    const img3 = existingImages[2] || '';
 
     modalOverlay.innerHTML = `
-      <div class="admin-modal">
+      <div class="admin-modal" style="max-width: 680px;">
         <div class="admin-modal-header">
           <h3>${isEdit ? 'Chỉnh Sửa Sản Phẩm' : 'Thêm Sản Phẩm Mới'}</h3>
           <button id="modal-close-btn" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--color-text-secondary);">✕</button>
@@ -487,18 +488,56 @@ export async function renderAdmin(container) {
               </div>
             </div>
 
+            <!-- Multi-Image & Device Upload -->
             <div class="admin-form-group">
-              <label>Link ảnh sản phẩm chính</label>
-              <div style="display: flex; gap: 12px; align-items: center;">
-                <input type="text" id="m-image" class="admin-form-input" style="flex: 1;" required value="${defaultImg}">
-                <img id="m-img-preview" src="${defaultImg}" class="admin-img-preview-thumb" alt="Preview" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+              <label style="font-weight: 600; display: block; margin-bottom: 6px;">
+                Hình ảnh sản phẩm (Hỗ trợ tải trực tiếp từ máy hoặc dán link URL)
+              </label>
+
+              <!-- Main Image -->
+              <div style="background: #fbfbfb; border: 1px solid var(--color-border); border-radius: 6px; padding: 12px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 12px; font-weight: 600; color: var(--color-brand-primary);">Ảnh đại diện chính *</span>
+                  <span style="font-size: 11px; color: var(--color-text-secondary);">Hiển thị ngoài danh mục & chi tiết</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="text" id="m-image-1" class="admin-form-input" style="flex: 1;" required value="${img1}" placeholder="Dán link ảnh hoặc bấm nút Tải ảnh...">
+                  <input type="file" id="m-file-1" accept="image/*" style="display: none;">
+                  <button type="button" class="admin-btn admin-btn--outline admin-btn-sm" id="btn-upload-1" title="Tải ảnh từ máy tính hoặc điện thoại">📁 Tải ảnh</button>
+                  <img id="m-img-preview-1" src="${img1 || './images/products/daychuyen3-removebg-preview.png'}" class="admin-img-preview-thumb" alt="Preview 1" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+                </div>
+                <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 6px;">
+                  Gợi ý ảnh mẫu nhanh: 
+                  <a href="javascript:void(0)" class="preset-img-btn" data-target="1" data-url="./images/products/daychuyen3-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Dây chuyền 3]</a>
+                  <a href="javascript:void(0)" class="preset-img-btn" data-target="1" data-url="./images/products/4-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Nhẫn/Lắc 4]</a>
+                  <a href="javascript:void(0)" class="preset-img-btn" data-target="1" data-url="./images/products/6-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Vòng hạt 6]</a>
+                  <a href="javascript:void(0)" class="preset-img-btn" data-target="1" data-url="./images/products/bongtay1.1-removebg-preview.png" style="color:var(--color-brand-primary);">[Bông tai 1.1]</a>
+                </div>
               </div>
-              <div style="font-size: 11px; color: var(--color-text-secondary); margin-top: 6px;">
-                Gợi ý ảnh mẫu: 
-                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/daychuyen3-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Dây chuyền 3]</a>
-                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/4-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Nhẫn/Lắc cỏ 4]</a>
-                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/6-removebg-preview.png" style="color:var(--color-brand-primary);margin-right:8px;">[Vòng hạt 6]</a>
-                <a href="javascript:void(0)" class="preset-img-btn" data-url="./images/products/bongtay1.1-removebg-preview.png" style="color:var(--color-brand-primary);">[Bông tai 1.1]</a>
+
+              <!-- Gallery Extra Images (2 & 3) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <!-- Image 2 -->
+                <div style="background: #fbfbfb; border: 1px solid var(--color-border); border-radius: 6px; padding: 10px;">
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px;">Ảnh phụ 2 (Tùy chọn)</div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="text" id="m-image-2" class="admin-form-input" style="flex: 1; font-size: 12px; padding: 6px 10px;" value="${img2}" placeholder="Link hoặc tải ảnh">
+                    <input type="file" id="m-file-2" accept="image/*" style="display: none;">
+                    <button type="button" class="admin-btn admin-btn--outline admin-btn-sm" id="btn-upload-2">📁 Tải</button>
+                    <img id="m-img-preview-2" src="${img2 || './images/products/Daychuyen4.3-removebg-preview.png'}" class="admin-img-preview-thumb" style="width: 40px; height: 40px;" alt="Preview 2" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+                  </div>
+                </div>
+
+                <!-- Image 3 -->
+                <div style="background: #fbfbfb; border: 1px solid var(--color-border); border-radius: 6px; padding: 10px;">
+                  <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px;">Ảnh phụ 3 (Tùy chọn)</div>
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="text" id="m-image-3" class="admin-form-input" style="flex: 1; font-size: 12px; padding: 6px 10px;" value="${img3}" placeholder="Link hoặc tải ảnh">
+                    <input type="file" id="m-file-3" accept="image/*" style="display: none;">
+                    <button type="button" class="admin-btn admin-btn--outline admin-btn-sm" id="btn-upload-3">📁 Tải</button>
+                    <img id="m-img-preview-3" src="${img3 || './images/products/Daychuyen4.3-removebg-preview.png'}" class="admin-img-preview-thumb" style="width: 40px; height: 40px;" alt="Preview 3" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -526,18 +565,44 @@ export async function renderAdmin(container) {
     modalOverlay.querySelector('#modal-close-btn').addEventListener('click', closeModal);
     modalOverlay.querySelector('#m-cancel').addEventListener('click', closeModal);
 
-    // Live preview input listener
-    const imgInput = modalOverlay.querySelector('#m-image');
-    const imgPreview = modalOverlay.querySelector('#m-img-preview');
-    imgInput.addEventListener('input', () => {
-      imgPreview.src = imgInput.value.trim() || './images/products/Daychuyen4.3-removebg-preview.png';
+    // Setup 3 image inputs with live preview and local file upload
+    [1, 2, 3].forEach(idx => {
+      const input = modalOverlay.querySelector(`#m-image-${idx}`);
+      const fileInput = modalOverlay.querySelector(`#m-file-${idx}`);
+      const uploadBtn = modalOverlay.querySelector(`#btn-upload-${idx}`);
+      const preview = modalOverlay.querySelector(`#m-img-preview-${idx}`);
+
+      input.addEventListener('input', () => {
+        preview.src = input.value.trim() || './images/products/Daychuyen4.3-removebg-preview.png';
+      });
+
+      uploadBtn.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          showToast('Vui lòng chọn ảnh dung lượng dưới 5MB!', 'warning');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = (loadEvt) => {
+          const dataUrl = loadEvt.target.result;
+          input.value = dataUrl;
+          preview.src = dataUrl;
+          showToast(`Đã tải ảnh ${idx === 1 ? 'chính' : idx} từ thiết bị thành công!`, 'success');
+        };
+        reader.readAsDataURL(file);
+      });
     });
 
-    // Preset button click
+    // Preset shortcuts for image 1
     modalOverlay.querySelectorAll('.preset-img-btn').forEach(a => {
       a.addEventListener('click', () => {
-        imgInput.value = a.dataset.url;
-        imgPreview.src = a.dataset.url;
+        const input = modalOverlay.querySelector('#m-image-1');
+        const preview = modalOverlay.querySelector('#m-img-preview-1');
+        input.value = a.dataset.url;
+        preview.src = a.dataset.url;
       });
     });
 
@@ -547,6 +612,14 @@ export async function renderAdmin(container) {
       const saveBtn = modalOverlay.querySelector('button[type="submit"]');
       saveBtn.textContent = 'Đang lưu...';
       saveBtn.disabled = true;
+
+      const img1Val = modalOverlay.querySelector('#m-image-1').value.trim();
+      const img2Val = modalOverlay.querySelector('#m-image-2').value.trim();
+      const img3Val = modalOverlay.querySelector('#m-image-3').value.trim();
+      const finalImages = [img1Val, img2Val, img3Val].filter(Boolean);
+      if (finalImages.length === 0) {
+        finalImages.push('./images/products/Daychuyen4.3-removebg-preview.png');
+      }
 
       const updatedItem = {
         id: prod ? prod.id : 'pd-' + Date.now(),
@@ -558,7 +631,7 @@ export async function renderAdmin(container) {
         currency: '₫',
         materials: modalOverlay.querySelector('#m-materials').value.trim(),
         stones: modalOverlay.querySelector('#m-stones').value.trim(),
-        images: [modalOverlay.querySelector('#m-image').value.trim()],
+        images: finalImages,
         description: modalOverlay.querySelector('#m-description').value.trim(),
         specifications: prod && prod.specifications ? prod.specifications : {
           'Chất liệu': modalOverlay.querySelector('#m-materials').value.trim(),
@@ -757,23 +830,67 @@ export async function renderAdmin(container) {
   // ════════════════════════════════════════════════════════════
   function renderContactsTab() {
     let currentFilter = 'all';
+    let searchQuery = '';
+
+    function exportContactsToCSV(data) {
+      if (!data || data.length === 0) {
+        showToast('Không có dữ liệu liên hệ để xuất file!', 'warning');
+        return;
+      }
+      const headers = ['Thời gian', 'Họ và tên', 'Số điện thoại', 'Chủ đề tư vấn', 'Nội dung tin nhắn', 'Trạng thái'];
+      const rows = data.map(c => [
+        `"${new Date(c.created_at).toLocaleString('vi-VN').replace(/"/g, '""')}"`,
+        `"${(c.fullName || '').replace(/"/g, '""')}"`,
+        `"${(c.phone || '').replace(/"/g, '""')}"`,
+        `"${(c.subject || '').replace(/"/g, '""')}"`,
+        `"${(c.message || '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`,
+        `"${c.status === 'completed' ? 'Đã tư vấn' : 'Chờ xử lý'}"`
+      ]);
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `phat-dat-yeu-cau-tu-van-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast(`Đã xuất ${data.length} liên hệ sang file Excel / CSV!`, 'success');
+    }
 
     function renderList() {
       let filtered = contacts;
       if (currentFilter === 'pending') filtered = contacts.filter(c => c.status === 'pending');
       if (currentFilter === 'completed') filtered = contacts.filter(c => c.status === 'completed');
 
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(c =>
+          (c.fullName && c.fullName.toLowerCase().includes(q)) ||
+          (c.phone && c.phone.includes(q)) ||
+          (c.subject && c.subject.toLowerCase().includes(q)) ||
+          (c.message && c.message.toLowerCase().includes(q))
+        );
+      }
+
       contentArea.innerHTML = `
         <div class="admin-card">
-          <div class="admin-card-header">
+          <div class="admin-card-header" style="flex-wrap: wrap; gap: 14px;">
             <div>
               <h3 class="admin-card-title">Khách hàng yêu cầu tư vấn & liên hệ</h3>
               <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">Các câu hỏi từ form liên hệ và nút tư vấn trên website</div>
             </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="admin-btn ${currentFilter === 'all' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="all">Tất cả (${contacts.length})</button>
-              <button class="admin-btn ${currentFilter === 'pending' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="pending">Chờ xử lý (${contacts.filter(c => c.status === 'pending').length})</button>
-              <button class="admin-btn ${currentFilter === 'completed' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="completed">Đã tư vấn (${contacts.filter(c => c.status === 'completed').length})</button>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <input type="text" id="contact-search-input" class="admin-form-input" style="max-width: 240px; padding: 6px 12px; font-size: 13px;" placeholder="🔍 Tìm tên, SĐT, nội dung..." value="${searchQuery}">
+              <div style="display: flex; gap: 4px;">
+                <button class="admin-btn ${currentFilter === 'all' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="all">Tất cả (${contacts.length})</button>
+                <button class="admin-btn ${currentFilter === 'pending' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="pending">Chờ (${contacts.filter(c => c.status === 'pending').length})</button>
+                <button class="admin-btn ${currentFilter === 'completed' ? 'admin-btn--primary' : 'admin-btn--outline'} admin-btn-sm" data-filter="completed">Đã xử lý (${contacts.filter(c => c.status === 'completed').length})</button>
+              </div>
+              <button class="admin-btn admin-btn--outline admin-btn-sm" id="btn-export-contacts" title="Tải file Excel / CSV về máy" style="font-weight: 600;">
+                📥 Xuất Excel
+              </button>
             </div>
           </div>
           <div class="admin-table-responsive">
@@ -791,7 +908,7 @@ export async function renderAdmin(container) {
               </thead>
               <tbody>
                 ${filtered.length === 0 ? `
-                  <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không có yêu cầu tư vấn nào trong mục này.</td></tr>
+                  <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không có yêu cầu tư vấn nào phù hợp với bộ lọc.</td></tr>
                 ` : filtered.map(c => `
                   <tr>
                     <td style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">${new Date(c.created_at).toLocaleString('vi-VN')}</td>
@@ -818,6 +935,23 @@ export async function renderAdmin(container) {
           </div>
         </div>
       `;
+
+      // Search input
+      const searchEl = contentArea.querySelector('#contact-search-input');
+      searchEl.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderList();
+        const nextSearchEl = contentArea.querySelector('#contact-search-input');
+        if (nextSearchEl) {
+          nextSearchEl.focus();
+          nextSearchEl.setSelectionRange(nextSearchEl.value.length, nextSearchEl.value.length);
+        }
+      });
+
+      // Export CSV
+      contentArea.querySelector('#btn-export-contacts').addEventListener('click', () => {
+        exportContactsToCSV(filtered);
+      });
 
       // Filter tabs
       contentArea.querySelectorAll('[data-filter]').forEach(btn => {
@@ -954,6 +1088,40 @@ export async function renderAdmin(container) {
           </div>
         </div>
       </div>
+
+      <!-- Admin Account & Password Settings -->
+      <div class="admin-card" style="margin-top: 24px;">
+        <div class="admin-card-header">
+          <h3 class="admin-card-title">🔐 Đổi Mật Khẩu Quản Trị Backoffice</h3>
+        </div>
+        <div style="padding: 24px; max-width: 600px;">
+          <form id="admin-password-form">
+            <div class="admin-form-group">
+              <label>Tài khoản Email đăng nhập</label>
+              <input type="email" id="adm-email" class="admin-form-input" required value="${getAdminCredentials().email}">
+            </div>
+
+            <div class="admin-form-group">
+              <label>Mật khẩu hiện tại *</label>
+              <input type="password" id="adm-old-pass" class="admin-form-input" required placeholder="Nhập mật khẩu hiện tại (mặc định: admin)">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="admin-form-group">
+                <label>Mật khẩu mới *</label>
+                <input type="password" id="adm-new-pass" class="admin-form-input" required minlength="4" placeholder="Tối thiểu 4 ký tự">
+              </div>
+              <div class="admin-form-group">
+                <label>Xác nhận mật khẩu mới *</label>
+                <input type="password" id="adm-confirm-pass" class="admin-form-input" required minlength="4" placeholder="Nhập lại mật khẩu mới">
+              </div>
+            </div>
+
+            <button type="submit" class="admin-btn admin-btn--primary" id="btn-save-admin-pass">Cập nhật Mật khẩu Quản trị</button>
+            <div id="admin-pass-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
+          </form>
+        </div>
+      </div>
     `;
 
     // Save Supabase Key
@@ -1057,6 +1225,57 @@ export async function renderAdmin(container) {
       storeBtn.disabled = false;
       showToast('Đã lưu thông tin cửa hàng thành công!', 'success');
       setTimeout(() => { storeFeedback.style.display = 'none'; }, 4000);
+    });
+
+    // Change Admin Password Form
+    const passForm = contentArea.querySelector('#admin-password-form');
+    const passFeedback = contentArea.querySelector('#admin-pass-feedback');
+    passForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = contentArea.querySelector('#adm-email').value.trim();
+      const oldPass = contentArea.querySelector('#adm-old-pass').value;
+      const newPass = contentArea.querySelector('#adm-new-pass').value;
+      const confirmPass = contentArea.querySelector('#adm-confirm-pass').value;
+
+      const currentCreds = getAdminCredentials();
+      if (oldPass !== currentCreds.password) {
+        passFeedback.style.display = 'block';
+        passFeedback.style.background = '#FFEBEE';
+        passFeedback.style.color = '#C62828';
+        passFeedback.textContent = 'Mật khẩu hiện tại không đúng. Mật khẩu mặc định là "admin".';
+        showToast('Mật khẩu hiện tại không chính xác!', 'error');
+        return;
+      }
+
+      if (newPass !== confirmPass) {
+        passFeedback.style.display = 'block';
+        passFeedback.style.background = '#FFEBEE';
+        passFeedback.style.color = '#C62828';
+        passFeedback.textContent = 'Mật khẩu mới và xác nhận mật khẩu không trùng khớp.';
+        showToast('Xác nhận mật khẩu không trùng khớp!', 'error');
+        return;
+      }
+
+      const res = updateAdminCredentials(email, newPass);
+      if (res.success) {
+        passFeedback.style.display = 'block';
+        passFeedback.style.background = '#E8F5E9';
+        passFeedback.style.color = '#2E7D32';
+        passFeedback.textContent = 'Đã cập nhật mật khẩu quản trị thành công!';
+        contentArea.querySelector('#adm-old-pass').value = '';
+        contentArea.querySelector('#adm-new-pass').value = '';
+        contentArea.querySelector('#adm-confirm-pass').value = '';
+        const sidebarEmail = page.querySelector('.admin-sidebar-footer strong');
+        if (sidebarEmail) sidebarEmail.textContent = email;
+        showToast('Đã đổi mật khẩu quản trị thành công!', 'success');
+        setTimeout(() => { passFeedback.style.display = 'none'; }, 4000);
+      } else {
+        passFeedback.style.display = 'block';
+        passFeedback.style.background = '#FFEBEE';
+        passFeedback.style.color = '#C62828';
+        passFeedback.textContent = res.error || 'Có lỗi xảy ra khi cập nhật.';
+        showToast(res.error || 'Lỗi cập nhật mật khẩu', 'error');
+      }
     });
   }
 

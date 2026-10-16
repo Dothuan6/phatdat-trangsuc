@@ -352,3 +352,226 @@
 .pd-dialog-btn--warning:hover {
   background: #B45309;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   IMAGE LIGHTBOX MODAL (Phóng to ảnh trang sức)
+   ══════════════════════════════════════════════════════════════ */
+
+.pd-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 18, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100005;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  user-select: none;
+}
+
+.pd-lightbox-overlay.is-visible {
+  opacity: 1;
+}
+
+.pd-lightbox-container {
+  position: relative;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pd-lightbox-img {
+  max-width: 85vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  transform: scale(0.95);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pd-lightbox-overlay.is-visible .pd-lightbox-img {
+  transform: scale(1);
+}
+
+.pd-lightbox-close {
+  position: absolute;
+  top: -46px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background 0.2s;
+}
+
+.pd-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.pd-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.pd-lightbox-nav:hover {
+  background: rgba(255, 255, 255, 0.35);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.pd-lightbox-nav--prev {
+  left: -60px;
+}
+
+.pd-lightbox-nav--next {
+  right: -60px;
+}
+
+.pd-lightbox-counter {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .pd-lightbox-nav--prev { left: 10px; }
+  .pd-lightbox-nav--next { right: 10px; }
+  .pd-lightbox-close { top: 16px; right: 16px; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   QUICK CALLBACK MODAL (Yêu cầu gọi lại tư vấn)
+   ══════════════════════════════════════════════════════════════ */
+
+.pd-callback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 42, 39, 0.65);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 100002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.pd-callback-overlay.is-visible {
+  opacity: 1;
+}
+
+.pd-callback-card {
+  background: #ffffff;
+  border-radius: 12px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  transform: scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: var(--font-body, sans-serif);
+}
+
+.pd-callback-overlay.is-visible .pd-callback-card {
+  transform: scale(1);
+}
+
+.pd-callback-header {
+  padding: 20px 24px 16px 24px;
+  background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pd-callback-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.pd-callback-product-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: #f8faf9;
+  border-bottom: 1px solid #eef2f1;
+}
+
+.pd-callback-product-preview img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.pd-callback-body {
+  padding: 20px 24px;
+}
+
+.pd-callback-group {
+  margin-bottom: 14px;
+}
+
+.pd-callback-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.pd-callback-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.pd-callback-input:focus {
+  outline: none;
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 3px rgba(30, 93, 87, 0.12);
+}
+
+.pd-callback-footer {
+  padding: 14px 24px 20px 24px;
+  display: flex;
+  gap: 10px;
+}

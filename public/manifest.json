@@ -1,0 +1,21 @@
+{
+  "name": "Phát Đạt Jewelry – Trang sức Bạc 925",
+  "short_name": "Phát Đạt",
+  "description": "Trang sức Bạc 925 tinh xảo, nhẫn cỏ ba lá, dây chuyền xà cừ, đá Moissanite cao cấp.",
+  "start_url": "./#/",
+  "display": "standalone",
+  "background_color": "#1E5D57",
+  "theme_color": "#1E5D57",
+  "icons": [
+    {
+      "src": "./images/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

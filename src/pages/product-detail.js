@@ -10,7 +10,7 @@ import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
 import { siteInfo } from '../data/site-info.js';
 import { t } from '../i18n.js';
 import { isWishlisted, toggleWishlist } from '../data/wishlist-store.js';
-import { showToast } from '../components/feedback-modal.js';
+import { showToast, openLightboxModal, openQuickCallbackModal } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -52,10 +52,15 @@ export function renderProductDetail(container, params = {}) {
     const item = document.createElement('div');
     item.className = 'pdp-gallery__item';
     item.dataset.index = idx;
+    item.style.cursor = 'zoom-in';
+    item.title = 'Bấm để phóng to xem chi tiết đá & giác cắt';
     item.innerHTML = `
       <img src="${imgSrc}" alt="${product.name} - Hình ${idx + 1}" loading="${idx === 0 ? 'eager' : 'lazy'}"
            onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
     `;
+    item.addEventListener('click', () => {
+      openLightboxModal(galleryImages, idx);
+    });
     galleryInner.appendChild(item);
   });
 
@@ -250,8 +255,9 @@ export function renderProductDetail(container, params = {}) {
   const ctaContainer = document.createElement('div');
   ctaContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;';
 
-  // Zalo Consult Button (Primary CTA)
-  const zaloBtn = document.createElement('a');
+  // 1. Zalo Consult Button with Auto-copy Product Info
+  const zaloBtn = document.createElement('button');
+  zaloBtn.type = 'button';
   zaloBtn.className = 'btn btn--full';
   zaloBtn.style.cssText = `
     background-color: #0068FF;
@@ -260,28 +266,67 @@ export function renderProductDetail(container, params = {}) {
     font-weight: 600;
     gap: 8px;
     padding: 14px 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   `;
-  zaloBtn.href = `${siteInfo.zalo}`;
-  zaloBtn.target = '_blank';
-  zaloBtn.rel = 'noopener';
   zaloBtn.innerHTML = `
     <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
       <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.07-.17 1.15-.72 2.76-1.78 3.86 1.76.12 3.65-.63 4.94-1.57.97.26 2 .41 3 .41 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
     </svg>
     <span>NHẮN ZALO TƯ VẤN & XEM VIDEO THẬT</span>
   `;
+
+  zaloBtn.addEventListener('click', () => {
+    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}\n- Link xem: ${window.location.href}`;
+    try {
+      navigator.clipboard.writeText(infoText);
+      showToast('Đã sao chép mã và link sản phẩm! Bạn chỉ cần Dán (Paste) vào khung chat Zalo.', 'success', 4000);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 500);
+  });
   ctaContainer.appendChild(zaloBtn);
 
-  // Phone Call Button (Secondary CTA)
+  // 2. Quick Callback Request Button
+  const callbackBtn = document.createElement('button');
+  callbackBtn.type = 'button';
+  callbackBtn.className = 'btn btn--full';
+  callbackBtn.style.cssText = `
+    background-color: var(--color-accent-gold);
+    border-color: var(--color-accent-gold);
+    color: #143F3B;
+    font-weight: 700;
+    gap: 8px;
+    padding: 13px 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease;
+  `;
+  callbackBtn.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+    </svg>
+    <span>YÊU CẦU GỌI LẠI TƯ VẤN (MIỄN PHÍ)</span>
+  `;
+  callbackBtn.addEventListener('click', () => {
+    openQuickCallbackModal(product);
+  });
+  ctaContainer.appendChild(callbackBtn);
+
+  // 3. Phone Call Button (Secondary CTA)
   const phoneBtn = document.createElement('a');
-  phoneBtn.className = 'btn btn--full';
+  phoneBtn.className = 'btn btn--full btn--outline';
   phoneBtn.style.cssText = `
-    background-color: var(--color-brand-primary);
     border-color: var(--color-brand-primary);
-    color: #ffffff;
+    color: var(--color-brand-primary);
     font-weight: 600;
     gap: 8px;
-    padding: 14px 20px;
+    padding: 12px 20px;
   `;
   phoneBtn.href = siteInfo.phoneHref;
   phoneBtn.innerHTML = `
@@ -402,33 +447,62 @@ export function renderProductDetail(container, params = {}) {
     box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
   `;
   stickyBar.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 10px; max-width: 60%;">
-      <img src="${galleryImages[0]}" alt="${product.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--color-border-light);">
+    <div style="display: flex; align-items: center; gap: 8px; max-width: 45%;">
+      <img src="${galleryImages[0]}" alt="${product.name}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 4px; border: 1px solid var(--color-border-light); flex-shrink: 0;">
       <div style="overflow: hidden;">
-        <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.name}</div>
-        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary);">${formatPrice(product.price)}</div>
+        <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${product.name}</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--color-brand-primary);">${formatPrice(product.price)}</div>
       </div>
     </div>
-    <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="
-      background-color: #0068FF;
-      color: #fff;
-      padding: 9px 16px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 600;
-      text-decoration: none;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    ">
-      <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-        <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.07-.17 1.15-.72 2.76-1.78 3.86 1.76.12 3.65-.63 4.94-1.57.97.26 2 .41 3 .41 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
-      </svg>
-      Tư vấn Zalo
-    </a>
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <button type="button" id="sticky-callback-btn" style="
+        background-color: var(--color-accent-gold);
+        color: #143F3B;
+        border: none;
+        padding: 8px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+      ">Gọi lại</button>
+      <button type="button" id="sticky-zalo-btn" style="
+        background-color: #0068FF;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      ">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+          <path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.43 3.84 7.07-.17 1.15-.72 2.76-1.78 3.86 1.76.12 3.65-.63 4.94-1.57.97.26 2 .41 3 .41 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/>
+        </svg>
+        Zalo
+      </button>
+    </div>
   `;
   page.appendChild(stickyBar);
+
+  stickyBar.querySelector('#sticky-callback-btn').addEventListener('click', () => {
+    openQuickCallbackModal(product);
+  });
+
+  stickyBar.querySelector('#sticky-zalo-btn').addEventListener('click', () => {
+    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}\n- Link xem: ${window.location.href}`;
+    try {
+      navigator.clipboard.writeText(infoText);
+      showToast('Đã sao chép mã và link sản phẩm! Bạn chỉ cần Dán (Paste) vào khung chat Zalo.', 'success', 3500);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 400);
+  });
 
   // Show sticky bar on scroll on mobile
   const handleScroll = () => {

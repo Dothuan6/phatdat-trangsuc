@@ -3,6 +3,7 @@
 // ============================================================
 
 import '../styles/feedback.css';
+import { addCustomerContact } from '../services/supabase.js';
 
 // SVG Icons
 const ICONS = {
@@ -315,7 +316,198 @@ export function showAlertModal({
 }
 
 // ══════════════════════════════════════════════════════════════
-// 4. CONVENIENCE SHORTCUTS
+// 4. IMAGE LIGHTBOX MODAL (Phóng to ảnh cận cảnh)
+// ══════════════════════════════════════════════════════════════
+
+export function openLightboxModal(images = [], initialIndex = 0) {
+  if (!images || images.length === 0) return;
+
+  const validImages = Array.isArray(images) ? images : [images];
+  let currentIndex = Math.max(0, Math.min(initialIndex, validImages.length - 1));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-lightbox-overlay';
+
+  overlay.innerHTML = `
+    <div class="pd-lightbox-container">
+      <button type="button" class="pd-lightbox-close" aria-label="Đóng">✕</button>
+      ${validImages.length > 1 ? `
+        <button type="button" class="pd-lightbox-nav pd-lightbox-nav--prev" aria-label="Ảnh trước">‹</button>
+        <button type="button" class="pd-lightbox-nav pd-lightbox-nav--next" aria-label="Ảnh tiếp theo">›</button>
+      ` : ''}
+      <img src="${validImages[currentIndex]}" alt="Phóng to ảnh trang sức" class="pd-lightbox-img">
+      ${validImages.length > 1 ? `
+        <div class="pd-lightbox-counter">${currentIndex + 1} / ${validImages.length}</div>
+      ` : ''}
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('is-visible');
+  });
+
+  const imgEl = overlay.querySelector('.pd-lightbox-img');
+  const counterEl = overlay.querySelector('.pd-lightbox-counter');
+
+  const updateImage = () => {
+    imgEl.src = validImages[currentIndex];
+    if (counterEl) counterEl.textContent = `${currentIndex + 1} / ${validImages.length}`;
+  };
+
+  const next = () => {
+    currentIndex = (currentIndex + 1) % validImages.length;
+    updateImage();
+  };
+
+  const prev = () => {
+    currentIndex = (currentIndex - 1 + validImages.length) % validImages.length;
+    updateImage();
+  };
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => {
+      overlay.remove();
+      document.removeEventListener('keydown', handleKey);
+    }, 250);
+  };
+
+  const handleKey = (e) => {
+    if (e.key === 'Escape') close();
+    if (validImages.length > 1) {
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    }
+  };
+
+  document.addEventListener('keydown', handleKey);
+
+  overlay.querySelector('.pd-lightbox-close').addEventListener('click', close);
+
+  const prevBtn = overlay.querySelector('.pd-lightbox-nav--prev');
+  if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
+
+  const nextBtn = overlay.querySelector('.pd-lightbox-nav--next');
+  if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay || e.target.classList.contains('pd-lightbox-container')) close();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 5. QUICK CALLBACK REQUEST MODAL (Yêu cầu gọi lại tư vấn)
+// ══════════════════════════════════════════════════════════════
+
+export function openQuickCallbackModal(product) {
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+
+  const defaultImg = (product && product.images && product.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  const priceDisplay = product ? `${(product.price || 0).toLocaleString('vi-VN')} ₫` : '';
+
+  overlay.innerHTML = `
+    <div class="pd-callback-card" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>Yêu Cầu Gọi Lại Tư Vấn</h3>
+          <div style="font-size: 12px; opacity: 0.85; margin-top: 2px;">Phát Đạt Jewelry sẽ liên hệ lại trong vòng 15 phút</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div class="pd-callback-product-preview">
+        <img src="${defaultImg}" alt="${product?.name || ''}">
+        <div>
+          <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">${product?.name || 'Trang sức Phát Đạt'}</div>
+          <div style="font-size: 12px; color: var(--color-brand-primary); font-weight: 600; margin-top: 2px;">
+            ${priceDisplay} <span style="color: var(--color-text-secondary); font-weight: normal; margin-left: 6px;">Mã: ${product?.reference || ''}</span>
+          </div>
+        </div>
+      </div>
+
+      <form id="pd-callback-form">
+        <div class="pd-callback-body">
+          <div class="pd-callback-group">
+            <label for="cb-phone">Số điện thoại của bạn *</label>
+            <input type="tel" id="cb-phone" class="pd-callback-input" required placeholder="VD: 0912 345 678" pattern="[0-9\\s]{9,13}" autofocus>
+          </div>
+
+          <div class="pd-callback-group">
+            <label for="cb-name">Họ và tên của bạn</label>
+            <input type="text" id="cb-name" class="pd-callback-input" placeholder="VD: Thu Hà">
+          </div>
+
+          <div class="pd-callback-group">
+            <label for="cb-note">Ghi chú yêu cầu tư vấn</label>
+            <input type="text" id="cb-note" class="pd-callback-input" placeholder="VD: Cần tư vấn size tay, hoặc quà sinh nhật...">
+          </div>
+        </div>
+
+        <div class="pd-callback-footer">
+          <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="cb-cancel-btn">Hủy bỏ</button>
+          <button type="submit" class="pd-dialog-btn pd-dialog-btn--primary" id="cb-submit-btn">Gửi Yêu Cầu Tư Vấn</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    overlay.classList.add('is-visible');
+    const phoneInput = overlay.querySelector('#cb-phone');
+    if (phoneInput) phoneInput.focus();
+  });
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#cb-cancel-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  // Submit Handler
+  overlay.querySelector('#pd-callback-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const phone = overlay.querySelector('#cb-phone').value.trim();
+    const name = overlay.querySelector('#cb-name').value.trim();
+    const note = overlay.querySelector('#cb-note').value.trim();
+    const submitBtn = overlay.querySelector('#cb-submit-btn');
+
+    submitBtn.textContent = 'Đang gửi...';
+    submitBtn.disabled = true;
+
+    try {
+      await addCustomerContact({
+        fullName: name || 'Khách hàng quan tâm ' + (product?.name || 'sản phẩm'),
+        phone: phone,
+        subject: `Tư vấn SP: ${product?.name || ''} (${product?.reference || ''})`,
+        message: `Khách yêu cầu gọi lại tư vấn mẫu: ${product?.name || ''} - Giá: ${priceDisplay}. Ghi chú: ${note || 'Không có'}`
+      });
+
+      close();
+      showToast(
+        `Đã gửi yêu cầu tư vấn thành công! Nhân viên Phát Đạt sẽ liên hệ lại qua số ${phone} sớm nhất.`,
+        'success',
+        4500
+      );
+    } catch (err) {
+      submitBtn.textContent = 'Gửi Yêu Cầu Tư Vấn';
+      submitBtn.disabled = false;
+      showToast('Có lỗi xảy ra, vui lòng thử lại sau hoặc gọi hotline.', 'error');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 6. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -327,5 +519,8 @@ export const toast = {
 
 export const modal = {
   confirm: showConfirmModal,
-  alert: showAlertModal
+  alert: showAlertModal,
+  lightbox: openLightboxModal,
+  callback: openQuickCallbackModal
 };
+
