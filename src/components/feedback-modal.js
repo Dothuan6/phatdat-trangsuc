@@ -1406,7 +1406,7 @@ export function openWarrantyLookupModal(initialPhone = '') {
 
         <div id="warranty-result-area">
           <div style="background: #F8FAF9; border: 1px dashed var(--color-border); border-radius: 8px; padding: 16px; text-align: center; font-size: 12.5px; color: var(--color-text-secondary);">
-            💡 Mọi khách hàng của Phát Đạt Jewelry chỉ cần đọc Số Điện Thoại tại quầy (709 Trần Xuân Soạn, Q.7) đều được làm sáng trang sức bạc miễn phí trọn đời, không cần giữ hóa đơn giấy.
+            💡 Mọi khách hàng của Phát Đạt Jewelry chỉ cần đọc Số Điện Thoại tại quầy (${siteInfo.address}) đều được làm sáng trang sức bạc miễn phí trọn đời, không cần giữ hóa đơn giấy.
           </div>
         </div>
       </div>
@@ -1533,7 +1533,7 @@ export function openVirtualTryOnModal(product) {
 
         <!-- Try-On Interactive Stage -->
         <div id="vto-stage" style="
-          position: relative; width: 100%; height: 370px; border-radius: 12px; overflow: hidden;
+          position: relative; width: 100%; height: clamp(230px, 42vh, 360px); border-radius: 12px; overflow: hidden;
           background: radial-gradient(circle at 50% 35%, #F7DFC6 0%, #DFB995 65%, #C49870 100%);
           border: 1px solid var(--color-border); user-select: none; touch-action: none;
           display: flex; align-items: center; justify-content: center;
@@ -1628,16 +1628,6 @@ export function openVirtualTryOnModal(product) {
     }
   }
 
-  const close = () => {
-    stopCamera();
-    overlay.classList.remove('is-visible');
-    setTimeout(() => overlay.remove(), 250);
-  };
-
-  overlay.querySelector('.modal-close-x').addEventListener('click', close);
-  overlay.querySelector('#vto-close-btn').addEventListener('click', close);
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-
   function updateTransform() {
     jewelryEl.style.left = `${posX}%`;
     jewelryEl.style.top = `${posY}%`;
@@ -1672,6 +1662,20 @@ export function openVirtualTryOnModal(product) {
   window.addEventListener('touchmove', onPointerMove, { passive: false });
   window.addEventListener('mouseup', onPointerUp);
   window.addEventListener('touchend', onPointerUp);
+
+  const close = () => {
+    stopCamera();
+    window.removeEventListener('mousemove', onPointerMove);
+    window.removeEventListener('touchmove', onPointerMove);
+    window.removeEventListener('mouseup', onPointerUp);
+    window.removeEventListener('touchend', onPointerUp);
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#vto-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
 
   // Sliders
   const scaleRange = overlay.querySelector('#vto-scale-range');

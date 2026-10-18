@@ -164,7 +164,6 @@ export function createHeader() {
 export function createHeaderSpacer() {
   const spacer = document.createElement('div');
   spacer.className = 'header-spacer';
-  spacer.style.height = '105px';
   return spacer;
 }
 

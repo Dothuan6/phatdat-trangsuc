@@ -89,13 +89,20 @@
    HEADER
    ══════════════════════════════════════════════════════════════ */
 
-.site-header {
+.site-header-wrapper {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: var(--z-header);
-  background-color: transparent;
+}
+
+.site-header {
+  position: relative;
+  width: 100%;
+  background-color: rgba(250, 249, 246, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   transition: background-color var(--transition-base), box-shadow var(--transition-base);
 }
 
@@ -228,9 +235,9 @@
   padding: var(--space-sm);
 }
 
-/* Spacer for fixed header */
+/* Spacer for fixed header + announcement bar */
 .header-spacer {
-  height: 72px;
+  height: 104px;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1285,15 +1292,17 @@
 
 .search-drawer {
   position: fixed;
-  top: 72px; /* Below header */
+  top: 104px; /* Below announcement bar + header */
   left: 0;
   width: 100%;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
   background-color: var(--color-bg-primary);
   z-index: var(--z-modal);
-  transform: translateY(-100%);
+  transform: translateY(-120%);
   transition: transform var(--transition-base);
   padding: 0 var(--container-padding) var(--space-4xl);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
 }
 
 .search-drawer__inner {
@@ -1436,7 +1445,8 @@
 
 @media (max-width: 768px) {
   .search-drawer {
-    top: 60px;
+    top: 92px;
+    max-height: calc(100vh - 92px);
     padding: 0 var(--container-padding-mobile) var(--space-2xl);
   }
   .search-creations-grid {
@@ -1445,7 +1455,7 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   RESPONSIVE FOOTER
+   RESPONSIVE FOOTER & MOBILE CARDS
    ══════════════════════════════════════════════════════════════ */
 
 @media (max-width: 1024px) {
@@ -1459,13 +1469,23 @@
 }
 
 @media (max-width: 768px) {
+  .top-announcement-bar {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+    line-height: 1.35;
+  }
+
   .header-inner {
     padding: 0 var(--container-padding-mobile);
     height: 60px;
   }
 
+  .header-right {
+    gap: 6px;
+  }
+
   .header-spacer {
-    height: 60px;
+    height: 92px;
   }
 
   .header-search-btn span {
@@ -1473,7 +1493,23 @@
   }
 
   .header-region {
-    display: none;
+    display: none !important;
+  }
+
+  .product-card__info {
+    padding: 8px 6px 12px;
+  }
+
+  .product-card__name {
+    font-size: 12px;
+  }
+
+  .product-card__materials {
+    font-size: 11px;
+  }
+
+  .product-card__price {
+    font-size: 13px;
   }
 
   .footer-categories {

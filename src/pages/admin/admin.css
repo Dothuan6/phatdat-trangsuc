@@ -610,6 +610,24 @@
   background: #fafaf8;
 }
 
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.admin-grid-2-wide {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 16px;
+}
+
+.admin-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .admin-dashboard-layout {
@@ -619,7 +637,53 @@
     width: 100%;
   }
   .admin-sidebar-menu {
+    display: flex;
     flex-direction: row;
     overflow-x: auto;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .admin-nav-item {
+    white-space: nowrap;
+    padding: 10px 14px;
+    border-radius: 6px;
+  }
+  .admin-sidebar-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 16px;
   }
 }
+
+@media (max-width: 768px) {
+  .admin-topbar {
+    height: auto;
+    min-height: 60px;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .admin-content {
+    padding: 16px;
+  }
+  .admin-card-header {
+    padding: 14px 16px;
+  }
+  .admin-grid-2,
+  .admin-grid-2-wide,
+  .admin-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-modal-overlay {
+    padding: 10px;
+  }
+  .admin-modal-header,
+  .admin-modal-body,
+  .admin-modal-footer {
+    padding: 14px 16px;
+  }
+}
+

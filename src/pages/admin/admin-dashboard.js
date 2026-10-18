@@ -613,7 +613,7 @@ export async function renderAdmin(container) {
         </div>
         <form id="product-modal-form">
           <div class="admin-modal-body">
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 16px;">
+            <div class="admin-grid-2-wide">
               <div class="admin-form-group">
                 <label>Tên sản phẩm *</label>
                 <input type="text" id="m-name" class="admin-form-input" required value="${prod ? prod.name : ''}" placeholder="VD: Dây chuyền cỏ ba lá xà cừ">
@@ -624,7 +624,7 @@ export async function renderAdmin(container) {
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+            <div class="admin-grid-3">
               <div class="admin-form-group">
                 <label>Danh mục *</label>
                 <select id="m-category" class="admin-form-input" required>
@@ -646,7 +646,7 @@ export async function renderAdmin(container) {
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="admin-grid-2">
               <div class="admin-form-group">
                 <label>Chất liệu</label>
                 <input type="text" id="m-materials" class="admin-form-input" value="${prod ? prod.materials : 'Bạc 925 xi vàng'}">
@@ -657,7 +657,7 @@ export async function renderAdmin(container) {
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="admin-grid-2">
               <div class="admin-form-group">
                 <label>Kích cỡ tùy chọn (phân cách bằng dấu phẩy)</label>
                 <input type="text" id="m-sizes" class="admin-form-input" value="${sizesStr}" placeholder="VD: Freesize, Size 6, Size 7">
@@ -696,7 +696,7 @@ export async function renderAdmin(container) {
               </div>
 
               <!-- Gallery Extra Images (2 & 3) -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="admin-grid-2" style="gap: 10px;">
                 <!-- Image 2 -->
                 <div style="background: #fbfbfb; border: 1px solid var(--color-border); border-radius: 6px; padding: 10px;">
                   <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 6px;">Ảnh phụ 2 (Tùy chọn)</div>
@@ -1243,7 +1243,7 @@ export async function renderAdmin(container) {
     const currentKey = getSupabaseAnonKey();
 
     contentArea.innerHTML = `
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div class="admin-grid-2" style="gap: 24px;">
         <!-- Supabase Connection Config -->
         <div class="admin-card">
           <div class="admin-card-header">
@@ -1279,7 +1279,7 @@ export async function renderAdmin(container) {
             <div style="border-top: 1px solid #eef2f3; padding-top: 20px;">
               <h4 style="font-size: 14px; color: var(--color-brand-primary); margin: 0 0 8px 0;">Công cụ Đồng bộ & Sao lưu Dữ liệu</h4>
               <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px 0;">
-                Đồng bộ nhanh 20 sản phẩm mẫu lên đám mây hoặc tải bản sao lưu toàn hệ thống (.JSON) về máy.
+                Đồng bộ nhanh 20 sản phẩm mẫu lên đám mây hoặc sao lưu / khôi phục toàn hệ thống (.JSON).
               </p>
               <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="admin-btn admin-btn--outline" id="btn-seed-supabase" style="border-color: var(--color-accent-gold); color: var(--color-brand-primary);">
@@ -1291,6 +1291,10 @@ export async function renderAdmin(container) {
                 <button class="admin-btn admin-btn--outline" id="btn-export-full-backup">
                   💾 Tải Bản Sao Lưu Toàn Hệ Thống (.JSON)
                 </button>
+                <button class="admin-btn admin-btn--outline" id="btn-restore-full-backup">
+                  📂 Khôi Phục Từ File .JSON
+                </button>
+                <input type="file" id="input-restore-backup-file" accept=".json,application/json" style="display: none;">
               </div>
               <div id="seed-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
             </div>
@@ -1346,7 +1350,7 @@ export async function renderAdmin(container) {
               <input type="password" id="adm-old-pass" class="admin-form-input" required placeholder="Nhập mật khẩu hiện tại (mặc định: admin)">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="admin-grid-2">
               <div class="admin-form-group">
                 <label>Mật khẩu mới *</label>
                 <input type="password" id="adm-new-pass" class="admin-form-input" required minlength="4" placeholder="Tối thiểu 4 ký tự">
@@ -1464,6 +1468,49 @@ export async function renderAdmin(container) {
         a.click();
         URL.revokeObjectURL(url);
         showToast('Đã tải bản sao lưu toàn hệ thống (.JSON) về máy thành công!', 'success');
+      });
+    }
+
+    // Restore Full JSON Backup
+    const restoreBtn = contentArea.querySelector('#btn-restore-full-backup');
+    const restoreInput = contentArea.querySelector('#input-restore-backup-file');
+    if (restoreBtn && restoreInput) {
+      restoreBtn.addEventListener('click', () => restoreInput.click());
+      restoreInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (ev) => {
+          try {
+            const parsed = JSON.parse(ev.target.result);
+            if (!parsed || (!Array.isArray(parsed.products) && !Array.isArray(parsed.collections))) {
+              showToast('File JSON không đúng định dạng bản sao lưu Phát Đạt Jewelry!', 'error');
+              return;
+            }
+            if (Array.isArray(parsed.products)) {
+              localStorage.setItem('phatdat_admin_products', JSON.stringify(parsed.products));
+              products = parsed.products;
+            }
+            if (Array.isArray(parsed.collections)) {
+              localStorage.setItem('phatdat_admin_collections', JSON.stringify(parsed.collections));
+              collections = parsed.collections;
+            }
+            if (Array.isArray(parsed.contacts)) {
+              localStorage.setItem('phatdat_admin_contacts', JSON.stringify(parsed.contacts));
+              contacts = parsed.contacts;
+            }
+            if (parsed.siteSettings) {
+              await saveAdminSiteSettings(parsed.siteSettings);
+              siteSettings = parsed.siteSettings;
+            }
+            updateSidebarBadges();
+            renderSettingsTab();
+            showToast(`Khôi phục dữ liệu thành công (${products.length} SP, ${collections.length} BST)!`, 'success');
+          } catch (err) {
+            showToast('Lỗi đọc file sao lưu JSON: ' + err.message, 'error');
+          }
+        };
+        reader.readAsText(file);
       });
     }
 
