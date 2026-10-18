@@ -133,3 +133,10 @@ window.addEventListener('keydown', (e) => {
     }
   }
 });
+
+// Register Progressive Web App (PWA) Service Worker for Offline Mode
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}

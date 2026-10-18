@@ -296,27 +296,37 @@ export async function renderAdmin(container) {
   // TAB 2: PRODUCTS
   // ════════════════════════════════════════════════════════════
   function renderProductsTab() {
+    let currentFilteredList = products;
+
     contentArea.innerHTML = `
       <div class="admin-card">
-        <div class="admin-card-header">
-          <div style="display: flex; align-items: center; gap: 14px; flex: 1; flex-wrap: wrap;">
-            <input type="text" id="product-search-input" class="admin-form-input" style="max-width: 280px; padding: 8px 12px;" placeholder="Tìm tên hoặc mã SP...">
-            <select id="product-filter-cat" class="admin-form-input" style="max-width: 180px; padding: 8px 12px;">
+        <div class="admin-card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap;">
+            <input type="text" id="product-search-input" class="admin-form-input" style="max-width: 240px; padding: 8px 12px;" placeholder="Tìm tên hoặc mã SP...">
+            <select id="product-filter-cat" class="admin-form-input" style="max-width: 165px; padding: 8px 12px;">
               <option value="all">Tất cả danh mục</option>
               <option value="necklaces">Dây chuyền</option>
               <option value="rings">Nhẫn</option>
               <option value="bracelets">Vòng & Lắc tay</option>
               <option value="earrings">Bông tai</option>
             </select>
-            <select id="product-filter-status" class="admin-form-input" style="max-width: 160px; padding: 8px 12px;">
+            <select id="product-filter-status" class="admin-form-input" style="max-width: 155px; padding: 8px 12px;">
               <option value="all">Tất cả trạng thái</option>
               <option value="active">Đang hiển thị</option>
               <option value="hidden">Đã ẩn</option>
             </select>
           </div>
-          <button class="admin-btn admin-btn--primary" id="btn-add-product">
-            + Thêm Sản Phẩm Mới
-          </button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="admin-btn admin-btn--outline admin-btn-sm" id="btn-batch-print-qr" title="In tờ A4 toàn bộ tem QR trưng bày tại quầy">
+              🖨️ In Tem QR (A4)
+            </button>
+            <button class="admin-btn admin-btn--outline admin-btn-sm" id="btn-bulk-price" title="Tăng/giảm giá hàng loạt theo %">
+              ⚡ Đổi Giá Hàng Loạt
+            </button>
+            <button class="admin-btn admin-btn--primary" id="btn-add-product">
+              + Thêm Sản Phẩm Mới
+            </button>
+          </div>
         </div>
 
         <div class="admin-table-responsive">
@@ -347,6 +357,7 @@ export async function renderAdmin(container) {
     const filterStatus = contentArea.querySelector('#product-filter-status');
 
     function renderProductRows(items) {
+      currentFilteredList = items;
       if (items.length === 0) {
         tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--color-text-secondary);">Không tìm thấy sản phẩm nào phù hợp.</td></tr>`;
         return;
@@ -371,6 +382,7 @@ export async function renderAdmin(container) {
             </td>
             <td style="text-align: right; white-space: nowrap;">
               <button class="admin-btn admin-btn--outline admin-btn-sm qr-product-btn" data-id="${p.id}" title="In tem mã QR trưng bày tại quầy" style="margin-right: 4px;">🏷️ QR</button>
+              <button class="admin-btn admin-btn--outline admin-btn-sm duplicate-product-btn" data-id="${p.id}" title="Nhân bản nhanh mẫu này" style="margin-right: 4px;">📄 Nhân bản</button>
               <button class="admin-btn admin-btn--outline admin-btn-sm toggle-active-btn" data-id="${p.id}" data-active="${isActive ? 'true' : 'false'}" title="${isActive ? 'Ẩn sản phẩm khỏi website' : 'Hiện sản phẩm lên website'}">
                 ${isActive ? 'Ẩn' : 'Hiện'}
               </button>
@@ -386,6 +398,24 @@ export async function renderAdmin(container) {
         btn.addEventListener('click', () => {
           const item = products.find(p => p.id === btn.dataset.id);
           if (item) openQrTagModal(item);
+        });
+      });
+
+      tableBody.querySelectorAll('.duplicate-product-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const orig = products.find(p => p.id === btn.dataset.id);
+          if (!orig) return;
+          const clone = {
+            ...orig,
+            id: 'pd-' + Date.now(),
+            name: `${orig.name} (Bản sao)`,
+            reference: 'PD' + Date.now().toString().slice(-6)
+          };
+          await saveAdminProduct(clone);
+          products = await getAdminProducts();
+          updateSidebarBadges();
+          filterTable();
+          showToast(`Đã nhân bản thành công "${clone.name}"!`, 'success');
         });
       });
 
@@ -453,6 +483,107 @@ export async function renderAdmin(container) {
       renderProductRows(res);
     }
 
+    // Batch Print A4 QR Sheet
+    contentArea.querySelector('#btn-batch-print-qr').addEventListener('click', () => {
+      const printList = currentFilteredList.length > 0 ? currentFilteredList : products;
+      const win = window.open('', '_blank', 'width=900,height=750');
+      if (!win) {
+        showToast('Vui lòng cho phép mở cửa sổ bật lên (Pop-up) để in bảng tem QR!', 'warning');
+        return;
+      }
+      const baseOrigin = window.location.origin + window.location.pathname;
+      const cardsHtml = printList.map(p => {
+        const prodUrl = `${baseOrigin}#/product/${p.id}`;
+        const qrImg = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=4&data=${encodeURIComponent(prodUrl)}`;
+        return `
+          <div style="border: 1px dashed #1E5D57; border-radius: 8px; padding: 10px; display: flex; align-items: center; gap: 10px; page-break-inside: avoid;">
+            <img src="${qrImg}" width="72" height="72" alt="QR">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 9px; font-weight: 700; color: #1E5D57; letter-spacing: 0.08em;">PHÁT ĐẠT JEWELRY · BẠC S925</div>
+              <div style="font-size: 12px; font-weight: 700; color: #111; margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
+              <div style="font-size: 11px; color: #555; font-family: monospace;">SKU: ${p.reference}</div>
+              <div style="font-size: 13px; font-weight: 700; color: #1E5D57; margin-top: 2px;">${formatPrice(p.price)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Bảng Tem QR Trưng Bày A4 - Phát Đạt Jewelry</title>
+          <style>
+            body { font-family: sans-serif; margin: 20px; color: #222; }
+            .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+            @media print { .no-print { display: none; } body { margin: 8mm; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; background: #F4F9F8; padding: 12px 16px; border-radius: 8px; border: 1px solid #C5DEDB;">
+            <div><strong>🖨️ Bảng Tem QR Trưng Bày Quầy Kính (${printList.length} sản phẩm)</strong> — Cắt theo đường viền nét đứt</div>
+            <button onclick="window.print()" style="background: #1E5D57; color: #fff; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer;">In Ngay (Khổ A4)</button>
+          </div>
+          <div class="grid">${cardsHtml}</div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    });
+
+    // Bulk Price Adjuster Modal
+    contentArea.querySelector('#btn-bulk-price').addEventListener('click', () => {
+      const targetList = currentFilteredList.length > 0 ? currentFilteredList : products;
+      const overlay = document.createElement('div');
+      overlay.className = 'admin-modal-overlay';
+      overlay.innerHTML = `
+        <div class="admin-modal" style="max-width: 460px;">
+          <div class="admin-modal-header">
+            <h3>⚡ Điều Chỉnh Giá Hàng Loạt (${targetList.length} SP)</h3>
+            <button type="button" id="bp-close" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
+          </div>
+          <div class="admin-modal-body">
+            <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px;">
+              Áp dụng cho <strong>${targetList.length} sản phẩm</strong> đang hiển thị trong bộ lọc hiện tại (làm tròn đến hàng nghìn VNĐ):
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+              <button type="button" class="admin-btn admin-btn--outline bp-preset" data-delta="10000">+ Tăng 10.000₫</button>
+              <button type="button" class="admin-btn admin-btn--outline bp-preset" data-delta="-10000">- Giảm 10.000₫</button>
+              <button type="button" class="admin-btn admin-btn--outline bp-preset" data-pct="5">+ Tăng 5% giá bạc</button>
+              <button type="button" class="admin-btn admin-btn--outline bp-preset" data-pct="-5">- Giảm 5% khuyến mãi</button>
+            </div>
+          </div>
+          <div class="admin-modal-footer">
+            <button type="button" class="admin-btn admin-btn--outline" id="bp-cancel">Đóng</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      const closeBp = () => overlay.remove();
+      overlay.querySelector('#bp-close').addEventListener('click', closeBp);
+      overlay.querySelector('#bp-cancel').addEventListener('click', closeBp);
+
+      overlay.querySelectorAll('.bp-preset').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          btn.textContent = 'Đang cập nhật...';
+          btn.disabled = true;
+          const delta = btn.dataset.delta ? parseInt(btn.dataset.delta, 10) : 0;
+          const pct = btn.dataset.pct ? parseFloat(btn.dataset.pct) : 0;
+
+          for (const item of targetList) {
+            let newPrice = item.price;
+            if (delta !== 0) newPrice = Math.max(50000, item.price + delta);
+            if (pct !== 0) newPrice = Math.max(50000, Math.round((item.price * (1 + pct / 100)) / 1000) * 1000);
+            await saveAdminProduct({ ...item, price: newPrice });
+          }
+          products = await getAdminProducts();
+          closeBp();
+          filterTable();
+          showToast(`Đã cập nhật giá hàng loạt cho ${targetList.length} sản phẩm!`, 'success');
+        });
+      });
+    });
+
     searchInput.addEventListener('input', filterTable);
     filterCat.addEventListener('change', filterTable);
     filterStatus.addEventListener('change', filterTable);
@@ -471,6 +602,8 @@ export async function renderAdmin(container) {
     const img1 = existingImages[0] || (prod ? '' : './images/products/daychuyen3-removebg-preview.png');
     const img2 = existingImages[1] || '';
     const img3 = existingImages[2] || '';
+    const sizesStr = prod && Array.isArray(prod.availableSizes) ? prod.availableSizes.join(', ') : 'Freesize, Size 6, Size 7';
+    const colorsStr = prod && Array.isArray(prod.availableColors) ? prod.availableColors.join(', ') : 'Bạc sáng 925, Xi vàng 18K';
 
     modalOverlay.innerHTML = `
       <div class="admin-modal" style="max-width: 680px;">
@@ -521,6 +654,17 @@ export async function renderAdmin(container) {
               <div class="admin-form-group">
                 <label>Đá đính kèm</label>
                 <input type="text" id="m-stones" class="admin-form-input" value="${prod ? prod.stones : 'Xà cừ, Đá CZ'}">
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="admin-form-group">
+                <label>Kích cỡ tùy chọn (phân cách bằng dấu phẩy)</label>
+                <input type="text" id="m-sizes" class="admin-form-input" value="${sizesStr}" placeholder="VD: Freesize, Size 6, Size 7">
+              </div>
+              <div class="admin-form-group">
+                <label>Màu sắc xi mạ (phân cách bằng dấu phẩy)</label>
+                <input type="text" id="m-colors" class="admin-form-input" value="${colorsStr}" placeholder="VD: Bạc sáng 925, Xi vàng 18K">
               </div>
             </div>
 
@@ -657,6 +801,9 @@ export async function renderAdmin(container) {
         finalImages.push('./images/products/Daychuyen4.3-removebg-preview.png');
       }
 
+      const parsedSizes = modalOverlay.querySelector('#m-sizes').value.split(',').map(s => s.trim()).filter(Boolean);
+      const parsedColors = modalOverlay.querySelector('#m-colors').value.split(',').map(c => c.trim()).filter(Boolean);
+
       const updatedItem = {
         id: prod ? prod.id : 'pd-' + Date.now(),
         name: modalOverlay.querySelector('#m-name').value.trim(),
@@ -673,8 +820,8 @@ export async function renderAdmin(container) {
           'Chất liệu': modalOverlay.querySelector('#m-materials').value.trim(),
           'Đá đính kèm': modalOverlay.querySelector('#m-stones').value.trim()
         },
-        availableSizes: prod && prod.availableSizes ? prod.availableSizes : ['Freesize'],
-        availableColors: prod && prod.availableColors ? prod.availableColors : ['Bạc sáng 925', 'Xi vàng 18K'],
+        availableSizes: parsedSizes.length > 0 ? parsedSizes : ['Freesize'],
+        availableColors: parsedColors.length > 0 ? parsedColors : ['Bạc sáng 925'],
         is_active: modalOverlay.querySelector('#m-active').checked,
         isActive: modalOverlay.querySelector('#m-active').checked,
         rating: prod ? prod.rating : 4.9,
@@ -972,6 +1119,7 @@ export async function renderAdmin(container) {
                       </span>
                     </td>
                     <td style="text-align: right; white-space: nowrap;">
+                      <button type="button" class="admin-btn admin-btn--outline admin-btn-sm copy-zalo-script-btn" data-id="${c.id}" title="Sao chép mẫu tin nhắn phản hồi cá nhân hóa & mở Zalo" style="margin-right: 4px;">📋 Mẫu Zalo</button>
                       <a href="https://zalo.me/${(c.phone || '').replace(/[^0-9]/g, '')}" target="_blank" class="admin-btn admin-btn--outline admin-btn-sm" style="margin-right: 4px;">Chat Zalo</a>
                       ${c.status === 'pending' ? `
                         <button class="admin-btn admin-btn--primary admin-btn-sm mark-done-btn" data-id="${c.id}" style="margin-right: 4px;">Đã tư vấn</button>
@@ -986,6 +1134,23 @@ export async function renderAdmin(container) {
           </div>
         </div>
       `;
+
+      // Copy personalized Zalo reply script
+      contentArea.querySelectorAll('.copy-zalo-script-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = contacts.find(c => c.id === btn.dataset.id);
+          if (!item) return;
+          const scriptText = `Dạ Phát Đạt Jewelry xin chào ${item.fullName || 'anh/chị'} ạ! 💎\nCửa hàng vừa nhận được yêu cầu "${item.subject || 'Tư vấn trang sức Bạc S925'}" của mình.\nEm xin phép gửi video quay cận cảnh sản phẩm dưới ánh sáng thật và tư vấn size/hộp quà miễn phí cho mình ngay nhé ạ!`;
+          try {
+            navigator.clipboard.writeText(scriptText);
+            showToast(`Đã sao chép mẫu câu chào cho khách "${item.fullName}"! Đang mở Zalo...`, 'success');
+          } catch (e) {}
+          const cleanPhone = (item.phone || '').replace(/[^0-9]/g, '');
+          if (cleanPhone) {
+            setTimeout(() => window.open(`https://zalo.me/${cleanPhone}`, '_blank', 'noopener'), 450);
+          }
+        });
+      });
 
       // CRM note save listeners
       contentArea.querySelectorAll('.save-crm-note-btn').forEach(btn => {
@@ -1112,9 +1277,9 @@ export async function renderAdmin(container) {
 
             <!-- Database Sync & Seeding Tools -->
             <div style="border-top: 1px solid #eef2f3; padding-top: 20px;">
-              <h4 style="font-size: 14px; color: var(--color-brand-primary); margin: 0 0 8px 0;">Công cụ Đồng bộ Dữ liệu</h4>
+              <h4 style="font-size: 14px; color: var(--color-brand-primary); margin: 0 0 8px 0;">Công cụ Đồng bộ & Sao lưu Dữ liệu</h4>
               <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px 0;">
-                Đồng bộ nhanh 20 sản phẩm mẫu và các bộ sưu tập gốc lên Supabase để lưu trữ trên đám mây.
+                Đồng bộ nhanh 20 sản phẩm mẫu lên đám mây hoặc tải bản sao lưu toàn hệ thống (.JSON) về máy.
               </p>
               <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="admin-btn admin-btn--outline" id="btn-seed-supabase" style="border-color: var(--color-accent-gold); color: var(--color-brand-primary);">
@@ -1122,6 +1287,9 @@ export async function renderAdmin(container) {
                 </button>
                 <button class="admin-btn admin-btn--outline" id="btn-refresh-from-db">
                   🔄 Tải lại dữ liệu từ Supabase
+                </button>
+                <button class="admin-btn admin-btn--outline" id="btn-export-full-backup">
+                  💾 Tải Bản Sao Lưu Toàn Hệ Thống (.JSON)
                 </button>
               </div>
               <div id="seed-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
@@ -1273,6 +1441,31 @@ export async function renderAdmin(container) {
       refreshBtn.textContent = '🔄 Tải lại dữ liệu từ Supabase';
       refreshBtn.disabled = false;
     });
+
+    // Export Full JSON Backup
+    const backupBtn = contentArea.querySelector('#btn-export-full-backup');
+    if (backupBtn) {
+      backupBtn.addEventListener('click', () => {
+        const payload = {
+          exportedAt: new Date().toISOString(),
+          brand: 'Phát Đạt Jewelry',
+          siteSettings,
+          products,
+          collections,
+          contacts,
+          crmNotes: getContactCrmNotes(),
+          analytics: getProductAnalytics()
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `phat-dat-jewelry-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Đã tải bản sao lưu toàn hệ thống (.JSON) về máy thành công!', 'success');
+      });
+    }
 
     // Save Store Settings
     const storeBtn = contentArea.querySelector('#btn-save-store');

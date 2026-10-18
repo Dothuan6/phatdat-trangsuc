@@ -1123,12 +1123,21 @@ export function openQuickViewModal(product) {
           </div>
 
           <!-- Actions -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
             <button type="button" id="qv-zalo-btn" style="background: #0068FF; color: #fff; border: none; border-radius: 6px; padding: 11px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
               💬 Tư Vấn Zalo Ngay
             </button>
             <button type="button" id="qv-callback-btn" style="background: var(--color-accent-gold); color: #143F3B; border: none; border-radius: 6px; padding: 11px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
               📞 Yêu Cầu Gọi Lại
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+            <button type="button" id="qv-vto-btn" style="background: #F4F9F8; color: var(--color-brand-primary); border: 1px solid #C5DEDB; border-radius: 6px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">
+              📹 Ướm Thử Camera
+            </button>
+            <button type="button" id="qv-dgc-btn" style="background: #FAF6EE; color: #8A6218; border: 1px solid var(--color-accent-gold); border-radius: 6px; padding: 8px 10px; font-size: 12px; font-weight: 700; cursor: pointer;">
+              🖼️ Tạo Thiệp Ảnh (.PNG)
             </button>
           </div>
 
@@ -1151,6 +1160,14 @@ export function openQuickViewModal(product) {
   overlay.querySelector('.modal-close-x').addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   overlay.querySelector('#qv-full-link').addEventListener('click', close);
+  overlay.querySelector('#qv-vto-btn').addEventListener('click', () => {
+    close();
+    openVirtualTryOnModal(product);
+  });
+  overlay.querySelector('#qv-dgc-btn').addEventListener('click', () => {
+    close();
+    openDigitalGiftCardModal(product);
+  });
 
   // Thumbnail switcher
   const mainImg = overlay.querySelector('#qv-main-img');
@@ -1462,7 +1479,585 @@ export function openWarrantyLookupModal(initialPhone = '') {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 12. CONVENIENCE SHORTCUTS
+// 12. VIRTUAL TRY-ON STUDIO (WEBRTC CAMERA + PHOTO + SILHOUETTE)
+// ══════════════════════════════════════════════════════════════
+
+export function openVirtualTryOnModal(product) {
+  if (!product) return;
+
+  let activeStream = null;
+  let isMirrored = true;
+  let jScale = 1.0;
+  let jRotate = 0;
+  let posX = 50; // percentage
+  let posY = 58; // percentage
+  let currentMode = 'silhouette'; // 'camera' | 'photo' | 'silhouette'
+  let uploadedDataUrl = '';
+
+  const imgSrc = (product.images && product.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  const catLabel = product.category === 'rings' ? 'Ngón tay / Bàn tay'
+    : (product.category === 'earrings' ? 'Khuôn mặt / Vành tai'
+    : (product.category === 'bracelets' ? 'Cổ tay' : 'Cổ & Xương quai xanh'));
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 720px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>📷 Phòng Ướm Thử Trang Sức Ảo (Virtual Try-On)</h3>
+          <div style="font-size: 12px; opacity: 0.88;">Ướm thử mẫu "${product.name}" bằng Camera thật, ảnh cá nhân hoặc ma-nơ-canh</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 18px 20px; overflow-y: auto; flex: 1;">
+        <!-- Mode Switcher Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" id="vto-mode-camera" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              📹 Bật Camera Thật
+            </button>
+            <button type="button" id="vto-mode-upload" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">
+              📁 Tải Ảnh Của Bạn
+            </button>
+            <input type="file" id="vto-file-input" accept="image/*" style="display: none;">
+            <button type="button" id="vto-mode-silhouette" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #FAF8F4; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">
+              👤 Nền Mẫu (${catLabel})
+            </button>
+          </div>
+          <button type="button" id="vto-mirror-btn" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; cursor: pointer;" title="Lật gương Camera">
+            ↔ Lật gương
+          </button>
+        </div>
+
+        <!-- Try-On Interactive Stage -->
+        <div id="vto-stage" style="
+          position: relative; width: 100%; height: 370px; border-radius: 12px; overflow: hidden;
+          background: radial-gradient(circle at 50% 35%, #F7DFC6 0%, #DFB995 65%, #C49870 100%);
+          border: 1px solid var(--color-border); user-select: none; touch-action: none;
+          display: flex; align-items: center; justify-content: center;
+        ">
+          <!-- Live WebRTC Video -->
+          <video id="vto-video" autoplay playsinline muted style="display: none; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+
+          <!-- Uploaded Photo Backdrop -->
+          <img id="vto-uploaded-img" alt="Ảnh ướm thử" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+
+          <!-- Default Stylized Neckline / Hand Silhouette SVG -->
+          <div id="vto-silhouette-art" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+            <svg viewBox="0 0 400 360" width="100%" height="100%" style="max-width: 440px; opacity: 0.85;">
+              <defs>
+                <linearGradient id="skinGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FCECE3"/>
+                  <stop offset="50%" stop-color="#F1CFB6"/>
+                  <stop offset="100%" stop-color="#DDA982"/>
+                </linearGradient>
+              </defs>
+              <!-- Stylized graceful neck & collarbone silhouette -->
+              <path d="M145,20 C148,85 135,130 70,165 C30,185 15,230 15,350 L385,350 C385,230 370,185 330,165 C265,130 252,85 255,20 Z" fill="url(#skinGrad)" stroke="rgba(160,110,75,0.35)" stroke-width="2"/>
+              <path d="M120,175 Q200,210 280,175" fill="none" stroke="rgba(160,110,75,0.4)" stroke-width="2" stroke-dasharray="4 4"/>
+              <path d="M165,190 Q200,275 235,190" fill="none" stroke="rgba(201,151,56,0.55)" stroke-width="1.5"/>
+            </svg>
+            <div style="position: absolute; top: 10px; left: 12px; background: rgba(20,63,59,0.78); color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 11px;">
+              💡 Kéo thả món trang sức đến vị trí bạn muốn ướm thử
+            </div>
+          </div>
+
+          <!-- Draggable Jewelry Overlay -->
+          <div id="vto-jewelry-item" style="
+            position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            cursor: grab; z-index: 10; padding: 8px; border: 1.5px dashed rgba(201,151,56,0.75);
+            border-radius: 10px; background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 70%);
+            transition: box-shadow 0.15s ease;
+          " title="Kéo để di chuyển vị trí trang sức">
+            <img id="vto-jewelry-img" src="${imgSrc}" alt="${product.name}" crossorigin="anonymous" style="
+              width: 150px; height: 150px; object-fit: contain; pointer-events: none;
+              filter: drop-shadow(0 8px 16px rgba(0,0,0,0.28));
+            " onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+          </div>
+        </div>
+
+        <!-- Adjustment Sliders -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; background: #F8FAF9; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--color-border-light);">
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+              <span>🔍 Kích thước trang sức:</span>
+              <span id="vto-scale-val">100%</span>
+            </div>
+            <input type="range" id="vto-scale-range" min="0.4" max="2.2" step="0.05" value="1" style="width: 100%; accent-color: var(--color-brand-primary); cursor: pointer;">
+          </div>
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+              <span>🔄 Xoay góc nghiêng:</span>
+              <span id="vto-rot-val">0°</span>
+            </div>
+            <input type="range" id="vto-rot-range" min="-45" max="45" step="1" value="0" style="width: 100%; accent-color: var(--color-brand-primary); cursor: pointer;">
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="vto-close-btn">Đóng</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="pd-dialog-btn" id="vto-snapshot-btn" style="background: var(--color-accent-gold); color: #143F3B; border: none; font-weight: 700;">
+            📸 Chụp & Lưu Ảnh Ướm Thử
+          </button>
+          <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="vto-consult-btn">
+            💬 Nhắn Zalo Tư Vấn Mẫu Này
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const videoEl = overlay.querySelector('#vto-video');
+  const uploadedImgEl = overlay.querySelector('#vto-uploaded-img');
+  const silhouetteEl = overlay.querySelector('#vto-silhouette-art');
+  const jewelryEl = overlay.querySelector('#vto-jewelry-item');
+  const jewelryImgEl = overlay.querySelector('#vto-jewelry-img');
+  const stageEl = overlay.querySelector('#vto-stage');
+
+  function stopCamera() {
+    if (activeStream) {
+      activeStream.getTracks().forEach(t => t.stop());
+      activeStream = null;
+    }
+  }
+
+  const close = () => {
+    stopCamera();
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#vto-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  function updateTransform() {
+    jewelryEl.style.left = `${posX}%`;
+    jewelryEl.style.top = `${posY}%`;
+    jewelryEl.style.transform = `translate(-50%, -50%) scale(${jScale}) rotate(${jRotate}deg)`;
+  }
+
+  // Drag & Drop support (Mouse + Touch)
+  let dragging = false;
+  const onPointerDown = (e) => {
+    dragging = true;
+    jewelryEl.style.cursor = 'grabbing';
+    jewelryEl.style.borderColor = '#C99738';
+    e.preventDefault();
+  };
+  const onPointerMove = (e) => {
+    if (!dragging) return;
+    const rect = stageEl.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    posX = Math.max(10, Math.min(90, ((clientX - rect.left) / rect.width) * 100));
+    posY = Math.max(10, Math.min(90, ((clientY - rect.top) / rect.height) * 100));
+    updateTransform();
+  };
+  const onPointerUp = () => {
+    dragging = false;
+    jewelryEl.style.cursor = 'grab';
+  };
+
+  jewelryEl.addEventListener('mousedown', onPointerDown);
+  jewelryEl.addEventListener('touchstart', onPointerDown, { passive: false });
+  window.addEventListener('mousemove', onPointerMove);
+  window.addEventListener('touchmove', onPointerMove, { passive: false });
+  window.addEventListener('mouseup', onPointerUp);
+  window.addEventListener('touchend', onPointerUp);
+
+  // Sliders
+  const scaleRange = overlay.querySelector('#vto-scale-range');
+  const scaleVal = overlay.querySelector('#vto-scale-val');
+  scaleRange.addEventListener('input', () => {
+    jScale = parseFloat(scaleRange.value);
+    scaleVal.textContent = `${Math.round(jScale * 100)}%`;
+    updateTransform();
+  });
+
+  const rotRange = overlay.querySelector('#vto-rot-range');
+  const rotVal = overlay.querySelector('#vto-rot-val');
+  rotRange.addEventListener('input', () => {
+    jRotate = parseInt(rotRange.value, 10);
+    rotVal.textContent = `${jRotate}°`;
+    updateTransform();
+  });
+
+  // Camera Mode
+  overlay.querySelector('#vto-mode-camera').addEventListener('click', async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showToast('Trình duyệt của bạn không hỗ trợ mở Camera trực tiếp. Bạn có thể bấm "Tải Ảnh Của Bạn" nhé!', 'warning');
+      return;
+    }
+    try {
+      stopCamera();
+      activeStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      videoEl.srcObject = activeStream;
+      videoEl.style.display = 'block';
+      uploadedImgEl.style.display = 'none';
+      silhouetteEl.style.display = 'none';
+      currentMode = 'camera';
+      showToast('Đã bật Camera ướm thử! Hãy di chuyển món trang sức khớp với vị trí của bạn.', 'success');
+    } catch (err) {
+      showToast('Không thể truy cập Camera (có thể bạn chưa cấp quyền). Hãy thử tải ảnh cá nhân lên nhé!', 'info');
+    }
+  });
+
+  // Mirror Toggle
+  overlay.querySelector('#vto-mirror-btn').addEventListener('click', () => {
+    isMirrored = !isMirrored;
+    videoEl.style.transform = isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+  });
+
+  // Upload Photo Mode
+  const fileInput = overlay.querySelector('#vto-file-input');
+  overlay.querySelector('#vto-mode-upload').addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      stopCamera();
+      uploadedDataUrl = ev.target.result;
+      uploadedImgEl.src = uploadedDataUrl;
+      uploadedImgEl.style.display = 'block';
+      videoEl.style.display = 'none';
+      silhouetteEl.style.display = 'none';
+      currentMode = 'photo';
+      showToast('Đã tải ảnh của bạn! Kéo thả và phóng to trang sức để ướm thử.', 'success');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Silhouette Mode
+  overlay.querySelector('#vto-mode-silhouette').addEventListener('click', () => {
+    stopCamera();
+    videoEl.style.display = 'none';
+    uploadedImgEl.style.display = 'none';
+    silhouetteEl.style.display = 'flex';
+    currentMode = 'silhouette';
+  });
+
+  // Snapshot Download via HTML5 Canvas
+  overlay.querySelector('#vto-snapshot-btn').addEventListener('click', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 600;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Draw background
+    if (currentMode === 'camera' && videoEl.readyState >= 2) {
+      ctx.save();
+      if (isMirrored) {
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
+    } else if (currentMode === 'photo' && uploadedImgEl.complete) {
+      ctx.drawImage(uploadedImgEl, 0, 0, canvas.width, canvas.height);
+    } else {
+      const grad = ctx.createRadialGradient(400, 220, 40, 400, 300, 460);
+      grad.addColorStop(0, '#FCECE3');
+      grad.addColorStop(0.6, '#E2BA91');
+      grad.addColorStop(1, '#C49870');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 2. Draw jewelry item at current relative position
+    if (jewelryImgEl.complete) {
+      const targetX = (posX / 100) * canvas.width;
+      const targetY = (posY / 100) * canvas.height;
+      const drawSize = 210 * jScale;
+      ctx.save();
+      ctx.translate(targetX, targetY);
+      ctx.rotate((jRotate * Math.PI) / 180);
+      ctx.shadowColor = 'rgba(0,0,0,0.28)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 8;
+      ctx.drawImage(jewelryImgEl, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
+      ctx.restore();
+    }
+
+    // 3. Draw watermark footer bar
+    ctx.fillStyle = 'rgba(20, 63, 59, 0.88)';
+    ctx.fillRect(0, canvas.height - 54, canvas.width, 54);
+    ctx.fillStyle = '#F3D184';
+    ctx.font = 'bold 17px sans-serif';
+    ctx.fillText(`PHÁT ĐẠT JEWELRY — ${product.name} (${formatPrice(product.price)})`, 20, canvas.height - 22);
+
+    const link = document.createElement('a');
+    link.download = `uom-thu-${product.id}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Đã lưu ảnh ướm thử trang sức về máy thành công!', 'success');
+  });
+
+  overlay.querySelector('#vto-consult-btn').addEventListener('click', () => {
+    close();
+    window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 13. DOWNLOADABLE LUXURY GIFT CARD IMAGE GENERATOR (CANVAS PNG)
+// ══════════════════════════════════════════════════════════════
+
+export function openDigitalGiftCardModal(product, options = {}) {
+  if (!product) return;
+
+  const themes = [
+    {
+      id: 'emerald',
+      name: '💚 Ngọc Lục Bảo Hoàng Gia',
+      bg1: '#143F3B',
+      bg2: '#1E5D57',
+      border: '#C99738',
+      textMain: '#FFFFFF',
+      textAccent: '#F3D184',
+      cardBox: 'rgba(255,255,255,0.08)'
+    },
+    {
+      id: 'ivory',
+      name: '🤍 Kem Tuyết Thanh Lịch',
+      bg1: '#FDFBF7',
+      bg2: '#F4EFE6',
+      border: '#C99738',
+      textMain: '#1E3A37',
+      textAccent: '#9A6F1A',
+      cardBox: 'rgba(30,93,87,0.06)'
+    },
+    {
+      id: 'ruby',
+      name: '🧧 Đỏ Gấm May Mắn',
+      bg1: '#5E1124',
+      bg2: '#8C1D40',
+      border: '#F3D184',
+      textMain: '#FFFFFF',
+      textAccent: '#F3D184',
+      cardBox: 'rgba(255,255,255,0.09)'
+    }
+  ];
+
+  let selectedTheme = themes[0];
+  const initialNote = options.giftCardNote || 'Chúc người thương luôn rạng rỡ, bình an và ngập tràn hạnh phúc!';
+  const initialEngraving = options.engravingText || '';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 780px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>🖼️ Tạo & Tải Thiệp Quà Tặng Kỹ Thuật Số (PNG)</h3>
+          <div style="font-size: 12px; opacity: 0.88;">Thiết kế tấm thiệp sang trọng kèm hình ảnh trang sức để gửi tặng qua Zalo / Messenger</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 20px; align-items: start;">
+        <!-- Form Controls -->
+        <div>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12.5px; font-weight: 700; display: block; margin-bottom: 6px; color: var(--color-text-primary);">🎨 Chọn chủ đề màu thiệp:</label>
+            <div style="display: flex; flex-direction: column; gap: 6px;" id="dgc-theme-list">
+              ${themes.map((th, idx) => `
+                <button type="button" class="dgc-theme-btn" data-id="${th.id}" style="padding: 8px 12px; border-radius: 8px; border: ${idx === 0 ? '2px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: #fff; text-align: left; font-size: 12.5px; font-weight: ${idx === 0 ? '700' : '500'}; cursor: pointer;">
+                  ${th.name}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 12.5px; font-weight: 600; display: block; margin-bottom: 4px;">Gửi tặng đến (Tên người nhận):</label>
+            <input type="text" id="dgc-to-input" value="Người thương" maxlength="32" style="width: 100%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px;">
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 12.5px; font-weight: 600; display: block; margin-bottom: 4px;">Lời chúc trên thiệp:</label>
+            <textarea id="dgc-msg-input" rows="3" maxlength="160" style="width: 100%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px;">${initialNote}</textarea>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <label style="font-size: 12.5px; font-weight: 600; display: block; margin-bottom: 4px;">Người gửi / Chữ ký:</label>
+            <input type="text" id="dgc-from-input" value="Yêu thương gửi trao ♥" maxlength="32" style="width: 100%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px;">
+          </div>
+        </div>
+
+        <!-- Live Canvas Preview -->
+        <div style="text-align: center;">
+          <div style="font-size: 11.5px; color: var(--color-text-secondary); margin-bottom: 6px; font-weight: 600;">Xem trước thiệp quà tặng (Chuẩn tỷ lệ gửi Zalo HD):</div>
+          <canvas id="dgc-canvas" width="600" height="750" style="width: 100%; max-width: 310px; height: auto; border-radius: 12px; box-shadow: 0 12px 28px rgba(0,0,0,0.18); border: 1px solid var(--color-border);"></canvas>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="dgc-close-btn">Đóng</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="dgc-download-btn" style="background: var(--color-accent-gold); color: #143F3B; font-weight: 700;">
+          📥 Tải Ảnh Thiệp Về Máy (.PNG)
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#dgc-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  const canvas = overlay.querySelector('#dgc-canvas');
+  const ctx = canvas.getContext('2d');
+  const toInput = overlay.querySelector('#dgc-to-input');
+  const msgInput = overlay.querySelector('#dgc-msg-input');
+  const fromInput = overlay.querySelector('#dgc-from-input');
+
+  const prodImg = new Image();
+  prodImg.crossOrigin = 'anonymous';
+  prodImg.src = (product.images && product.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  prodImg.onload = () => drawCard();
+  prodImg.onerror = () => drawCard();
+
+  function wrapText(context, text, x, y, maxWidth, lineHeight) {
+    const words = text.split(' ');
+    let line = '';
+    let curY = y;
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const metrics = context.measureText(testLine);
+      if (metrics.width > maxWidth && n > 0) {
+        context.fillText(line.trim(), x, curY);
+        line = words[n] + ' ';
+        curY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    context.fillText(line.trim(), x, curY);
+    return curY;
+  }
+
+  function drawCard() {
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Background Gradient
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, selectedTheme.bg1);
+    grad.addColorStop(1, selectedTheme.bg2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Double Luxury Gold Border
+    ctx.strokeStyle = selectedTheme.border;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(20, 20, W - 40, H - 40);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(28, 28, W - 56, H - 56);
+
+    // Header Brand Title
+    ctx.textAlign = 'center';
+    ctx.fillStyle = selectedTheme.textAccent;
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('✦ PHÁT ĐẠT JEWELRY · TRANG SỨC BẠC S925 ✦', W / 2, 68);
+
+    ctx.fillStyle = selectedTheme.textMain;
+    ctx.font = 'italic bold 28px Georgia, serif';
+    ctx.fillText(`Gửi tặng: ${toInput.value.trim() || 'Người thương'}`, W / 2, 112);
+
+    // Product Showcase Circle / Frame
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(W / 2, 260, 110, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = selectedTheme.border;
+    ctx.stroke();
+    ctx.clip();
+    if (prodImg.complete && prodImg.naturalWidth > 0) {
+      ctx.drawImage(prodImg, W / 2 - 95, 260 - 95, 190, 190);
+    }
+    ctx.restore();
+
+    // Product Name & Info
+    ctx.fillStyle = selectedTheme.textAccent;
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillText(product.name, W / 2, 405);
+
+    ctx.fillStyle = selectedTheme.textMain;
+    ctx.font = '13px sans-serif';
+    ctx.fillText(`Chất liệu: ${product.materials || 'Bạc Ý S925'}${initialEngraving ? ` • Khắc: "${initialEngraving}"` : ''}`, W / 2, 430);
+
+    // Message Box
+    ctx.fillStyle = selectedTheme.cardBox;
+    ctx.fillRect(56, 455, W - 112, 165);
+    ctx.strokeStyle = selectedTheme.border;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(56, 455, W - 112, 165);
+
+    ctx.fillStyle = selectedTheme.textMain;
+    ctx.font = 'italic 18px Georgia, serif';
+    wrapText(ctx, `"${msgInput.value.trim() || initialNote}"`, W / 2, 502, W - 150, 28);
+
+    // Sender signature
+    ctx.fillStyle = selectedTheme.textAccent;
+    ctx.font = 'bold 16px Georgia, serif';
+    ctx.fillText(`— ${fromInput.value.trim() || 'Yêu thương gửi trao ♥'} —`, W / 2, 660);
+
+    // Footer Warranty Note
+    ctx.fillStyle = selectedTheme.textMain;
+    ctx.globalAlpha = 0.78;
+    ctx.font = '12px sans-serif';
+    ctx.fillText('Bảo hành làm sáng Bạc S925 miễn phí trọn đời tại Phát Đạt Jewelry • Hotline: 0898 025 013', W / 2, 704);
+    ctx.globalAlpha = 1.0;
+  }
+
+  overlay.querySelectorAll('.dgc-theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedTheme = themes.find(t => t.id === btn.dataset.id) || themes[0];
+      overlay.querySelectorAll('.dgc-theme-btn').forEach(b => {
+        b.style.border = '1px solid var(--color-border)';
+        b.style.fontWeight = '500';
+      });
+      btn.style.border = '2px solid var(--color-brand-primary)';
+      btn.style.fontWeight = '700';
+      drawCard();
+    });
+  });
+
+  [toInput, msgInput, fromInput].forEach(el => el.addEventListener('input', drawCard));
+  drawCard();
+
+  overlay.querySelector('#dgc-download-btn').addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = `thiep-qua-tang-phat-dat-${product.id}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Đã tải ảnh Thiệp Quà Tặng (.PNG) về máy! Bạn có thể gửi ngay qua Zalo/Messenger.', 'success', 4000);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 14. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -1482,7 +2077,9 @@ export const modal = {
   giftFinder: openGiftFinderModal,
   quickView: openQuickViewModal,
   fengShui: openFengShuiMatcherModal,
-  warranty: openWarrantyLookupModal
+  warranty: openWarrantyLookupModal,
+  virtualTryOn: openVirtualTryOnModal,
+  digitalGiftCard: openDigitalGiftCardModal
 };
 
 

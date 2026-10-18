@@ -1,21 +1,46 @@
 {
-  "name": "Phát Đạt Jewelry – Trang sức Bạc 925",
-  "short_name": "Phát Đạt",
-  "description": "Trang sức Bạc 925 tinh xảo, nhẫn cỏ ba lá, dây chuyền xà cừ, đá Moissanite cao cấp.",
+  "name": "Phát Đạt Jewelry – Trang Sức Bạc S925 Cao Cấp",
+  "short_name": "Phát Đạt Jewelry",
+  "description": "Khám phá trang sức Bạc Ý S925 tinh xảo: Dây chuyền, Nhẫn, Lắc tay, Bông tai. Bảo hành làm sáng miễn phí trọn đời.",
   "start_url": "./#/",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#1E5D57",
+  "orientation": "portrait-primary",
+  "background_color": "#FAF8F4",
   "theme_color": "#1E5D57",
+  "lang": "vi-VN",
   "icons": [
     {
       "src": "./images/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "./images/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tất cả Trang sức Bạc S925",
+      "short_name": "Trang sức",
+      "description": "Khám phá bộ sưu tập trang sức Bạc 925",
+      "url": "./#/jewelry"
+    },
+    {
+      "name": "Danh sách Yêu thích",
+      "short_name": "Yêu thích",
+      "description": "Xem lại các mẫu trang sức đã lưu",
+      "url": "./#/wishlist"
+    },
+    {
+      "name": "Đặt lịch hẹn Showroom",
+      "short_name": "Cửa hàng",
+      "description": "Xem địa chỉ & đặt lịch thử trang sức",
+      "url": "./#/stores"
     }
   ]
 }
