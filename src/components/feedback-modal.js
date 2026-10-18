@@ -1027,7 +1027,181 @@ export function openGiftFinderModal() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 9. CONVENIENCE SHORTCUTS
+// 9. PRODUCT QUICK VIEW MODAL (XEM NHANH TRÊN THẺ SẢN PHẨM)
+// ══════════════════════════════════════════════════════════════
+
+export function openQuickViewModal(product) {
+  if (!product) return;
+  trackProductEvent(product.id, 'view');
+
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : ['./images/products/Daychuyen4.3-removebg-preview.png'];
+  const sizes = Array.isArray(product.availableSizes) && product.availableSizes.length > 0
+    ? product.availableSizes
+    : ['Freesize'];
+  const colors = Array.isArray(product.availableColors) && product.availableColors.length > 0
+    ? product.availableColors
+    : ['Bạc sáng 925'];
+
+  let selectedSize = sizes[0];
+  let selectedColor = colors[0];
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 760px; width: 100%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>👁️ Xem Nhanh Sản Phẩm</h3>
+          <div style="font-size: 12px; opacity: 0.85;">Bộ sưu tập ${product.collection} · Mã: ${product.reference}</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 22px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; align-items: start;">
+        <!-- Left: Image Preview & Thumbnails -->
+        <div>
+          <div style="background: #FBF9F5; border: 1px solid var(--color-border-light); border-radius: 10px; overflow: hidden; height: 280px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+            <img id="qv-main-img" src="${images[0]}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s ease;" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+          </div>
+          ${images.length > 1 ? `
+            <div style="display: flex; gap: 8px; justify-content: center;">
+              ${images.map((img, i) => `
+                <button type="button" class="qv-thumb-btn" data-src="${img}" style="width: 54px; height: 54px; border-radius: 6px; overflow: hidden; border: 2px solid ${i === 0 ? 'var(--color-brand-primary)' : 'var(--color-border)'}; padding: 0; background: #fff; cursor: pointer;">
+                  <img src="${img}" alt="Thumb ${i + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                </button>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Right: Product Info & Quick Variant Selection -->
+        <div>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 6px;">
+            <span style="color: #f39c12;">★★★★★</span>
+            <strong>${product.rating || 4.9}</strong>
+            <span style="color: var(--color-text-secondary);">(${product.reviewsCount || 20} đánh giá)</span>
+            <span style="background: var(--color-brand-light); color: var(--color-brand-primary); padding: 2px 8px; border-radius: 12px; font-weight: 600; font-size: 11px;">Còn hàng</span>
+          </div>
+
+          <h2 style="font-family: var(--font-display); font-size: 21px; color: var(--color-brand-primary); margin: 0 0 8px;">${product.name}</h2>
+
+          <div style="font-size: 23px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 12px;">
+            ${formatPrice(product.price)}
+            <span style="font-size: 12px; font-weight: 400; color: var(--color-text-secondary);"> (Tặng hộp quà & khăn lau bạc)</span>
+          </div>
+
+          <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; margin: 0 0 14px;">
+            ${product.description}
+          </p>
+
+          <div style="background: #F8FAF9; border-radius: 8px; padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px; display: grid; gap: 4px;">
+            <div>• <strong>Chất liệu:</strong> ${product.materials}</div>
+            ${product.stones ? `<div>• <strong>Đá đính kèm:</strong> ${product.stones}</div>` : ''}
+            <div>• <strong>Bảo hành:</strong> Đánh bóng & làm sáng miễn phí trọn đời</div>
+          </div>
+
+          <!-- Size Selector -->
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 6px;">KÍCH CỠ / CHIỀU DÀI:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="qv-size-group">
+              ${sizes.map((s, idx) => `
+                <button type="button" class="gift-quiz-pill ${idx === 0 ? 'is-selected' : ''}" data-val="${s}" style="padding: 5px 10px; font-size: 12px;">${s}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Color Selector -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 6px;">MÀU XI MẠ:</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="qv-color-group">
+              ${colors.map((c, idx) => `
+                <button type="button" class="gift-quiz-pill ${idx === 0 ? 'is-selected' : ''}" data-val="${c}" style="padding: 5px 10px; font-size: 12px;">${c}</button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+            <button type="button" id="qv-zalo-btn" style="background: #0068FF; color: #fff; border: none; border-radius: 6px; padding: 11px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              💬 Tư Vấn Zalo Ngay
+            </button>
+            <button type="button" id="qv-callback-btn" style="background: var(--color-accent-gold); color: #143F3B; border: none; border-radius: 6px; padding: 11px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              📞 Yêu Cầu Gọi Lại
+            </button>
+          </div>
+
+          <a href="#/product/${product.id}" id="qv-full-link" style="display: block; text-align: center; font-size: 13px; font-weight: 600; color: var(--color-brand-primary); text-decoration: underline; padding: 4px 0;">
+            Xem chi tiết đầy đủ, thông số & đánh giá →
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector('#qv-full-link').addEventListener('click', close);
+
+  // Thumbnail switcher
+  const mainImg = overlay.querySelector('#qv-main-img');
+  overlay.querySelectorAll('.qv-thumb-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      mainImg.src = btn.dataset.src;
+      overlay.querySelectorAll('.qv-thumb-btn').forEach(b => {
+        b.style.borderColor = b === btn ? 'var(--color-brand-primary)' : 'var(--color-border)';
+      });
+    });
+  });
+
+  // Pill selectors
+  overlay.querySelectorAll('#qv-size-group .gift-quiz-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.querySelectorAll('#qv-size-group .gift-quiz-pill').forEach(b => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+      selectedSize = btn.dataset.val;
+    });
+  });
+  overlay.querySelectorAll('#qv-color-group .gift-quiz-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.querySelectorAll('#qv-color-group .gift-quiz-pill').forEach(b => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+      selectedColor = btn.dataset.val;
+    });
+  });
+
+  // Zalo button
+  overlay.querySelector('#qv-zalo-btn').addEventListener('click', () => {
+    trackProductEvent(product.id, 'zalo');
+    const prodUrl = `${window.location.origin}${window.location.pathname}#/product/${product.id}`;
+    const text = `[Phát Đạt Jewelry] Tôi muốn tư vấn mẫu:\n- Tên SP: ${product.name} (${product.reference})\n- Giá: ${formatPrice(product.price)}\n- Phiên bản: ${selectedSize} | ${selectedColor}\n- Link: ${prodUrl}`;
+    try {
+      navigator.clipboard.writeText(text);
+      showToast('Đã sao chép thông tin sản phẩm! Đang mở Zalo...', 'success', 3000);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 400);
+  });
+
+  // Callback button
+  overlay.querySelector('#qv-callback-btn').addEventListener('click', () => {
+    close();
+    openQuickCallbackModal(product, { size: selectedSize, color: selectedColor });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 10. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -1044,7 +1218,9 @@ export const modal = {
   callback: openQuickCallbackModal,
   qrTag: openQrTagModal,
   compare: openCompareModal,
-  giftFinder: openGiftFinderModal
+  giftFinder: openGiftFinderModal,
+  quickView: openQuickViewModal
 };
+
 
 

@@ -1,5 +1,5 @@
 // ============================================================
-// PRODUCT CARD COMPONENT
+// PRODUCT CARD COMPONENT — Phát Đạt Jewelry
 // ============================================================
 
 import { formatPrice } from '../data/products.js';
@@ -10,7 +10,22 @@ import {
   isCompared,
   toggleCompareProduct
 } from '../data/wishlist-store.js';
-import { showToast } from './feedback-modal.js';
+import { showToast, openQuickViewModal } from './feedback-modal.js';
+
+function getProductBadge(product) {
+  const hotIds = ['pd-01', 'pd-02', 'pd-06', 'pd-09', 'pd-14'];
+  const newIds = ['pd-04', 'pd-08', 'pd-12', 'pd-17', 'pd-19'];
+  if (hotIds.includes(product.id) || (product.reviewsCount && product.reviewsCount >= 28)) {
+    return { text: '🔥 Bán chạy', bg: '#FFF3E0', color: '#B45309', border: '#FCD34D' };
+  }
+  if (newIds.includes(product.id)) {
+    return { text: '✨ Mẫu mới', bg: '#EBF4F3', color: '#1E5D57', border: '#A7D7D2' };
+  }
+  if (product.price <= 199000) {
+    return { text: '🎁 Quà tặng Hot', bg: '#FDF2F8', color: '#9D174D', border: '#FBCFE8' };
+  }
+  return null;
+}
 
 export function createProductCard(product) {
   const card = document.createElement('a');
@@ -26,9 +41,29 @@ export function createProductCard(product) {
   const heartFill = isLiked ? 'currentColor' : 'none';
   const heartColor = isLiked ? '#D4380D' : 'currentColor';
   const inCompare = isCompared(product.id);
+  const badge = getProductBadge(product);
+  const primaryImg = (product.images && product.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  const secondaryImg = product.images && product.images.length > 1 ? product.images[1] : null;
 
   card.innerHTML = `
-    <div class="product-card__image" style="position: relative;">
+    <div class="product-card__image" style="position: relative; overflow: hidden;">
+      ${badge ? `
+        <span class="product-card__badge" style="
+          position: absolute;
+          bottom: 10px;
+          left: 10px;
+          z-index: 2;
+          background: ${badge.bg};
+          color: ${badge.color};
+          border: 1px solid ${badge.border};
+          border-radius: 12px;
+          font-size: 10.5px;
+          font-weight: 700;
+          padding: 2px 8px;
+          pointer-events: none;
+        ">${badge.text}</span>
+      ` : ''}
+
       <button type="button" class="product-card__compare" style="
         position: absolute;
         top: 10px;
@@ -51,7 +86,23 @@ export function createProductCard(product) {
         </svg>
       </button>
 
-      <img src="${product.images[0]}" alt="${product.name}" loading="lazy"
+      <button type="button" class="product-card__quickview" style="
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        z-index: 2;
+        background: rgba(20, 63, 59, 0.88);
+        color: #ffffff;
+        border: none;
+        border-radius: 14px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      " title="Xem nhanh thông tin & tư vấn">👁️ Xem nhanh</button>
+
+      <img class="product-card__img-el" src="${primaryImg}" alt="${product.name}" loading="lazy"
            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23F5F5F0%22 width=%22400%22 height=%22400%22/%3E%3Cpath d=%22M200 100 L180 160 L140 160 L172 195 L160 250 L200 220 L240 250 L228 195 L260 160 L220 160Z%22 fill=%22none%22 stroke=%22%23C5A467%22 stroke-width=%222%22/%3E%3Ctext x=%22200%22 y=%22320%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2212%22 font-family=%22serif%22%3E${product.name}%3C/text%3E%3C/svg%3E';">
     </div>
     <h3 class="product-card__name">${product.name}</h3>
@@ -60,6 +111,26 @@ export function createProductCard(product) {
     ${variationsHtml}
   `;
 
+  // Hover secondary image swap
+  if (secondaryImg) {
+    const imgEl = card.querySelector('.product-card__img-el');
+    card.addEventListener('mouseenter', () => {
+      imgEl.src = secondaryImg;
+    });
+    card.addEventListener('mouseleave', () => {
+      imgEl.src = primaryImg;
+    });
+  }
+
+  // Quick View button
+  const quickViewBtn = card.querySelector('.product-card__quickview');
+  quickViewBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openQuickViewModal(product);
+  });
+
+  // Wishlist button
   const wishlistBtn = card.querySelector('.product-card__wishlist');
   wishlistBtn.addEventListener('click', (e) => {
     e.preventDefault();
@@ -74,6 +145,7 @@ export function createProductCard(product) {
     );
   });
 
+  // Compare button
   const compareBtn = card.querySelector('.product-card__compare');
   compareBtn.addEventListener('click', (e) => {
     e.preventDefault();
@@ -96,3 +168,4 @@ export function createProductCard(product) {
 
   return card;
 }
+

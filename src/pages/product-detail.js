@@ -2,7 +2,7 @@
 // PRODUCT DETAIL PAGE (PDP) — Phát Đạt Jewelry
 // ============================================================
 
-import { getProductById, getRelatedProducts, formatPrice } from '../data/products.js';
+import { products, getProductById, getRelatedProducts, formatPrice } from '../data/products.js';
 import { createAccordion } from '../components/accordion.js';
 import { createProductCard } from '../components/product-card.js';
 import { createCarousel } from '../components/carousel.js';
@@ -16,7 +16,9 @@ import {
   getRecentlyViewedProductIds,
   isCompared,
   toggleCompareProduct,
-  trackProductEvent
+  trackProductEvent,
+  getCustomProductReviews,
+  addCustomProductReview
 } from '../data/wishlist-store.js';
 import {
   showToast,
@@ -533,26 +535,201 @@ export function renderProductDetail(container, params = {}) {
     info.appendChild(specsSection);
   }
 
-  // ── Customer Reviews & Ratings ──
+  // ── Complete The Look / Mix & Match Combo Set ──
+  const sameCollectionDiffCat = products.filter(p => p.id !== product.id && p.collection === product.collection && p.category !== product.category);
+  const fallbackComplement = products.filter(p => p.id !== product.id && p.category !== product.category);
+  const pairItems = [...sameCollectionDiffCat, ...fallbackComplement].slice(0, 2);
+
+  if (pairItems.length > 0) {
+    const comboProducts = [product, ...pairItems];
+    const comboBox = document.createElement('div');
+    comboBox.style.cssText = 'margin-top: 28px; background: #FBF9F5; border: 1px solid #E5DEC9; border-radius: 10px; padding: 18px;';
+    comboBox.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 6px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 700; color: #8A6218; text-transform: uppercase; letter-spacing: 0.08em;">✨ Gợi ý phối đồ đồng điệu</span>
+          <h3 style="font-family: var(--font-display); font-size: 17px; color: var(--color-brand-primary); margin: 2px 0 0;">Phối Trọn Bộ ${product.collection}</h3>
+        </div>
+        <span style="font-size: 11px; background: #FAF4E8; color: #8A6218; border: 1px solid var(--color-accent-gold); padding: 3px 9px; border-radius: 12px; font-weight: 600;">🎁 Tặng hộp quà đôi & khăn lau bạc</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;" id="combo-items-list">
+        ${comboProducts.map((cp, idx) => `
+          <label style="display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 8px; padding: 8px 10px; cursor: pointer;">
+            <input type="checkbox" class="combo-item-check" data-id="${cp.id}" checked style="width: 16px; height: 16px; accent-color: var(--color-brand-primary);">
+            <img src="${cp.images[0]}" alt="${cp.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+            <div style="flex: 1; overflow: hidden;">
+              <div style="font-size: 12.5px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${idx === 0 ? '<span style="color:var(--color-brand-primary);">[Đang xem]</span> ' : ''}${cp.name}
+              </div>
+              <div style="font-size: 11px; color: var(--color-text-secondary);">Mã: ${cp.reference} · ${cp.materials}</div>
+            </div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); white-space: nowrap;">${formatPrice(cp.price)}</div>
+          </label>
+        `).join('')}
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px dashed #DFD6BE; padding-top: 12px;">
+        <div>
+          <span style="font-size: 12px; color: var(--color-text-secondary);">Tổng giá trị bộ (<span id="combo-count-num">${comboProducts.length}</span> món):</span>
+          <strong id="combo-total-price" style="font-size: 17px; color: var(--color-brand-primary); margin-left: 6px;">
+            ${formatPrice(comboProducts.reduce((s, i) => s + i.price, 0))}
+          </strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="combo-zalo-btn" style="background: #0068FF; color: #fff; border: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            💬 Tư vấn bộ này qua Zalo
+          </button>
+          <button type="button" id="combo-callback-btn" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            📞 Gọi lại tư vấn bộ
+          </button>
+        </div>
+      </div>
+    `;
+    info.appendChild(comboBox);
+
+    const getSelectedComboProducts = () => {
+      const checkedIds = Array.from(comboBox.querySelectorAll('.combo-item-check:checked')).map(c => c.dataset.id);
+      return comboProducts.filter(cp => checkedIds.includes(cp.id));
+    };
+
+    comboBox.querySelectorAll('.combo-item-check').forEach(chk => {
+      chk.addEventListener('change', () => {
+        const selected = getSelectedComboProducts();
+        comboBox.querySelector('#combo-count-num').textContent = selected.length;
+        comboBox.querySelector('#combo-total-price').textContent = formatPrice(selected.reduce((s, i) => s + i.price, 0));
+      });
+    });
+
+    comboBox.querySelector('#combo-zalo-btn').addEventListener('click', () => {
+      const selected = getSelectedComboProducts();
+      if (selected.length === 0) {
+        showToast('Vui lòng chọn ít nhất 1 món trong bộ trang sức!', 'warning');
+        return;
+      }
+      const lines = selected.map((item, idx) => `${idx + 1}. ${item.name} (${item.reference}) - ${formatPrice(item.price)}`).join('\n');
+      const total = formatPrice(selected.reduce((s, i) => s + i.price, 0));
+      const msg = `[Phát Đạt Jewelry] Tôi muốn tư vấn phối trọn bộ (${selected.length} món - Tổng: ${total}):\n${lines}`;
+      try {
+        navigator.clipboard.writeText(msg);
+        showToast('Đã sao chép trọn bộ trang sức! Bạn chỉ cần Dán (Paste) vào Zalo.', 'success', 3500);
+      } catch (e) {}
+      setTimeout(() => {
+        window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+      }, 450);
+    });
+
+    comboBox.querySelector('#combo-callback-btn').addEventListener('click', () => {
+      const selected = getSelectedComboProducts();
+      if (selected.length === 0) {
+        showToast('Vui lòng chọn ít nhất 1 món trong bộ trang sức!', 'warning');
+        return;
+      }
+      openQuickCallbackModal(selected);
+    });
+  }
+
+  // ── Customer Reviews & Interactive Review Submission ──
   const reviewsSection = document.createElement('div');
   reviewsSection.style.cssText = 'margin-top: 32px; border-top: 1px solid var(--color-border); padding-top: 24px;';
-  reviewsSection.innerHTML = `
-    <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--color-brand-primary); margin-bottom: 16px;">Đánh Giá Của Khách Hàng (${product.reviews.length})</h3>
-    <div style="display: flex; flex-direction: column; gap: 14px;">
-      ${product.reviews.map(r => `
-        <div style="background: #fafaf8; border: 1px solid var(--color-border-light); border-radius: 6px; padding: 14px 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">
-              ${r.author} <span style="font-weight: 400; color: var(--color-text-secondary); font-size: 12px;">(${r.city})</span>
-            </div>
-            <div style="color: #f39c12; font-size: 12px;">★★★★★</div>
-          </div>
-          <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0;">"${r.comment}"</p>
-          <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 6px; text-align: right;">Đã mua tại Phát Đạt Jewelry · ${r.date}</div>
+
+  function renderReviewsContent() {
+    const customRevs = getCustomProductReviews(product.id);
+    const allReviews = [...customRevs, ...(product.reviews || [])];
+    let chosenRating = 5;
+
+    reviewsSection.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+        <div>
+          <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--color-brand-primary); margin: 0;">Đánh Giá Của Khách Hàng (${allReviews.length})</h3>
+          <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">Trung bình ★ ${product.rating || 4.9}/5 từ khách hàng đã sở hữu</div>
         </div>
-      `).join('')}
-    </div>
-  `;
+        <button type="button" id="toggle-write-review-btn" style="background: var(--color-brand-light); color: var(--color-brand-primary); border: 1px solid var(--color-brand-primary); border-radius: 6px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+          ✍️ Viết đánh giá của bạn
+        </button>
+      </div>
+
+      <!-- Write Review Form (Collapsible) -->
+      <form id="pdp-write-review-form" style="display: none; background: #F8FAF9; border: 1px solid var(--color-border); border-radius: 8px; padding: 16px; margin-bottom: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">Chia sẻ cảm nhận của bạn về ${product.name}</div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <span style="font-size: 12px; font-weight: 600;">Mức độ hài lòng:</span>
+          <div id="rev-star-picker" style="display: inline-flex; gap: 4px;">
+            ${[1, 2, 3, 4, 5].map(st => `
+              <button type="button" class="rev-star-btn" data-star="${st}" style="background: none; border: none; font-size: 20px; color: #f39c12; cursor: pointer; padding: 0;">★</button>
+            `).join('')}
+          </div>
+          <span id="rev-star-label" style="font-size: 12px; color: var(--color-brand-primary); font-weight: 600;">Tuyệt vời (5/5)</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <input type="text" id="rev-author" required placeholder="Tên của bạn (VD: Minh Thư) *" style="padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12.5px;">
+          <input type="text" id="rev-city" placeholder="Tỉnh / Thành (VD: Q.7, TP.HCM)" style="padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12.5px;">
+        </div>
+        <textarea id="rev-comment" rows="2" required placeholder="Cảm nhận về độ sáng của bạc, đá đính kèm, hộp quà... *" style="width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12.5px; margin-bottom: 10px;"></textarea>
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" id="cancel-rev-btn" style="background: #fff; border: 1px solid var(--color-border); border-radius: 6px; padding: 6px 12px; font-size: 12px; cursor: pointer;">Hủy</button>
+          <button type="submit" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 12px; font-weight: 700; cursor: pointer;">Gửi đánh giá</button>
+        </div>
+      </form>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        ${allReviews.map(r => `
+          <div style="background: #fafaf8; border: 1px solid var(--color-border-light); border-radius: 6px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <div style="font-weight: 600; font-size: 13px; color: var(--color-text-primary);">
+                ${r.author} <span style="font-weight: 400; color: var(--color-text-secondary); font-size: 12px;">(${r.city || 'TP.HCM'})</span>
+                ${r.variant ? `<span style="margin-left: 6px; font-size: 11px; background: #EBF4F3; color: var(--color-brand-primary); padding: 1px 7px; border-radius: 10px; font-weight: 500;">${r.variant}</span>` : ''}
+              </div>
+              <div style="color: #f39c12; font-size: 12px;">${'★'.repeat(r.rating || 5)}${'☆'.repeat(5 - (r.rating || 5))}</div>
+            </div>
+            <p style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; margin: 0;">"${r.comment}"</p>
+            <div style="font-size: 11px; color: var(--color-text-muted); margin-top: 6px; text-align: right;">✓ Đã sở hữu tại Phát Đạt Jewelry · ${r.date}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    const toggleBtn = reviewsSection.querySelector('#toggle-write-review-btn');
+    const revForm = reviewsSection.querySelector('#pdp-write-review-form');
+    const cancelBtn = reviewsSection.querySelector('#cancel-rev-btn');
+
+    toggleBtn.addEventListener('click', () => {
+      revForm.style.display = revForm.style.display === 'none' ? 'block' : 'none';
+    });
+    cancelBtn.addEventListener('click', () => {
+      revForm.style.display = 'none';
+    });
+
+    const starLabels = { 1: 'Cần cải thiện (1/5)', 2: 'Tạm ổn (2/5)', 3: 'Hài lòng (3/5)', 4: 'Rất đẹp (4/5)', 5: 'Tuyệt vời (5/5)' };
+    reviewsSection.querySelectorAll('.rev-star-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        chosenRating = parseInt(btn.dataset.star, 10) || 5;
+        reviewsSection.querySelector('#rev-star-label').textContent = starLabels[chosenRating];
+        reviewsSection.querySelectorAll('.rev-star-btn').forEach(b => {
+          const st = parseInt(b.dataset.star, 10);
+          b.textContent = st <= chosenRating ? '★' : '☆';
+        });
+      });
+    });
+
+    revForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const author = reviewsSection.querySelector('#rev-author').value.trim();
+      const city = reviewsSection.querySelector('#rev-city').value.trim() || 'TP.HCM';
+      const comment = reviewsSection.querySelector('#rev-comment').value.trim();
+      if (!author || !comment) return;
+
+      addCustomProductReview(product.id, {
+        author,
+        city,
+        rating: chosenRating,
+        variant: `${selectedSize} · ${selectedColor}`,
+        comment
+      });
+      showToast('Cảm ơn bạn đã gửi đánh giá cho sản phẩm!', 'success', 3000);
+      renderReviewsContent();
+    });
+  }
+
+  renderReviewsContent();
   info.appendChild(reviewsSection);
 
   infoPanel.appendChild(info);

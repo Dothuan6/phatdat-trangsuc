@@ -191,3 +191,41 @@ export function saveContactCrmNote(contactId, note) {
     return false;
   }
 }
+
+// ── 7. CUSTOMER INTERACTIVE PRODUCT REVIEWS ──
+const REVIEWS_KEY = 'phatdat_custom_reviews';
+
+export function getCustomProductReviews(productId) {
+  try {
+    const raw = localStorage.getItem(REVIEWS_KEY);
+    const all = raw ? JSON.parse(raw) : {};
+    return Array.isArray(all[productId]) ? all[productId] : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function addCustomProductReview(productId, reviewObj) {
+  if (!productId || !reviewObj) return [];
+  try {
+    const raw = localStorage.getItem(REVIEWS_KEY);
+    const all = raw ? JSON.parse(raw) : {};
+    const list = Array.isArray(all[productId]) ? all[productId] : [];
+    const newEntry = {
+      id: 'rev-' + Date.now(),
+      author: (reviewObj.author || 'Khách hàng').trim(),
+      city: (reviewObj.city || 'TP.HCM').trim(),
+      rating: Number(reviewObj.rating) || 5,
+      variant: (reviewObj.variant || 'Bạc sáng 925').trim(),
+      comment: (reviewObj.comment || '').trim(),
+      date: new Date().toLocaleDateString('vi-VN')
+    };
+    list.unshift(newEntry);
+    all[productId] = list;
+    localStorage.setItem(REVIEWS_KEY, JSON.stringify(all));
+    return list;
+  } catch (e) {
+    return [];
+  }
+}
+

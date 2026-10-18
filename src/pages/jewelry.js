@@ -15,13 +15,20 @@ export function renderJewelry(container, params = {}) {
   const page = document.createElement('div');
   page.className = 'page-jewelry';
 
+  // Read optional query params from hash (e.g. #/jewelry?price=under-200)
+  const hashQueryIdx = window.location.hash.indexOf('?');
+  const urlParams = hashQueryIdx !== -1
+    ? new URLSearchParams(window.location.hash.slice(hashQueryIdx + 1))
+    : new URLSearchParams();
+  const initialPriceRange = urlParams.get('price') || 'all';
+
   // Active filters state
   let filters = {
     category: currentCategory,
     collection: 'all',
     materials: [],
     stones: [],
-    priceRange: 'all',
+    priceRange: initialPriceRange,
     sort: 'featured',
   };
 

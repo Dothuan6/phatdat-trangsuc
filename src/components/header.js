@@ -2,7 +2,7 @@ import { navigate } from '../router.js';
 import { t, currentLang, toggleLang } from '../i18n.js';
 import { products, formatPrice, searchProducts, categories, collections } from '../data/products.js';
 import { getWishlistedProductIds, getRecentSearches, addRecentSearch } from '../data/wishlist-store.js';
-import { openGiftFinderModal } from './feedback-modal.js';
+import { openGiftFinderModal, openQuickViewModal } from './feedback-modal.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -298,7 +298,10 @@ function openSearchDrawer() {
           </ul>
         </div>
         <div class="search-col search-col--wide">
-          <h4 class="search-col__title" id="search-results-title">Sản phẩm gợi ý hôm nay</h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h4 class="search-col__title" id="search-results-title" style="margin: 0;">Sản phẩm gợi ý hôm nay</h4>
+            <button type="button" id="search-view-all-btn" style="display: none; background: none; border: none; color: var(--color-brand-primary); font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: underline;">Xem tất cả kết quả →</button>
+          </div>
           <div class="search-creations-grid" id="search-results-grid">
             <!-- Will be dynamically populated -->
           </div>
@@ -314,27 +317,46 @@ function openSearchDrawer() {
   const inputEl = drawer.querySelector('.search-drawer__input');
   const resultsGrid = drawer.querySelector('#search-results-grid');
   const resultsTitle = drawer.querySelector('#search-results-title');
+  const viewAllBtn = drawer.querySelector('#search-view-all-btn');
 
-  function renderSearchResults(items) {
+  function renderSearchResults(items, queryStr = '') {
     resultsGrid.innerHTML = '';
+    if (queryStr && items.length > 0) {
+      viewAllBtn.style.display = 'inline-block';
+      viewAllBtn.textContent = `Xem tất cả ${items.length} kết quả cho "${queryStr}" →`;
+    } else {
+      viewAllBtn.style.display = 'none';
+    }
+
     if (items.length === 0) {
       resultsGrid.innerHTML = `
         <div style="grid-column: 1 / -1; padding: 24px 0; color: var(--color-text-secondary); text-align: center;">
-          Không tìm thấy mẫu trang sức nào. Thử tìm từ khóa khác như "cỏ ba lá", "nhẫn", "bạc"...
+          Không tìm thấy mẫu trang sức nào cho từ khóa "<strong>${queryStr}</strong>". Thử tìm từ khóa khác như "cỏ ba lá", "nhẫn", "bạc"...
         </div>
       `;
       return;
     }
 
-    items.slice(0, 4).forEach(p => {
+    items.slice(0, 6).forEach(p => {
       const itemEl = document.createElement('a');
       itemEl.className = 'search-creation-item';
       itemEl.href = `#/product/${p.id}`;
+      itemEl.style.position = 'relative';
       itemEl.innerHTML = `
-        <img src="${p.images[0]}" alt="${p.name}" loading="lazy" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+        <div style="position: relative;">
+          <img src="${p.images[0]}" alt="${p.name}" loading="lazy" onerror="this.src='./images/products/Daychuyen4.3-removebg-preview.png'">
+          <button type="button" class="search-item-qv" style="position: absolute; bottom: 6px; right: 6px; background: rgba(20,63,59,0.88); color: #fff; border: none; border-radius: 10px; font-size: 10px; font-weight: 600; padding: 2px 7px; cursor: pointer;">👁️ Xem nhanh</button>
+        </div>
+        <div style="font-size: 10px; color: var(--color-text-secondary); margin-top: 4px;">${p.collection} · ${p.reference}</div>
         <div class="search-creation-item__name">${p.name}</div>
         <div class="search-creation-item__price">${formatPrice(p.price)}</div>
       `;
+      itemEl.querySelector('.search-item-qv').addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        closeSearch();
+        openQuickViewModal(p);
+      });
       itemEl.addEventListener('click', () => {
         if (inputEl.value.trim()) addRecentSearch(inputEl.value.trim());
         closeSearch();
@@ -343,8 +365,17 @@ function openSearchDrawer() {
     });
   }
 
+  viewAllBtn.addEventListener('click', () => {
+    const val = inputEl.value.trim();
+    if (val) {
+      addRecentSearch(val);
+      closeSearch();
+      navigate(`/search/${encodeURIComponent(val)}`);
+    }
+  });
+
   // Render initial featured products
-  renderSearchResults(products.slice(0, 4));
+  renderSearchResults(products.slice(0, 6));
 
   // Quick keyword click
   drawer.querySelectorAll('.search-quick-keyword').forEach(btn => {
@@ -354,7 +385,7 @@ function openSearchDrawer() {
       addRecentSearch(kw);
       const matched = searchProducts(kw);
       resultsTitle.textContent = `Kết quả cho "${kw}" (${matched.length})`;
-      renderSearchResults(matched);
+      renderSearchResults(matched, kw);
     });
   });
 
@@ -369,11 +400,11 @@ function openSearchDrawer() {
     const val = e.target.value.trim();
     if (!val) {
       resultsTitle.textContent = 'Sản phẩm gợi ý hôm nay';
-      renderSearchResults(products.slice(0, 4));
+      renderSearchResults(products.slice(0, 6), '');
     } else {
       const matched = searchProducts(val);
       resultsTitle.textContent = `Kết quả tìm kiếm (${matched.length})`;
-      renderSearchResults(matched);
+      renderSearchResults(matched, val);
     }
   });
 
