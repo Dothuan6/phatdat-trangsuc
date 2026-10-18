@@ -1503,6 +1503,12 @@ export async function renderAdmin(container) {
               await saveAdminSiteSettings(parsed.siteSettings);
               siteSettings = parsed.siteSettings;
             }
+            if (parsed.crmNotes && typeof parsed.crmNotes === 'object') {
+              localStorage.setItem('phatdat_admin_crm_notes_v1', JSON.stringify(parsed.crmNotes));
+            }
+            if (parsed.analytics && typeof parsed.analytics === 'object') {
+              localStorage.setItem('phatdat_product_analytics_v1', JSON.stringify(parsed.analytics));
+            }
             updateSidebarBadges();
             renderSettingsTab();
             showToast(`Khôi phục dữ liệu thành công (${products.length} SP, ${collections.length} BST)!`, 'success');
