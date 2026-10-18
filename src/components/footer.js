@@ -4,6 +4,12 @@
 
 import { t } from '../i18n.js';
 import { siteInfo } from '../data/site-info.js';
+import {
+  openFengShuiMatcherModal,
+  openWarrantyLookupModal,
+  openGiftFinderModal
+} from './feedback-modal.js';
+import { openGlobalSizeGuide } from './size-guide-modal.js';
 
 export function createFooter() {
   const footer = document.createElement('footer');
@@ -39,6 +45,14 @@ export function createFooter() {
         </a>
       </div>
 
+      <!-- Interactive Digital Tools Bar in Footer -->
+      <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 24px 0;">
+        <button type="button" id="footer-btn-fengshui" style="padding: 8px 14px; border-radius: 20px; border: 1px solid #E5C158; background: #FFF9EB; color: #7A5411; font-size: 12.5px; font-weight: 600; cursor: pointer;">🔮 Chọn đá hợp mệnh</button>
+        <button type="button" id="footer-btn-warranty" style="padding: 8px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-brand-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Tra cứu thẻ bảo hành SĐT</button>
+        <button type="button" id="footer-btn-size" style="padding: 8px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">📏 Đo size nhẫn trên màn hình</button>
+        <button type="button" id="footer-btn-gift" style="padding: 8px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🎁 Trợ lý chọn quà 30s</button>
+      </div>
+
       <div class="footer-contact">
         <p><strong>${siteInfo.name}</strong></p>
         <p>Địa chỉ: <a href="#/stores">${siteInfo.address}</a></p>
@@ -47,7 +61,8 @@ export function createFooter() {
           <a href="#/info/shipping">${t('footer.service1')}</a> &nbsp;·&nbsp;
           <a href="#/info/gifting">${t('footer.service2')}</a> &nbsp;·&nbsp;
           <a href="#/info/warranty">Bảo hành</a> &nbsp;·&nbsp;
-          <a href="#/info/size-guide">Hướng dẫn chọn size</a>
+          <a href="#/info/size-guide">Hướng dẫn chọn size</a> &nbsp;·&nbsp;
+          <a href="#/info/style-guide">Cẩm nang phối đồ</a>
         </p>
       </div>
 
@@ -57,6 +72,7 @@ export function createFooter() {
           <a href="#/contact">${t('nav.contactUs')}</a>
           <a href="#/legal/terms-of-use">${t('footer.legalNotices')}</a>
           <a href="#/legal/privacy-policy">${t('footer.privacyPolicy')}</a>
+          <a href="#/legal/silver-guarantee">Cam kết Bạc S925</a>
           <a href="#/info/cookies">${t('footer.cookies')}</a>
           <a href="#/info/accessibility">${t('footer.accessibility')}</a>
           <a href="#/sitemap">${t('footer.sitemap')}</a>
@@ -87,6 +103,11 @@ export function createFooter() {
       <p class="footer-copyright">${t('common.copyright')}</p>
     </div>
   `;
+
+  footer.querySelector('#footer-btn-fengshui').addEventListener('click', () => openFengShuiMatcherModal());
+  footer.querySelector('#footer-btn-warranty').addEventListener('click', () => openWarrantyLookupModal());
+  footer.querySelector('#footer-btn-size').addEventListener('click', () => openGlobalSizeGuide('ruler'));
+  footer.querySelector('#footer-btn-gift').addEventListener('click', () => openGiftFinderModal());
 
   return footer;
 }

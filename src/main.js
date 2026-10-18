@@ -12,7 +12,7 @@ import './styles/pages.css';
 import './styles/feedback.css';
 
 // Import components
-import { createHeader, createHeaderSpacer } from './components/header.js';
+import { createHeader, createHeaderSpacer, openSearchDrawer } from './components/header.js';
 import { createFooter } from './components/footer.js';
 import { createContactDrawer } from './components/contact-drawer.js';
 import { createBottomNav } from './components/bottom-nav.js';
@@ -112,4 +112,24 @@ if (document.readyState === 'loading') {
 // Listen for language changes to re-render
 window.addEventListener('languagechange', () => {
   init();
+});
+
+// Global Keyboard Shortcuts ('/' to search, 'Escape' to close active modal/drawer)
+window.addEventListener('keydown', (e) => {
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+  if (e.key === '/' && !isTyping && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    openSearchDrawer();
+  } else if (e.key === 'Escape') {
+    const activeModal = document.querySelector('.pd-callback-overlay.is-visible, .pd-modal-overlay.is-visible, .pd-lightbox-overlay.is-visible');
+    if (activeModal) {
+      activeModal.remove();
+    }
+    const sizeGuide = document.querySelector('.size-guide-overlay.is-open');
+    if (sizeGuide) {
+      sizeGuide.classList.remove('is-open');
+    }
+  }
 });

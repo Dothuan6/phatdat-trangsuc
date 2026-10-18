@@ -1,73 +1,96 @@
 // ============================================================
-// CONTACT DRAWER COMPONENT — "Any Questions?" slide-out panel
+// SMART CONTACT & SUPPORT DRAWER HUB — Phát Đạt Jewelry
 // ============================================================
 
-import { createAccordionGroup } from './accordion.js';
-import { t } from '../i18n.js';
 import { siteInfo } from '../data/site-info.js';
+import { addCustomerContact } from '../services/supabase.js';
+import {
+  showToast,
+  openGiftFinderModal,
+  openFengShuiMatcherModal,
+  openWarrantyLookupModal
+} from './feedback-modal.js';
+import { openGlobalSizeGuide } from './size-guide-modal.js';
 
 export function createContactDrawer() {
-  // Overlay
   const overlay = document.createElement('div');
   overlay.className = 'contact-drawer-overlay';
   overlay.id = 'contact-drawer-overlay';
 
-  // Drawer
   const drawer = document.createElement('div');
   drawer.className = 'contact-drawer';
   drawer.id = 'contact-drawer';
 
+  const hour = new Date().getHours();
+  const isOpenNow = hour >= 9 && hour < 21;
+
   drawer.innerHTML = `
-    <div class="contact-drawer__header">
-      <span class="contact-drawer__title">${t('contactDrawer.title')}</span>
-      <button class="contact-drawer__close" aria-label="Close">✕</button>
+    <div class="contact-drawer__header" style="background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%); color: #fff; padding: 18px 20px;">
+      <div>
+        <span class="contact-drawer__title" style="color: #fff; font-weight: 700; font-size: 16px; display: block;">Trung Tâm Hỗ Trợ & Tư Vấn</span>
+        <span style="font-size: 11.5px; color: ${isOpenNow ? '#68F7A6' : '#FCD34D'}; font-weight: 600;">
+          ${isOpenNow ? '● Cửa hàng Quận 7 đang mở cửa (09:00 – 21:00)' : '🌙 Ngoài giờ mở cửa — Để lại SĐT mai tiệm gọi ngay'}
+        </span>
+      </div>
+      <button class="contact-drawer__close" aria-label="Close" style="color: #fff;">✕</button>
     </div>
-    <div class="contact-drawer__intro">
-      <p>${t('contactDrawer.intro')}</p>
+
+    <div class="contact-drawer__body" id="contact-drawer-body" style="padding: 20px; overflow-y: auto;">
+      <!-- Direct Contact Channels -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px;">
+        <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="background: #0068FF; color: #fff; border-radius: 8px; padding: 12px; text-decoration: none; text-align: center; font-weight: 700; font-size: 13px;">
+          💬 Chat Zalo Ngay
+          <div style="font-size: 10.5px; font-weight: 400; opacity: 0.9; margin-top: 2px;">Xem video mẫu thật</div>
+        </a>
+        <a href="${siteInfo.phoneHref}" style="background: var(--color-brand-primary); color: #fff; border-radius: 8px; padding: 12px; text-decoration: none; text-align: center; font-weight: 700; font-size: 13px;">
+          📞 Gọi ${siteInfo.phoneDisplay}
+          <div style="font-size: 10.5px; font-weight: 400; opacity: 0.9; margin-top: 2px;">Hỗ trợ nhanh 24/7</div>
+        </a>
+      </div>
+
+      <!-- Inline 30s Callback Request -->
+      <div style="background: #FBF9F5; border: 1px solid #E5DEC9; border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 4px;">📲 Yêu cầu chuyên viên gọi lại trong 5 phút</div>
+        <div style="font-size: 11.5px; color: var(--color-text-secondary); margin-bottom: 10px;">Chỉ cần nhập SĐT, Phát Đạt sẽ liên hệ tư vấn mẫu & báo giá ngay:</div>
+        <form id="drawer-quick-cb-form" style="display: flex; gap: 6px;">
+          <input type="tel" id="drawer-cb-phone" required placeholder="Nhập số điện thoại của bạn..." style="flex: 1; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12.5px;">
+          <button type="submit" style="background: var(--color-accent-gold); color: #143F3B; border: none; border-radius: 6px; padding: 0 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">Gửi SĐT</button>
+        </form>
+      </div>
+
+      <!-- 4 Smart Jewelry Tools -->
+      <div style="margin-bottom: 18px;">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Công cụ tiện ích độc quyền</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button type="button" id="cd-tool-ruler" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            📏 Đo nhẫn trên màn hình
+          </button>
+          <button type="button" id="cd-tool-gift" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            🎁 Trợ lý chọn quà 30s
+          </button>
+          <button type="button" id="cd-tool-fengshui" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            🔮 Chọn đá hợp mệnh
+          </button>
+          <button type="button" id="cd-tool-warranty" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            🛡️ Tra cứu thẻ bảo hành
+          </button>
+        </div>
+      </div>
+
+      <!-- Store Info Card -->
+      <div style="background: #F4F9F8; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px; font-size: 12.5px; line-height: 1.6;">
+        <div style="font-weight: 700; color: var(--color-brand-primary); margin-bottom: 4px;">📍 Showroom Phát Đạt Jewelry</div>
+        <div style="color: var(--color-text-secondary);">${siteInfo.address}</div>
+        <div style="color: var(--color-text-secondary); margin-bottom: 10px;">Giờ mở cửa: <strong>${siteInfo.hours}</strong></div>
+        <div style="display: flex; gap: 10px;">
+          <a href="#/stores" class="drawer-nav-link" style="color: var(--color-brand-primary); font-weight: 700; text-decoration: underline;">📅 Đặt lịch hẹn thử mẫu</a>
+          <span>·</span>
+          <a href="#/contact" class="drawer-nav-link" style="color: var(--color-brand-primary); font-weight: 700; text-decoration: underline;">Gửi lời nhắn</a>
+        </div>
+      </div>
     </div>
-    <div class="contact-drawer__body" id="contact-drawer-body"></div>
   `;
 
-  // Accordion items
-  const accordionItems = [
-    {
-      label: t('contactDrawer.callUs'),
-      isOpen: true,
-      content: `
-        <p>${t('contactDrawer.callContent1')}</p>
-        <p>${t('contactDrawer.callContent2')}</p>
-        <p>${t('contactDrawer.callContent3')}</p>
-        <p>${t('contactDrawer.callContent4')}</p>
-        <div class="phone-row" style="margin-top: 16px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16">
-            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-          </svg>
-          <a href="${siteInfo.phoneHref}">${siteInfo.phoneDisplay}</a>
-        </div>
-      `,
-    },
-    {
-      label: t('contactDrawer.meetUs'),
-      isOpen: false,
-      content: `
-        <p>${t('contactDrawer.meetContent')}</p>
-        <a href="#/stores" class="link-underline" style="margin-top: 12px; display: inline-block; font-size: 12px;">${t('contactDrawer.findBoutique')}</a>
-      `,
-    },
-    {
-      label: t('contactDrawer.writeUs'),
-      isOpen: false,
-      content: `
-        <p>${t('contactDrawer.writeContent')}</p>
-        <a href="#/contact" class="link-underline" style="margin-top: 12px; display: inline-block; font-size: 12px;">${t('contactDrawer.emailUs')}</a>
-      `,
-    },
-  ];
-
-  const body = drawer.querySelector('#contact-drawer-body');
-  body.appendChild(createAccordionGroup(accordionItems, true));
-
-  // Close handlers
   function closeDrawer() {
     overlay.classList.remove('is-open');
     drawer.classList.remove('is-open');
@@ -90,14 +113,50 @@ export function createContactDrawer() {
 
   overlay.addEventListener('click', closeDrawer);
   drawer.querySelector('.contact-drawer__close').addEventListener('click', closeDrawer);
-
-  // Listen for header's toggle event
   document.addEventListener('toggle-contact-drawer', toggleDrawer);
 
-  // Close on navigation inside drawer
-  drawer.querySelectorAll('a[href]').forEach(link => {
+  drawer.querySelectorAll('.drawer-nav-link').forEach(link => {
     link.addEventListener('click', closeDrawer);
+  });
+
+  // Inline Callback Form Submit
+  drawer.querySelector('#drawer-quick-cb-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = drawer.querySelector('#drawer-cb-phone');
+    const cleanPhone = input.value.replace(/[^0-9+]/g, '');
+    if (cleanPhone.length < 9 || cleanPhone.length > 12) {
+      showToast('Vui lòng nhập số điện thoại hợp lệ (9 - 11 số)!', 'warning');
+      return;
+    }
+    await addCustomerContact({
+      fullName: 'Khách yêu cầu gọi nhanh (Header Drawer)',
+      phone: cleanPhone,
+      subject: 'Yêu cầu gọi lại nhanh 5 phút',
+      message: `Khách để lại SĐT ${cleanPhone} tại Trung tâm hỗ trợ nhanh.`
+    });
+    input.value = '';
+    closeDrawer();
+    showToast('Đã nhận SĐT! Chuyên viên Phát Đạt sẽ gọi lại cho bạn ngay.', 'success', 3500);
+  });
+
+  // Tool Launchers
+  drawer.querySelector('#cd-tool-ruler').addEventListener('click', () => {
+    closeDrawer();
+    openGlobalSizeGuide('ruler');
+  });
+  drawer.querySelector('#cd-tool-gift').addEventListener('click', () => {
+    closeDrawer();
+    openGiftFinderModal();
+  });
+  drawer.querySelector('#cd-tool-fengshui').addEventListener('click', () => {
+    closeDrawer();
+    openFengShuiMatcherModal();
+  });
+  drawer.querySelector('#cd-tool-warranty').addEventListener('click', () => {
+    closeDrawer();
+    openWarrantyLookupModal();
   });
 
   return { overlay, drawer, open: openDrawer, close: closeDrawer };
 }
+

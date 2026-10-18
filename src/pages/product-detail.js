@@ -25,7 +25,9 @@ import {
   openLightboxModal,
   openQuickCallbackModal,
   shareProductLink,
-  openQrTagModal
+  openQrTagModal,
+  openFengShuiMatcherModal,
+  openWarrantyLookupModal
 } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
@@ -138,6 +140,48 @@ export function renderProductDetail(container, params = {}) {
 
   gallery.appendChild(thumbDots);
   gallery.appendChild(galleryInner);
+
+  // ── Skin-Tone & Lighting Backdrop Switcher (Ướm thử tông da & nền trưng bày) ──
+  const skinToneBar = document.createElement('div');
+  skinToneBar.style.cssText = `
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px;
+    padding: 10px 14px; margin-top: 10px; background: #FAF8F4; border: 1px solid var(--color-border-light);
+    border-radius: 10px;
+  `;
+  skinToneBar.innerHTML = `
+    <span style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); margin-right: 4px;">📸 Ướm thử trên nền:</span>
+    <button type="button" class="pd-skintone-btn is-active" data-bg="#F9F9F9" data-border="var(--color-brand-primary)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1.5px solid var(--color-brand-primary); background: #fff; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #F9F9F9; border: 1px solid #ccc;"></span> Studio Sáng
+    </button>
+    <button type="button" class="pd-skintone-btn" data-bg="linear-gradient(135deg, #FCECE3 0%, #F5D6C6 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #F5D6C6; border: 1px solid rgba(0,0,0,0.1);"></span> Da Trắng Hồng
+    </button>
+    <button type="button" class="pd-skintone-btn" data-bg="linear-gradient(135deg, #F3D7B8 0%, #E2BA91 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #E2BA91; border: 1px solid rgba(0,0,0,0.1);"></span> Da Tự Nhiên
+    </button>
+    <button type="button" class="pd-skintone-btn" data-bg="linear-gradient(135deg, #D8A97C 0%, #BE8A5B 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #BE8A5B; border: 1px solid rgba(0,0,0,0.1);"></span> Da Bánh Mật
+    </button>
+    <button type="button" class="pd-skintone-btn" data-bg="radial-gradient(circle, #244743 0%, #112624 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #143F3B; border: 1px solid rgba(0,0,0,0.1);"></span> Nhung Ngọc Lục Bảo
+    </button>
+  `;
+  skinToneBar.querySelectorAll('.pd-skintone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      skinToneBar.querySelectorAll('.pd-skintone-btn').forEach(b => {
+        b.style.border = '1px solid var(--color-border)';
+        b.style.fontWeight = '500';
+      });
+      btn.style.border = '1.5px solid var(--color-brand-primary)';
+      btn.style.fontWeight = '600';
+      const bgVal = btn.dataset.bg;
+      galleryInner.querySelectorAll('.pdp-gallery__item').forEach(itemEl => {
+        itemEl.style.background = bgVal;
+        itemEl.style.transition = 'background 0.35s ease';
+      });
+    });
+  });
+  gallery.appendChild(skinToneBar);
   pdpLayout.appendChild(gallery);
 
   // ── Info Panel (Right) ──
@@ -337,21 +381,118 @@ export function renderProductDetail(container, params = {}) {
     info.appendChild(colorSection);
   }
 
-  // ── Gift Card Message Box (Viết thiệp quà tặng miễn phí) ──
+  // ── Personalization: Live Laser Engraving Previewer (Khắc Laser Tên / Ký Hiệu Miễn Phí) ──
+  let selectedEngravingFont = "'Cormorant Garamond', Georgia, serif";
+  let selectedEngravingFontLabel = 'Chữ Thanh Lịch';
+  let selectedGiftBoxStyle = 'Hộp Nhung Xanh Ngọc Lục Bảo';
+
+  const engraveBox = document.createElement('div');
+  engraveBox.style.cssText = `
+    background: #F4F9F8;
+    border: 1px solid #C5DEDB;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  `;
+  engraveBox.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+      <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--color-brand-primary); cursor: pointer;">
+        <input type="checkbox" id="pdp-engrave-toggle" style="accent-color: var(--color-brand-primary); width: 16px; height: 16px; cursor: pointer;">
+        <span>✒️ Khắc Laser Tên / Ngày Kỷ Niệm Lên Trang Sức (Miễn phí)</span>
+      </label>
+      <button type="button" id="pdp-fengshui-check-btn" style="background: #FFF9EB; border: 1px solid #E5C158; color: #7A5411; border-radius: 14px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+        🔮 Tư vấn hợp mệnh
+      </button>
+    </div>
+    <div id="pdp-engrave-pane" style="display: none; margin-top: 12px;">
+      <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+        <input type="text" id="pdp-engrave-input" maxlength="18" style="flex: 1; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; background: #fff;" placeholder="Nhập chữ khắc (Tối đa 18 ký tự, VD: Minh ♥ Anh)...">
+      </div>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <span style="font-size: 11.5px; color: var(--color-text-secondary);">Ký hiệu nhanh:</span>
+          <button type="button" class="engrave-sym-btn" data-sym=" ♥ " style="border: 1px solid var(--color-border); background: #fff; border-radius: 4px; padding: 2px 7px; font-size: 12px; cursor: pointer;">♥</button>
+          <button type="button" class="engrave-sym-btn" data-sym=" ∞ " style="border: 1px solid var(--color-border); background: #fff; border-radius: 4px; padding: 2px 7px; font-size: 12px; cursor: pointer;">∞</button>
+          <button type="button" class="engrave-sym-btn" data-sym=" ★ " style="border: 1px solid var(--color-border); background: #fff; border-radius: 4px; padding: 2px 7px; font-size: 12px; cursor: pointer;">★</button>
+          <button type="button" class="engrave-sym-btn" data-sym=" 🍀 " style="border: 1px solid var(--color-border); background: #fff; border-radius: 4px; padding: 2px 7px; font-size: 12px; cursor: pointer;">🍀</button>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px;">
+          <button type="button" class="engrave-font-btn is-active" data-font="'Cormorant Garamond', Georgia, serif" data-label="Chữ Thanh Lịch" style="border: 1px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; border-radius: 4px; padding: 3px 8px; font-size: 11px; cursor: pointer;">Thanh lịch</button>
+          <button type="button" class="engrave-font-btn" data-font="cursive, serif" data-label="Chữ Ký Mềm Mại" style="border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-style: italic; cursor: pointer;">Chữ ký</button>
+          <button type="button" class="engrave-font-btn" data-font="'Plus Jakarta Sans', sans-serif" data-label="Chữ Hiện Đại" style="border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); border-radius: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600; cursor: pointer;">Hiện đại</button>
+        </div>
+      </div>
+      <!-- Metallic Silver Engraving Plate Preview -->
+      <div style="background: linear-gradient(135deg, #E2E5E8 0%, #F8F9FA 45%, #CFD4D8 55%, #EBEEF0 100%); border: 1px solid #BDC3C7; border-radius: 24px; padding: 10px 18px; text-align: center; box-shadow: inset 0 1px 4px rgba(0,0,0,0.12);">
+        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #667; margin-bottom: 2px;">Mô phỏng khắc trên bề mặt Bạc S925</div>
+        <div id="pdp-engrave-preview-text" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 600; color: #3A4246; text-shadow: 0 1px 0 rgba(255,255,255,0.85); letter-spacing: 0.06em; min-height: 24px;">Phát Đạt ♥ Forever</div>
+      </div>
+    </div>
+  `;
+  info.appendChild(engraveBox);
+
+  const engraveToggle = engraveBox.querySelector('#pdp-engrave-toggle');
+  const engravePane = engraveBox.querySelector('#pdp-engrave-pane');
+  const engraveInput = engraveBox.querySelector('#pdp-engrave-input');
+  const engravePreview = engraveBox.querySelector('#pdp-engrave-preview-text');
+
+  engraveBox.querySelector('#pdp-fengshui-check-btn').addEventListener('click', () => {
+    openFengShuiMatcherModal();
+  });
+
+  engraveToggle.addEventListener('change', () => {
+    engravePane.style.display = engraveToggle.checked ? 'block' : 'none';
+    if (engraveToggle.checked) engraveInput.focus();
+  });
+  engraveInput.addEventListener('input', () => {
+    engravePreview.textContent = engraveInput.value.trim() || 'Phát Đạt ♥ Forever';
+  });
+  engraveBox.querySelectorAll('.engrave-sym-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if ((engraveInput.value + btn.dataset.sym).length <= 18) {
+        engraveInput.value += btn.dataset.sym;
+        engravePreview.textContent = engraveInput.value.trim() || 'Phát Đạt ♥ Forever';
+        engraveInput.focus();
+      }
+    });
+  });
+  engraveBox.querySelectorAll('.engrave-font-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedEngravingFont = btn.dataset.font;
+      selectedEngravingFontLabel = btn.dataset.label;
+      engravePreview.style.fontFamily = selectedEngravingFont;
+      engraveBox.querySelectorAll('.engrave-font-btn').forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-primary)';
+        b.style.borderColor = 'var(--color-border)';
+      });
+      btn.style.background = 'var(--color-brand-primary)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--color-brand-primary)';
+    });
+  });
+
+  // ── Gift Card Message Box & VIP Packaging Selector (Hộp quà & Thiệp viết tay miễn phí) ──
   const giftBox = document.createElement('div');
   giftBox.style.cssText = `
     background: #FAF6EE;
     border: 1px dashed var(--color-accent-gold);
-    border-radius: 6px;
+    border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 18px;
   `;
   giftBox.innerHTML = `
     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #8A6218; cursor: pointer;">
       <input type="checkbox" id="pdp-gift-toggle" style="accent-color: var(--color-brand-primary); width: 16px; height: 16px; cursor: pointer;">
-      <span>🎁 Kèm thiệp chúc mừng viết tay miễn phí (Quà tặng)</span>
+      <span>🎁 Chọn Hộp Quà Tặng Sang Trọng & Thiệp Viết Tay (Miễn phí)</span>
     </label>
     <div id="pdp-gift-pane" style="display: none; margin-top: 10px;">
+      <div style="font-size: 11.5px; font-weight: 600; color: #7A5411; margin-bottom: 6px;">🎀 Chọn phong cách hộp quà đi kèm:</div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;">
+        <button type="button" class="gift-box-style-btn is-active" data-box="Hộp Nhung Xanh Ngọc Lục Bảo" style="padding: 6px; border: 1.5px solid var(--color-brand-primary); background: #fff; border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--color-brand-primary); cursor: pointer;">💚 Hộp Nhung Xanh</button>
+        <button type="button" class="gift-box-style-btn" data-box="Hộp Nơ Kem Hoàng Gia" style="padding: 6px; border: 1px solid var(--color-border); background: #fff; border-radius: 6px; font-size: 11px; color: var(--color-text-primary); cursor: pointer;">🎀 Hộp Nơ Kem</button>
+        <button type="button" class="gift-box-style-btn" data-box="Túi Gấm Đỏ May Mắn" style="padding: 6px; border: 1px solid var(--color-border); background: #fff; border-radius: 6px; font-size: 11px; color: var(--color-text-primary); cursor: pointer;">🧧 Túi Gấm Đỏ</button>
+      </div>
       <input type="text" id="pdp-gift-note-input" style="width: 100%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 4px; font-size: 13px; background: #fff;" placeholder="Nhập lời chúc trên thiệp (VD: Chúc mừng sinh nhật em yêu!)...">
       <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;">
         <button type="button" class="gift-preset-chip" data-msg="Chúc mừng sinh nhật người thương, luôn rạng rỡ và hạnh phúc!" style="background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); cursor: pointer;">+ Sinh nhật người yêu</button>
@@ -369,6 +510,19 @@ export function renderProductDetail(container, params = {}) {
     giftPane.style.display = giftToggle.checked ? 'block' : 'none';
     if (giftToggle.checked) giftNoteInput.focus();
   });
+  giftBox.querySelectorAll('.gift-box-style-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedGiftBoxStyle = btn.dataset.box;
+      giftBox.querySelectorAll('.gift-box-style-btn').forEach(b => {
+        b.style.border = '1px solid var(--color-border)';
+        b.style.fontWeight = '400';
+        b.style.color = 'var(--color-text-primary)';
+      });
+      btn.style.border = '1.5px solid var(--color-brand-primary)';
+      btn.style.fontWeight = '600';
+      btn.style.color = 'var(--color-brand-primary)';
+    });
+  });
   giftBox.querySelectorAll('.gift-preset-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       giftNoteInput.value = chip.dataset.msg;
@@ -379,7 +533,7 @@ export function renderProductDetail(container, params = {}) {
   const ctaContainer = document.createElement('div');
   ctaContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;';
 
-  // 1. Zalo Consult Button with Auto-copy Product Info + Gift Note
+  // 1. Zalo Consult Button with Auto-copy Product Info + Engraving + Gift Note
   const zaloBtn = document.createElement('button');
   zaloBtn.type = 'button';
   zaloBtn.className = 'btn btn--full';
@@ -404,14 +558,17 @@ export function renderProductDetail(container, params = {}) {
 
   zaloBtn.addEventListener('click', () => {
     trackProductEvent(product.id, 'zalo');
-    const giftText = giftToggle.checked && giftNoteInput.value.trim()
-      ? `\n- 🎁 Thiệp quà tặng: "${giftNoteInput.value.trim()}"`
+    const engraveText = engraveToggle.checked && engraveInput.value.trim()
+      ? `\n- ✒️ Khắc Laser: "${engraveInput.value.trim()}" (${selectedEngravingFontLabel})`
+      : '';
+    const giftText = giftToggle.checked
+      ? `\n- 🎁 Đóng gói: ${selectedGiftBoxStyle}${giftNoteInput.value.trim() ? ` | Thiệp: "${giftNoteInput.value.trim()}"` : ''}`
       : '';
     const variantText = `\n- Tùy chọn: ${selectedSize || 'Freesize'} | ${selectedColor || 'Chuẩn'}`;
-    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}${variantText}${giftText}\n- Link xem: ${window.location.href}`;
+    const infoText = `[Phát Đạt Jewelry] Tôi muốn tư vấn sản phẩm:\n- Tên SP: ${product.name}\n- Mã SKU: ${product.reference}\n- Giá: ${formatPrice(product.price)}${variantText}${engraveText}${giftText}\n- Link xem: ${window.location.href}`;
     try {
       navigator.clipboard.writeText(infoText);
-      showToast('Đã sao chép thông tin sản phẩm & lời chúc! Bạn chỉ cần Dán (Paste) vào khung chat Zalo.', 'success', 4000);
+      showToast('Đã sao chép thông tin sản phẩm & tùy chọn cá nhân hóa! Bạn chỉ cần Dán (Paste) vào Zalo.', 'success', 4000);
     } catch (e) {}
     setTimeout(() => {
       window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
@@ -443,9 +600,13 @@ export function renderProductDetail(container, params = {}) {
     <span>YÊU CẦU GỌI LẠI TƯ VẤN (MIỄN PHÍ)</span>
   `;
   callbackBtn.addEventListener('click', () => {
+    const engraveSummary = engraveToggle.checked && engraveInput.value.trim()
+      ? ` | Khắc: "${engraveInput.value.trim()}" (${selectedEngravingFontLabel})`
+      : '';
+    const boxSummary = giftToggle.checked ? `[${selectedGiftBoxStyle}] ${giftNoteInput.value.trim()}` : '';
     openQuickCallbackModal(product, {
-      selectedInfo: `Size: ${selectedSize || 'Freesize'}, Màu: ${selectedColor || 'Bạc 925'}`,
-      giftCardNote: giftToggle.checked ? giftNoteInput.value.trim() : ''
+      selectedInfo: `Size: ${selectedSize || 'Freesize'}, Màu: ${selectedColor || 'Bạc 925'}${engraveSummary}`,
+      giftCardNote: boxSummary
     });
   });
   ctaContainer.appendChild(callbackBtn);

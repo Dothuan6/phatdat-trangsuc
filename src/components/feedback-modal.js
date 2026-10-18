@@ -1201,7 +1201,268 @@ export function openQuickViewModal(product) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 10. CONVENIENCE SHORTCUTS
+// 10. FENG SHUI & BIRTHSTONE MATCHER MODAL (CHỌN ĐÁ HỢP MỆNH & THÁNG SINH)
+// ══════════════════════════════════════════════════════════════
+
+const FENG_SHUI_ELEMENTS = [
+  {
+    key: 'kim',
+    name: 'Mệnh Kim',
+    icon: '🪙',
+    colors: 'Trắng ánh kim, Vàng kim, Xà cừ trắng, Đá Moissanite trắng',
+    meaning: 'Tương hợp sắc trắng tinh khiết của Bạc S925, đá Moissanite và mặt xà cừ trắng giúp thu hút tài lộc, may mắn và sự minh mẫn.',
+    matchFilter: (p) => p.materials.includes('Bạc') || (p.stones && (p.stones.includes('Moissanite') || p.stones.includes('Xà cừ') || p.stones.includes('CZ')))
+  },
+  {
+    key: 'moc',
+    name: 'Mệnh Mộc',
+    icon: '🍀',
+    colors: 'Xanh ngọc lục bảo, Đá đen huyền bí, Hoạ tiết Cỏ Ba Lá & Hoa lá',
+    meaning: 'Biểu trưng cho sức sống sinh sôi. Các thiết kế Cỏ Ba Lá may mắn, đá tối màu hoặc ánh xanh giúp cân bằng năng lượng và bình an.',
+    matchFilter: (p) => p.collection === 'Cỏ Ba Lá' || p.collection === 'Hoa Xinh' || p.name.toLowerCase().includes('cỏ')
+  },
+  {
+    key: 'thuy',
+    name: 'Mệnh Thủy',
+    icon: '💧',
+    colors: 'Bạc trắng sáng, Ngọc trai nước ngọt, Đá Moissanite ánh sao, Đá đen',
+    meaning: 'Kim sinh Thủy — đeo trang sức Bạc S925 nguyên bản, ngọc trai hoặc đá lấp lánh giúp công việc hanh thông, tình duyên thuận lợi.',
+    matchFilter: (p) => p.collection === 'Hạt Ngọc' || p.collection === 'Ánh Sao' || (p.stones && p.stones.includes('Ngọc trai'))
+  },
+  {
+    key: 'hoa',
+    name: 'Mệnh Hỏa',
+    icon: '🔥',
+    colors: 'Vàng hồng, Xi vàng 18K ấm áp, Hoạ tiết Cỏ 4 Lá & Hoa mặt trời',
+    meaning: 'Mộc sinh Hỏa — các mẫu trang sức hình Cỏ Ba Lá, Hoa Xinh hoặc phủ xi vàng 18K ấm áp tôn lên sự rạng rỡ, nhiệt huyết và quyến rũ.',
+    matchFilter: (p) => p.collection === 'Hoa Xinh' || p.collection === 'Cỏ Ba Lá' || (p.materials && p.materials.includes('vàng'))
+  },
+  {
+    key: 'tho',
+    name: 'Mệnh Thổ',
+    icon: '👑',
+    colors: 'Vàng Hoàng Gia 18K, Đá Moissanite, Ngọc trai ánh kem ấm',
+    meaning: 'Hỏa sinh Thổ — sắc vàng 18K sang trọng kết hợp đá quý lấp lánh mang lại sự vững chãi, thịnh vượng và quý nhân phù trợ.',
+    matchFilter: (p) => (p.materials && p.materials.includes('vàng')) || p.collection === 'Ánh Sao'
+  }
+];
+
+export function openFengShuiMatcherModal() {
+  let selectedKey = 'kim';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 680px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>🔮 Cố Vấn Chọn Trang Sức Hợp Mệnh & Phong Thủy</h3>
+          <div style="font-size: 12px; opacity: 0.85;">Khám phá màu đá, chất liệu Bạc 925 & biểu tượng may mắn hợp bản mệnh của bạn</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 20px; overflow-y: auto; flex: 1;">
+        <label style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); display: block; margin-bottom: 10px;">
+          Chọn Bản Mệnh Ngũ Hành (hoặc Mệnh người nhận quà):
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 18px;" id="fs-element-tabs">
+          ${FENG_SHUI_ELEMENTS.map((el, idx) => `
+            <button type="button" class="gift-quiz-pill ${idx === 0 ? 'is-selected' : ''}" data-key="${el.key}" style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; font-size: 12px;">
+              <span style="font-size: 20px;">${el.icon}</span>
+              <span>${el.name}</span>
+            </button>
+          `).join('')}
+        </div>
+
+        <div id="fs-advice-box" style="background: #FBF9F5; border: 1px solid #E5DEC9; border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;"></div>
+
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          ✨ Các mẫu trang sức mang năng lượng may mắn phù hợp nhất:
+        </div>
+        <div id="fs-products-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;"></div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="fs-close-btn">Đóng</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="fs-zalo-btn">💬 Nhắn Zalo Tư Vấn Theo Năm Sinh</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#fs-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  function renderElementSelection() {
+    const elObj = FENG_SHUI_ELEMENTS.find(e => e.key === selectedKey) || FENG_SHUI_ELEMENTS[0];
+    overlay.querySelector('#fs-advice-box').innerHTML = `
+      <div style="font-weight: 700; font-size: 14px; color: var(--color-brand-primary); margin-bottom: 4px;">
+        ${elObj.icon} Lời khuyên Phong Thủy cho ${elObj.name}
+      </div>
+      <div style="font-size: 12.5px; color: #8A6218; font-weight: 600; margin-bottom: 6px;">
+        • Màu sắc & Đá tương hợp: ${elObj.colors}
+      </div>
+      <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.55;">
+        ${elObj.meaning}
+      </div>
+    `;
+
+    let matched = products.filter(elObj.matchFilter);
+    if (matched.length < 4) matched = [...matched, ...products].slice(0, 4);
+    else matched = matched.slice(0, 4);
+
+    const grid = overlay.querySelector('#fs-products-grid');
+    grid.innerHTML = matched.map(p => `
+      <div style="border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; display: flex; gap: 10px; align-items: center; background: #fff;">
+        <img src="${p.images[0]}" alt="${p.name}" style="width: 58px; height: 58px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+        <div style="overflow: hidden; flex: 1;">
+          <div style="font-size: 10px; color: var(--color-brand-primary); font-weight: 700;">🍀 Hợp ${elObj.name}</div>
+          <a href="#/product/${p.id}" class="fs-prod-link" style="font-size: 13px; font-weight: 600; color: var(--color-text-primary); text-decoration: none; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</a>
+          <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-top: 2px;">${formatPrice(p.price)}</div>
+        </div>
+      </div>
+    `).join('');
+
+    grid.querySelectorAll('.fs-prod-link').forEach(a => a.addEventListener('click', close));
+  }
+
+  overlay.querySelectorAll('#fs-element-tabs .gift-quiz-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.querySelectorAll('#fs-element-tabs .gift-quiz-pill').forEach(b => b.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+      selectedKey = btn.dataset.key;
+      renderElementSelection();
+    });
+  });
+
+  overlay.querySelector('#fs-zalo-btn').addEventListener('click', () => {
+    const elObj = FENG_SHUI_ELEMENTS.find(e => e.key === selectedKey) || FENG_SHUI_ELEMENTS[0];
+    const msg = `[Phát Đạt Jewelry] Nhờ shop tư vấn mẫu trang sức Bạc 925 hợp ${elObj.name} (${elObj.colors}).`;
+    try {
+      navigator.clipboard.writeText(msg);
+      showToast(`Đã sao chép yêu cầu tư vấn ${elObj.name}! Đang mở Zalo...`, 'success', 3000);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 450);
+  });
+
+  renderElementSelection();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 11. DIGITAL WARRANTY & PHONE LOOKUP MODAL (TRA CỨU BẢO HÀNH SĐT)
+// ══════════════════════════════════════════════════════════════
+
+export function openWarrantyLookupModal(initialPhone = '') {
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 520px; width: 100%;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>🛡️ Tra Cứu Thẻ Bảo Hành & Lịch Hẹn</h3>
+          <div style="font-size: 12px; opacity: 0.85;">Bảo hành đánh bóng & làm sáng Bạc S925 miễn phí trọn đời</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="padding: 22px;">
+        <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px; line-height: 1.5;">
+          Nhập số điện thoại bạn đã đăng ký tư vấn hoặc mua hàng tại Phát Đạt Jewelry để kiểm tra trạng thái Thẻ Bảo Hành Điện Tử:
+        </p>
+        <form id="warranty-lookup-form" style="display: flex; gap: 8px; margin-bottom: 18px;">
+          <input type="tel" id="wl-phone-input" required placeholder="Nhập SĐT của bạn (VD: 0909123456)..." value="${initialPhone}" style="flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13.5px;">
+          <button type="submit" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 0 18px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;">
+            🔍 Tra Cứu
+          </button>
+        </form>
+
+        <div id="warranty-result-area">
+          <div style="background: #F8FAF9; border: 1px dashed var(--color-border); border-radius: 8px; padding: 16px; text-align: center; font-size: 12.5px; color: var(--color-text-secondary);">
+            💡 Mọi khách hàng của Phát Đạt Jewelry chỉ cần đọc Số Điện Thoại tại quầy (709 Trần Xuân Soạn, Q.7) đều được làm sáng trang sức bạc miễn phí trọn đời, không cần giữ hóa đơn giấy.
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="wl-close-btn">Đóng</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#wl-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  const form = overlay.querySelector('#warranty-lookup-form');
+  const resultArea = overlay.querySelector('#warranty-result-area');
+
+  function runLookup(phoneStr) {
+    const clean = (phoneStr || '').replace(/[^0-9]/g, '');
+    if (clean.length < 9 || clean.length > 11) {
+      showToast('Vui lòng nhập số điện thoại hợp lệ (9 - 11 chữ số)!', 'warning');
+      return;
+    }
+    const cardCode = 'PD-VIP-' + clean.slice(-4);
+    const todayStr = new Date().toLocaleDateString('vi-VN');
+
+    resultArea.innerHTML = `
+      <div style="background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%); color: #ffffff; border-radius: 12px; padding: 18px 20px; border: 1px solid var(--color-accent-gold); box-shadow: 0 8px 20px rgba(20,63,59,0.18);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 10.5px; letter-spacing: 0.14em; color: var(--color-accent-gold); font-weight: 700; text-transform: uppercase;">THẺ BẢO HÀNH ĐIỆN TỬ · PHÁT ĐẠT JEWELRY</span>
+          <span style="background: rgba(46, 204, 113, 0.22); color: #68F7A6; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;">● Đang Hiệu Lực</span>
+        </div>
+        <div style="font-family: monospace; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 4px;">
+          MÃ THẺ: ${cardCode}
+        </div>
+        <div style="font-size: 13px; opacity: 0.9; margin-bottom: 12px;">
+          Số điện thoại đăng ký: <strong>${clean}</strong> · Tra cứu ngày: ${todayStr}
+        </div>
+        <div style="background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 12px; font-size: 12px; line-height: 1.6;">
+          <div>✓ <strong>Quyền lợi 1:</strong> Đánh bóng & siêu âm làm sáng Bạc S925 miễn phí trọn đời (Không giới hạn số lần).</div>
+          <div>✓ <strong>Quyền lợi 2:</strong> Miễn phí gắn đá CZ tấm & chỉnh size nhẫn cơ bản trong 12 tháng.</div>
+          <div>✓ <strong>Quyền lợi 3:</strong> Ưu đãi giảm 10% phí xi mạ lại Vàng 18K / Bạch kim.</div>
+        </div>
+        <div style="margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <a href="#/stores" id="wl-book-store" style="color: var(--color-accent-gold); font-size: 12px; font-weight: 700; text-decoration: underline;">📅 Đặt lịch mang bạc ghé đánh bóng →</a>
+          <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="color: #ffffff; font-size: 12px; text-decoration: underline;">💬 Hỗ trợ Zalo</a>
+        </div>
+      </div>
+    `;
+    const bookLink = resultArea.querySelector('#wl-book-store');
+    if (bookLink) bookLink.addEventListener('click', close);
+  }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    runLookup(overlay.querySelector('#wl-phone-input').value);
+  });
+
+  if (initialPhone) {
+    runLookup(initialPhone);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 12. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -1219,8 +1480,11 @@ export const modal = {
   qrTag: openQrTagModal,
   compare: openCompareModal,
   giftFinder: openGiftFinderModal,
-  quickView: openQuickViewModal
+  quickView: openQuickViewModal,
+  fengShui: openFengShuiMatcherModal,
+  warranty: openWarrantyLookupModal
 };
+
 
 
 

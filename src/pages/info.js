@@ -4,7 +4,11 @@
 // ============================================================
 
 import { siteInfo } from '../data/site-info.js';
-import { openGiftFinderModal } from '../components/feedback-modal.js';
+import {
+  openGiftFinderModal,
+  openFengShuiMatcherModal,
+  openWarrantyLookupModal
+} from '../components/feedback-modal.js';
 import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
 
 const G = (n) => `./images/gallery/g${n}.jpg`;
@@ -43,9 +47,14 @@ export const infoPages = {
       <div style="background: #FBF9F5; border: 1px solid #E5DEC9; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: center;">
         <h3 style="margin: 0 0 8px; color: var(--color-brand-primary);">Chưa biết chọn mẫu nào hợp gu người nhận?</h3>
         <p style="font-size: 13.5px; color: var(--color-text-secondary); margin: 0 0 14px;">Trả lời 3 câu hỏi trắc nghiệm nhanh để hệ thống gợi ý mẫu trang sức phù hợp nhất theo dịp tặng & ngân sách.</p>
-        <button type="button" id="info-open-gift-quiz" class="btn" style="background: var(--color-accent-gold); border-color: var(--color-accent-gold); color: #143F3B; font-weight: 700;">
-          🎁 MỞ TRỢ LÝ CHỌN QUÀ TẶNG (30 GIÂY)
-        </button>
+        <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+          <button type="button" id="info-open-gift-quiz" class="btn" style="background: var(--color-accent-gold); border-color: var(--color-accent-gold); color: #143F3B; font-weight: 700;">
+            🎁 MỞ TRỢ LÝ CHỌN QUÀ TẶNG (30 GIÂY)
+          </button>
+          <button type="button" id="info-open-fengshui" class="btn" style="background: #fff; border-color: var(--color-brand-primary); color: var(--color-brand-primary); font-weight: 700;">
+            🔮 CHỌN ĐÁ PHONG THỦY HỢP MỆNH
+          </button>
+        </div>
       </div>
       <h2>Gợi ý quà tặng theo ngân sách</h2>
       <ul>
@@ -92,10 +101,59 @@ export const infoPages = {
     title: 'Chính Sách Bảo Hành Trọn Đời',
     image: G(6),
     body: () => `
+      <div style="background: linear-gradient(135deg, #143F3B 0%, #1E5D57 100%); color: #fff; border-radius: 12px; padding: 22px; margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+        <div>
+          <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #F3D184; font-weight: 700;">Đặc quyền khách hàng Phát Đạt</span>
+          <h3 style="margin: 4px 0 6px; color: #fff; font-family: var(--font-display); font-size: 1.4rem;">Tra Cứu Thẻ Bảo Hành Điện Tử</h3>
+          <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.85);">Không cần giữ hóa đơn giấy — chỉ cần nhập Số điện thoại để kích hoạt & kiểm tra quyền lợi làm sáng bạc miễn phí trọn đời.</p>
+        </div>
+        <button type="button" id="info-open-warranty-lookup" class="btn" style="background: var(--color-accent-gold); border-color: var(--color-accent-gold); color: #143F3B; font-weight: 700; white-space: nowrap;">
+          🛡️ TRA CỨU THẺ BẢO HÀNH NGAY
+        </button>
+      </div>
       <ul>
         <li><strong>Làm sáng & đánh bóng miễn phí trọn đời:</strong> Bất cứ khi nào trang sức bị xỉn nhẹ do mồ hôi, quý khách mang đến cửa hàng sẽ được siêu âm làm sạch và đánh bóng miễn phí 100%.</li>
-        <li><strong>Bảo hành gắn đáCZ tấm & hàn dây:</strong> Hỗ trợ miễn phí trong 12 tháng đầu sử dụng.</li>
+        <li><strong>Bảo hành gắn đá CZ tấm & hàn dây:</strong> Hỗ trợ miễn phí trong 12 tháng đầu sử dụng.</li>
         <li><strong>Xi mạ lại vàng 18K / Bạch kim:</strong> Hỗ trợ chi phí gốc ưu đãi dành riêng cho khách hàng Phát Đạt.</li>
+      </ul>
+      ${contactBlock()}`,
+  },
+  'style-guide': {
+    title: 'Cẩm Nang Phối Đồ & Bảo Quản Bạc S925',
+    image: G(11),
+    body: () => `
+      <p>Trang sức Bạc Ý S925 không chỉ là điểm nhấn thanh lịch cho trang phục thường ngày mà còn tôn lên thần thái riêng biệt của mỗi quý cô. Cùng Phát Đạt Jewelry khám phá bí quyết phối trang sức chuẩn Stylist và cách giữ bạc luôn sáng bóng như mới.</p>
+
+      <div style="background: #FBF9F5; border: 1px solid #E5DEC9; border-radius: 10px; padding: 18px 20px; margin: 20px 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+        <div>
+          <h3 style="margin: 0 0 4px; color: var(--color-brand-primary); font-size: 1.05rem;">🔮 Bạn muốn chọn màu đá hợp phong thủy & bản mệnh?</h3>
+          <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Khám phá gợi ý trang sức theo Ngũ Hành (Kim – Mộc – Thủy – Hỏa – Thổ) thu hút may mắn & bình an.</p>
+        </div>
+        <button type="button" id="info-open-fengshui" class="btn" style="background: var(--color-brand-primary); color: #fff; border-color: var(--color-brand-primary); font-size: 12.5px; padding: 10px 16px;">
+          🔮 Mở Cố Vấn Hợp Mệnh
+        </button>
+      </div>
+
+      <h2>1. Bí quyết chọn Dây Chuyền theo dáng cổ áo</h2>
+      <table>
+        <tr><th>Kiểu trang phục / Cổ áo</th><th>Độ dài dây lý tưởng</th><th>Thiết kế mặt dây gợi ý</th></tr>
+        <tr><td><strong>Áo sơ mi mở cúc / Cổ chữ V</strong></td><td>40cm – 42cm (Chạm xương quai xanh)</td><td>Mặt Cỏ Ba Lá, giọt nước hoặc đá Solitaire đơn giản</td></tr>
+        <tr><td><strong>Đầm trễ vai / Đầm dự tiệc</strong></td><td>38cm – 40cm (Ôm sát thanh thoát)</td><td>Đá Moissanite bắt sáng hoặc dây đính ngọc trai</td></tr>
+        <tr><td><strong>Áo cổ lọ / Áo thun tròn kín cổ</strong></td><td>45cm – 50cm (Dáng dài/Layering)</td><td>Phối 2 tầng dây mảnh tạo hiệu ứng thon gọn</td></tr>
+      </table>
+
+      <h2>2. Chọn Bông Tai tôn đường nét khuôn mặt</h2>
+      <ul>
+        <li><strong>Khuôn mặt tròn bầu bĩnh:</strong> Ưu tiên bông tai dáng dài, giọt nước hoặc tua rua mảnh để tạo cảm giác khuôn mặt thanh thoát hơn.</li>
+        <li><strong>Khuôn mặt trái xoan (Oval):</strong> Phù hợp với mọi kiểu bông tai, đặc biệt tỏa sáng với bông tai nụ đá CZ, Cỏ Ba Lá hoặc ngọc trai.</li>
+        <li><strong>Khuôn mặt góc cạnh / vuông:</strong> Chọn bông tai dáng tròn (Hoop), đường cong mềm mại hoặc họa tiết hoa để làm dịu đường nét.</li>
+      </ul>
+
+      <h2>3. Quy tắc 3 bước giữ Bạc S925 sáng bóng tại nhà</h2>
+      <ul>
+        <li><strong>Bước 1 — Hạn chế tiếp xúc hóa chất:</strong> Nên đeo trang sức sau cùng khi đã xịt nước hoa, keo xịt tóc hoặc thoa kem dưỡng da.</li>
+        <li><strong>Bước 2 — Lau nhẹ bằng khăn chuyên dụng:</strong> Sau khi đeo cả ngày, dùng khăn lau bạc (được Phát Đạt tặng kèm miễn phí) lau nhẹ mồ hôi trước khi cất vào hộp.</li>
+        <li><strong>Bước 3 — Làm sáng nhanh trong 2 phút:</strong> Nếu bạc bị xỉn nhẹ do lưu huỳnh trong mồ hôi, bạn có thể dùng một chút kem đánh răng và bàn chải mềm chà nhẹ dưới nước ấm, hoặc mang trực tiếp đến cửa hàng Phát Đạt để được đánh bóng siêu âm miễn phí trọn đời!</li>
       </ul>
       ${contactBlock()}`,
   },
@@ -134,6 +192,12 @@ export function renderInfo(container, params = {}) {
 
   const giftBtn = page.querySelector('#info-open-gift-quiz');
   if (giftBtn) giftBtn.addEventListener('click', () => openGiftFinderModal());
+
+  const fengshuiBtn = page.querySelector('#info-open-fengshui');
+  if (fengshuiBtn) fengshuiBtn.addEventListener('click', () => openFengShuiMatcherModal());
+
+  const warrantyBtn = page.querySelector('#info-open-warranty-lookup');
+  if (warrantyBtn) warrantyBtn.addEventListener('click', () => openWarrantyLookupModal());
 
   const rulerBtn = page.querySelector('#info-open-ring-ruler');
   if (rulerBtn) rulerBtn.addEventListener('click', () => openGlobalSizeGuide('ruler'));

@@ -8,6 +8,7 @@ import {
 import { createProductCard } from '../components/product-card.js';
 import { createFilterPanel } from '../components/filter-panel.js';
 import { createBreadcrumb } from '../components/breadcrumb.js';
+import { openFengShuiMatcherModal } from '../components/feedback-modal.js';
 import { t } from '../i18n.js';
 
 export function renderJewelry(container, params = {}) {
@@ -97,21 +98,27 @@ export function renderJewelry(container, params = {}) {
         Đang hiển thị <strong style="color: var(--color-text-primary);">0</strong> sản phẩm
       </div>
     </div>
-    <div class="sort-wrapper" style="position: relative;">
-      <select id="sort-select" style="
-        padding: 9px 32px 9px 14px;
-        border: 1px solid var(--color-border);
-        background: #fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6A68' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\") no-repeat right 10px center;
-        appearance: none;
-        -webkit-appearance: none;
-        border-radius: 4px;
-        font-size: 13px;
-        color: var(--color-text-primary);
-        cursor: pointer;
-        font-family: var(--font-body);
-      ">
-        ${sortOptions.map(opt => `<option value="${opt.id}">${opt.label}</option>`).join('')}
-      </select>
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <div class="plp-view-switcher" style="display: inline-flex; border: 1px solid var(--color-border); border-radius: 6px; overflow: hidden; background: #fff;">
+        <button type="button" class="plp-view-btn is-active" data-cols="grid-3" title="Xem lưới 3 cột chuẩn" style="border: none; background: var(--color-brand-primary); color: #fff; padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer;">⊞ 3 cột</button>
+        <button type="button" class="plp-view-btn" data-cols="grid-4" title="Xem lưới 4 cột thu gọn" style="border: none; border-left: 1px solid var(--color-border); background: #fff; color: var(--color-text-secondary); padding: 7px 10px; font-size: 12px; cursor: pointer;">▪ 4 cột</button>
+      </div>
+      <div class="sort-wrapper" style="position: relative;">
+        <select id="sort-select" style="
+          padding: 9px 32px 9px 14px;
+          border: 1px solid var(--color-border);
+          background: #fff url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A6A68' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\") no-repeat right 10px center;
+          appearance: none;
+          -webkit-appearance: none;
+          border-radius: 4px;
+          font-size: 13px;
+          color: var(--color-text-primary);
+          cursor: pointer;
+          font-family: var(--font-body);
+        ">
+          ${sortOptions.map(opt => `<option value="${opt.id}">${opt.label}</option>`).join('')}
+        </select>
+      </div>
     </div>
   `;
   page.appendChild(filterBar);
@@ -122,6 +129,7 @@ export function renderJewelry(container, params = {}) {
   quickFilterStrip.style.cssText = 'display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 10px 0 6px 0; scrollbar-width: none;';
   quickFilterStrip.innerHTML = `
     <span style="font-size: 12px; font-weight: 600; color: var(--color-text-secondary); white-space: nowrap;">Lọc nhanh:</span>
+    <button type="button" id="plp-open-fengshui-btn" style="padding: 5px 12px; border-radius: 16px; border: 1px solid #E5C158; background: #FFF9EB; color: #7A5411; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;">🔮 Chọn theo Bản Mệnh</button>
     <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="under-200" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">💰 Dưới 200k</button>
     <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="200-300" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">💎 200k – 300k</button>
     <button type="button" class="plp-quick-chip" data-qf-type="price" data-qf-val="above-300" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">👑 Trên 300k</button>
@@ -130,6 +138,10 @@ export function renderJewelry(container, params = {}) {
     <button type="button" class="plp-quick-chip" data-qf-type="material" data-qf-val="Bạc 925 xi vàng" style="padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; white-space: nowrap; cursor: pointer;">✨ Bạc xi vàng</button>
   `;
   page.appendChild(quickFilterStrip);
+
+  quickFilterStrip.querySelector('#plp-open-fengshui-btn').addEventListener('click', () => {
+    openFengShuiMatcherModal();
+  });
 
   quickFilterStrip.querySelectorAll('.plp-quick-chip').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -163,6 +175,21 @@ export function renderJewelry(container, params = {}) {
   grid.id = 'product-grid';
   gridSection.appendChild(grid);
   page.appendChild(gridSection);
+
+  // Wire Layout View Switcher (3-column vs 4-column)
+  filterBar.querySelectorAll('.plp-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBar.querySelectorAll('.plp-view-btn').forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-secondary)';
+        b.style.fontWeight = '400';
+      });
+      btn.style.background = 'var(--color-brand-primary)';
+      btn.style.color = '#fff';
+      btn.style.fontWeight = '600';
+      grid.className = btn.dataset.cols;
+    });
+  });
 
   // Empty state container
   const emptyState = document.createElement('div');

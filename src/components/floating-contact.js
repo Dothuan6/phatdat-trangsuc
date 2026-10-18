@@ -1,9 +1,9 @@
 // ============================================================
-// FLOATING QUICK CONTACT WIDGET & SMART ZALO ENGAGEMENT BUBBLE
+// FLOATING QUICK CONTACT WIDGET, SCROLL-TO-TOP & LIVE SHOWROOM PROOF
 // ============================================================
 
 import { siteInfo } from '../data/site-info.js';
-import { openGiftFinderModal } from './feedback-modal.js';
+import { openGiftFinderModal, openFengShuiMatcherModal } from './feedback-modal.js';
 
 export function createFloatingContact() {
   const container = document.createElement('div');
@@ -15,9 +15,9 @@ export function createFloatingContact() {
     <div id="smart-zalo-bubble" style="
       display: none;
       position: absolute;
-      bottom: 120px;
+      bottom: 170px;
       right: 0;
-      width: 260px;
+      width: 268px;
       background: #ffffff;
       border: 1px solid var(--color-accent-gold);
       border-radius: 12px;
@@ -31,17 +31,30 @@ export function createFloatingContact() {
         ✨ Phát Đạt Jewelry xin chào!
       </div>
       <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.45; margin-bottom: 10px;">
-        Bạn đang tìm quà tặng hay cần tư vấn mẫu Bạc 925 hợp mệnh & vừa size?
+        Bạn đang tìm quà tặng hay muốn xem gợi ý trang sức Bạc S925 hợp mệnh?
       </div>
       <div style="display: flex; gap: 6px;">
+        <button type="button" id="bubble-open-fengshui" style="flex: 1; background: #FFF9EB; color: #7A5411; border: 1px solid #E5C158; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; cursor: pointer;">
+          🔮 Hợp mệnh
+        </button>
         <button type="button" id="bubble-open-gift" style="flex: 1; background: #FAF4E8; color: #8A6218; border: 1px solid var(--color-accent-gold); border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; cursor: pointer;">
           🎁 Chọn quà
         </button>
         <a href="${siteInfo.zalo}" target="_blank" rel="noopener" style="flex: 1; background: #0068FF; color: #fff; border-radius: 6px; padding: 6px 8px; font-size: 11px; font-weight: 700; text-decoration: none; text-align: center;">
-          💬 Chat Zalo
+          💬 Zalo
         </a>
       </div>
     </div>
+
+    <!-- Scroll-to-Top Button (appears on scroll > 400px) -->
+    <button type="button" id="floating-scroll-top-btn" class="floating-btn" style="display: none; background: #ffffff; color: var(--color-brand-primary); border: 1px solid var(--color-border); cursor: pointer; width: 42px; height: 42px;" title="Lên đầu trang" aria-label="Lên đầu trang">
+      <span class="floating-btn__tooltip">Lên đầu trang</span>
+      <div class="floating-btn__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="18" height="18">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </div>
+    </button>
 
     <!-- Floating Gift Assistant Button -->
     <button type="button" id="floating-gift-btn" class="floating-btn" style="background: linear-gradient(135deg, #C99738, #A87922); color: #fff; border: none; cursor: pointer;" title="Trợ lý chọn quà tặng 30 giây" aria-label="Chọn quà tặng">
@@ -71,9 +84,29 @@ export function createFloatingContact() {
   `;
 
   const bubble = container.querySelector('#smart-zalo-bubble');
+  const scrollTopBtn = container.querySelector('#floating-scroll-top-btn');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 420) {
+      scrollTopBtn.style.display = 'flex';
+    } else {
+      scrollTopBtn.style.display = 'none';
+    }
+  }, { passive: true });
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   container.querySelector('#floating-gift-btn').addEventListener('click', () => {
     bubble.style.display = 'none';
     openGiftFinderModal();
+  });
+
+  container.querySelector('#bubble-open-fengshui').addEventListener('click', () => {
+    bubble.style.display = 'none';
+    sessionStorage.setItem('pd_bubble_dismissed', '1');
+    openFengShuiMatcherModal();
   });
 
   container.querySelector('#bubble-open-gift').addEventListener('click', () => {

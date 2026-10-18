@@ -47,6 +47,12 @@ export function renderLegal(container, params = {}) {
           ${t('legal.termsOfUse')}
         </button>
       </li>
+      <li>
+        <button class="legal-sidebar__link ${initialTab === 'silver-guarantee' ? 'is-active' : ''}" 
+                data-tab="silver-guarantee" id="legal-tab-silver">
+          Cam kết Bạc S925 & Bảo hành
+        </button>
+      </li>
     </ul>
   `;
   mainContainer.appendChild(sidebar);
@@ -68,6 +74,29 @@ export function renderLegal(container, params = {}) {
   termsPanel.id = 'panel-terms-of-use';
   termsPanel.innerHTML = buildTermsContent();
   contentArea.appendChild(termsPanel);
+
+  // Silver S925 Guarantee Panel
+  const silverPanel = document.createElement('div');
+  silverPanel.className = `legal-panel ${initialTab === 'silver-guarantee' ? 'is-active' : ''}`;
+  silverPanel.id = 'panel-silver-guarantee';
+  silverPanel.innerHTML = `
+    <h2 class="legal-content__title">Cam Kết Chất Lượng Bạc S925 & Chính Sách Thu Đổi</h2>
+    <div class="legal-content__meta">
+      <p class="legal-content__brand">PHÁT ĐẠT JEWELRY — TIÊU CHUẨN CHẤT LƯỢNG</p>
+      <p>Áp dụng cho toàn bộ sản phẩm bán ra tại cửa hàng & kênh trực tuyến</p>
+    </div>
+    <h3 class="legal-content__heading">1. Cam kết hàm lượng Bạc chuẩn S925</h3>
+    <p class="legal-content__text">100% sản phẩm trang sức tại Phát Đạt Jewelry được chế tác từ Bạc Ý S925 chuẩn hàm lượng (92.5% bạc nguyên chất kết hợp 7.5% hợp kim cao cấp tạo độ cứng và độ bóng vượt trội). Không chứa Niken hay chì, an toàn tuyệt đối cho làn da nhạy cảm.</p>
+    <h3 class="legal-content__heading">2. Đặc quyền làm sáng & đánh bóng miễn phí trọn đời</h3>
+    <p class="legal-content__text">Đặc tính tự nhiên của bạc thật là có thể phản ứng với lưu huỳnh trong tuyến mồ hôi hoặc môi trường sau thời gian dài sử dụng. Quý khách chỉ cần đọc Số điện thoại tại cửa hàng Phát Đạt (629 Nguyễn Kiệm, Phú Nhuận) để được làm sạch bằng máy rung siêu âm và đánh bóng miễn phí không giới hạn số lần.</p>
+    <h3 class="legal-content__heading">3. Chính sách đổi size & hỗ trợ thu đổi</h3>
+    <ul class="legal-content__list">
+      <li><strong>Đổi size / đổi mẫu miễn phí 7 ngày:</strong> Áp dụng cho sản phẩm còn nguyên vẹn, chưa trầy xước hoặc biến dạng.</li>
+      <li><strong>Bảo hành đính lại đá tấm CZ & hàn dây đứt:</strong> Miễn phí trong 12 tháng đầu kể từ ngày mua.</li>
+      <li><strong>Hỗ trợ xi mạ lại vàng 18K / vàng hồng / bạch kim:</strong> Hỗ trợ mức phí ưu đãi gốc tại xưởng cho khách hàng thân thiết.</li>
+    </ul>
+  `;
+  contentArea.appendChild(silverPanel);
 
   mainContainer.appendChild(contentArea);
   mainSection.appendChild(mainContainer);

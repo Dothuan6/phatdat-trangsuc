@@ -2,7 +2,12 @@ import { navigate } from '../router.js';
 import { t, currentLang, toggleLang } from '../i18n.js';
 import { products, formatPrice, searchProducts, categories, collections } from '../data/products.js';
 import { getWishlistedProductIds, getRecentSearches, addRecentSearch } from '../data/wishlist-store.js';
-import { openGiftFinderModal, openQuickViewModal } from './feedback-modal.js';
+import {
+  openGiftFinderModal,
+  openQuickViewModal,
+  openFengShuiMatcherModal,
+  openWarrantyLookupModal
+} from './feedback-modal.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -15,7 +20,7 @@ export function createHeader() {
   const headerWrapper = document.createElement('div');
   headerWrapper.className = 'site-header-wrapper';
 
-  // Top Announcement Bar
+  // Top Announcement Bar (Rotating Ticker)
   const topBar = document.createElement('div');
   topBar.className = 'top-announcement-bar';
   topBar.style.cssText = `
@@ -29,12 +34,27 @@ export function createHeader() {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     z-index: 801;
   `;
-  topBar.innerHTML = `
-    <span>✨ Phát Đạt Jewelry – Bạc 925 Tinh Tế · Bảo Hành Làm Sáng Trọn Đời · Hotline / Zalo: <strong>0898 025 013</strong></span>
-  `;
+  const promoMessages = [
+    '✨ Phát Đạt Jewelry – Bạc S925 Tinh Tế · Bảo Hành Đánh Bóng & Làm Sáng Trọn Đời · Hotline / Zalo: <strong>0898 025 013</strong>',
+    '🎁 Tặng Trọn Bộ Hộp Quà Nhung + Khăn Lau Bạc + Thiệp Viết Tay Miễn Phí Cho Mọi Sản Phẩm',
+    '🔮 Mới: Cố Vấn Chọn Trang Sức Theo Bản Mệnh Ngũ Hành & Đo Size Nhẫn Trực Tiếp Trên Màn Hình',
+    '🚚 Giao Hàng Toàn Quốc · Quý Khách Được Đồng Kiểm Tra Hàng Trước Khi Thanh Toán'
+  ];
+  let promoIdx = 0;
+  topBar.innerHTML = `<span id="top-promo-text" style="transition: opacity 0.3s ease;">${promoMessages[0]}</span>`;
+  setInterval(() => {
+    const el = topBar.querySelector('#top-promo-text');
+    if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(() => {
+      promoIdx = (promoIdx + 1) % promoMessages.length;
+      el.innerHTML = promoMessages[promoIdx];
+      el.style.opacity = '1';
+    }, 280);
+  }, 4500);
 
   const header = document.createElement('header');
   header.className = 'site-header';
@@ -46,7 +66,7 @@ export function createHeader() {
         <button class="header-menu-btn" id="menu-toggle" aria-label="Open menu">
           ${SVG_ICONS.hamburger}
         </button>
-        <button class="header-search-btn" aria-label="Search">
+        <button class="header-search-btn" aria-label="Search" title="Tìm kiếm nhanh (Phím tắt: /)">
           ${SVG_ICONS.search}
           <span>Tìm kiếm</span>
         </button>
@@ -57,6 +77,9 @@ export function createHeader() {
         </a>
       </div>
       <div class="header-right">
+        <button type="button" class="header-region hide-mobile" id="fengshui-header-btn" style="background: #FAF4E8; color: #8A6218; border: 1px solid var(--color-accent-gold); border-radius: 16px; padding: 5px 11px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Chọn trang sức hợp mệnh Ngũ Hành">
+          <span>🔮 Hợp mệnh</span>
+        </button>
         <button type="button" class="header-region hide-mobile" id="gift-finder-header-btn" style="background: var(--color-brand-light); color: var(--color-brand-primary); border: 1px solid var(--color-border); border-radius: 16px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Trợ lý chọn quà tặng">
           <span>🎁 Chọn quà</span>
         </button>
@@ -69,7 +92,7 @@ export function createHeader() {
           ${SVG_ICONS.wishlist}
           <span class="wishlist-count-badge" id="header-wishlist-badge" style="display: none;">0</span>
         </button>
-        <button class="header-icon" id="contact-toggle" aria-label="Tư vấn" title="Tư vấn nhanh">
+        <button class="header-icon" id="contact-toggle" aria-label="Tư vấn" title="Trung tâm hỗ trợ & tư vấn nhanh">
           ${SVG_ICONS.phone}
         </button>
       </div>
@@ -95,11 +118,11 @@ export function createHeader() {
   updateHeaderWishlistBadge();
   window.addEventListener('wishlist-updated', updateHeaderWishlistBadge);
 
-  // Gift finder button
+  // Gift finder & Feng Shui buttons
   const giftBtn = header.querySelector('#gift-finder-header-btn');
-  if (giftBtn) {
-    giftBtn.addEventListener('click', () => openGiftFinderModal());
-  }
+  if (giftBtn) giftBtn.addEventListener('click', () => openGiftFinderModal());
+  const fsBtn = header.querySelector('#fengshui-header-btn');
+  if (fsBtn) fsBtn.addEventListener('click', () => openFengShuiMatcherModal());
 
   // Scroll behavior
   window.addEventListener('scroll', () => {
@@ -192,6 +215,18 @@ function openNavDrawer() {
         <span>Bộ sưu tập đặc biệt</span>
         <span class="nav-item__chevron">›</span>
       </a>
+      <a class="nav-item" href="#/info/style-guide">
+        <span>📖 Cẩm nang phối đồ & Bảo quản bạc</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-fengshui">
+        <span>🔮 Cố vấn chọn trang sức hợp mệnh</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-warranty">
+        <span>🛡️ Tra cứu thẻ bảo hành điện tử</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
       <a class="nav-item" href="#/about">
         <span>Về Phát Đạt Jewelry</span>
         <span class="nav-item__chevron">›</span>
@@ -201,11 +236,11 @@ function openNavDrawer() {
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/stores">
-        <span>Hệ thống cửa hàng</span>
+        <span>Hệ thống cửa hàng & Đặt lịch hẹn</span>
         <span class="nav-item__chevron">›</span>
       </a>
       <a class="nav-item" href="#/contact">
-        <span>Liên hệ & Tư vấn</span>
+        <span>Liên hệ & Giải đáp nhanh (FAQ)</span>
         <span class="nav-item__chevron">›</span>
       </a>
     </div>
@@ -233,6 +268,17 @@ function openNavDrawer() {
   overlay.addEventListener('click', closeDrawer);
   drawer.querySelector('.nav-drawer__close').addEventListener('click', closeDrawer);
 
+  drawer.querySelector('#nav-open-fengshui').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openFengShuiMatcherModal();
+  });
+  drawer.querySelector('#nav-open-warranty').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openWarrantyLookupModal();
+  });
+
   drawer.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
       closeDrawer();
@@ -242,7 +288,7 @@ function openNavDrawer() {
 
 // ── Search Drawer with Realtime Dynamic Search ──
 
-function openSearchDrawer() {
+export function openSearchDrawer() {
   const existing = document.querySelector('.search-overlay');
   if (existing) existing.remove();
   const existingDrawer = document.querySelector('.search-drawer');
