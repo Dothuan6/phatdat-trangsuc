@@ -3,7 +3,7 @@
 // ============================================================
 
 import { addCustomerContact } from '../services/supabase.js';
-import { showToast } from '../components/feedback-modal.js';
+import { showToast, openLightboxModal } from '../components/feedback-modal.js';
 import { createAccordion } from '../components/accordion.js';
 import { siteInfo } from '../data/site-info.js';
 import { formatPrice } from '../data/products.js';
@@ -47,10 +47,33 @@ export function renderContact(container) {
         <a href="#/stores" style="background: #F4F9F8; border: 1px solid #C5DEDB; border-radius: 10px; padding: 18px; text-decoration: none; color: var(--color-text-primary); display: flex; align-items: center; gap: 14px;">
           <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--color-brand-primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">📍</div>
           <div>
-            <div style="font-weight: 700; font-size: 14px; color: var(--color-brand-primary);">Cửa Hàng Quận 7</div>
+            <div style="font-weight: 700; font-size: 14px; color: var(--color-brand-primary);">Cửa Hàng Phát Đạt</div>
             <div style="font-size: 12px; color: var(--color-text-secondary);">Đặt lịch thử mẫu & đánh bóng bạc miễn phí</div>
           </div>
         </a>
+      </div>
+
+      <!-- Official Social Media & Instagram QR Showcase -->
+      <div style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 12px; padding: 18px 22px; margin-bottom: 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+        <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 260px;">
+          <img src="${siteInfo.instagramQr || './images/instagram-qr.png'}" alt="QR Instagram @jewelryphatdat" id="contact-ig-qr-img" style="width: 76px; height: 76px; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-border-light); cursor: zoom-in; flex-shrink: 0;" title="Bấm để phóng to Mã QR Instagram">
+          <div>
+            <span style="font-size: 11px; font-weight: 700; color: #C13584; text-transform: uppercase; letter-spacing: 0.08em;">🌐 KÊNH MẠNG XÃ HỘI CHÍNH THỨC</span>
+            <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--color-brand-primary); margin: 2px 0 4px;">Theo Dõi Video Thực Tế & Bộ Sưu Tập Mới</h3>
+            <p style="font-size: 12.5px; color: var(--color-text-secondary); margin: 0;">Quét mã QR Instagram <strong>@jewelryphatdat</strong> hoặc kết nối qua Facebook & TikTok <strong>@phat.dat.jewelry</strong></p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="${siteInfo.facebook}" target="_blank" rel="noopener" style="background: #1877F2; color: #fff; text-decoration: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            📘 Facebook Fanpage
+          </a>
+          <a href="${siteInfo.tiktok}" target="_blank" rel="noopener" style="background: #111111; color: #fff; text-decoration: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            🎵 TikTok (@phat.dat.jewelry)
+          </a>
+          <a href="${siteInfo.instagram}" target="_blank" rel="noopener" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; text-decoration: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+            📸 Instagram (@jewelryphatdat)
+          </a>
+        </div>
       </div>
 
       <!-- Main Grid: Form + FAQ -->
@@ -152,6 +175,12 @@ export function renderContact(container) {
   `;
 
   // Topic pill selection
+  const igQrImg = page.querySelector('#contact-ig-qr-img');
+  if (igQrImg) {
+    igQrImg.addEventListener('click', () => {
+      openLightboxModal([siteInfo.instagramQr || './images/instagram-qr.png'], 0, 'Mã QR Instagram @jewelryphatdat — Phát Đạt Jewelry');
+    });
+  }
   page.querySelectorAll('#contact-topic-pills .gift-quiz-pill').forEach(btn => {
     btn.addEventListener('click', () => {
       page.querySelectorAll('#contact-topic-pills .gift-quiz-pill').forEach(b => b.classList.remove('is-selected'));

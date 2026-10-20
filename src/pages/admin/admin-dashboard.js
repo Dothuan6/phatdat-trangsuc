@@ -1382,6 +1382,21 @@ export async function renderAdmin(container) {
               <input type="text" id="s-address" class="admin-form-input" value="${siteSettings.address || 'C3B, 96, Ấp 3B, Tân Vĩnh Lộc, TP. Hồ Chí Minh, Việt Nam'}">
             </div>
 
+            <div class="admin-form-group">
+              <label>Link kênh Facebook</label>
+              <input type="text" id="s-facebook" class="admin-form-input" value="${siteSettings.facebook || 'https://www.facebook.com/profile.php?id=61594821396672'}">
+            </div>
+
+            <div class="admin-form-group">
+              <label>Link kênh TikTok</label>
+              <input type="text" id="s-tiktok" class="admin-form-input" value="${siteSettings.tiktok || 'https://www.tiktok.com/@phat.dat.jewelry?_r=1&_t=ZS-9AblM3HdvqX'}">
+            </div>
+
+            <div class="admin-form-group">
+              <label>Link kênh Instagram (@jewelryphatdat)</label>
+              <input type="text" id="s-instagram" class="admin-form-input" value="${siteSettings.instagram || 'https://www.instagram.com/jewelryphatdat/'}">
+            </div>
+
             <button class="admin-btn admin-btn--primary" id="btn-save-store">Lưu thông tin cửa hàng</button>
             <div id="store-save-feedback" style="margin-top: 12px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none;"></div>
           </div>
@@ -1582,11 +1597,15 @@ export async function renderAdmin(container) {
       storeBtn.textContent = 'Đang lưu...';
       storeBtn.disabled = true;
       const updated = {
+        ...siteSettings,
         name: contentArea.querySelector('#s-name').value.trim(),
         phoneDisplay: contentArea.querySelector('#s-phone').value.trim(),
         phoneHref: 'tel:' + contentArea.querySelector('#s-phone').value.replace(/[^0-9]/g, ''),
         zalo: contentArea.querySelector('#s-zalo').value.trim(),
         address: contentArea.querySelector('#s-address').value.trim(),
+        facebook: contentArea.querySelector('#s-facebook').value.trim(),
+        tiktok: contentArea.querySelector('#s-tiktok').value.trim(),
+        instagram: contentArea.querySelector('#s-instagram').value.trim(),
       };
       await saveAdminSiteSettings(updated);
       siteSettings = updated;

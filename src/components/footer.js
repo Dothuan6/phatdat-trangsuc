@@ -7,7 +7,8 @@ import { siteInfo } from '../data/site-info.js';
 import {
   openFengShuiMatcherModal,
   openWarrantyLookupModal,
-  openGiftFinderModal
+  openGiftFinderModal,
+  openLightboxModal
 } from './feedback-modal.js';
 import { openGlobalSizeGuide } from './size-guide-modal.js';
 
@@ -79,18 +80,26 @@ export function createFooter() {
           <a href="#/admin" style="color: var(--color-brand-primary); font-weight: 600;">🔒 Quản trị (Admin)</a>
         </div>
         <div class="footer-social">
-          <a href="${siteInfo.facebook}" target="_blank" rel="noopener" aria-label="Facebook ${siteInfo.facebookName}">
+          <a href="${siteInfo.facebook}" target="_blank" rel="noopener" aria-label="Facebook ${siteInfo.facebookName}" title="Facebook Phát Đạt Jewelry">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
             </svg>
           </a>
-          <a href="${siteInfo.instagram}" target="_blank" rel="noopener" aria-label="Instagram ${siteInfo.instagramName}">
+          <a href="${siteInfo.tiktok}" target="_blank" rel="noopener" aria-label="TikTok ${siteInfo.tiktokName}" title="TikTok @phat.dat.jewelry">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+            </svg>
+          </a>
+          <a href="${siteInfo.instagram}" target="_blank" rel="noopener" aria-label="Instagram ${siteInfo.instagramName}" title="Instagram @jewelryphatdat">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
               <rect x="2" y="2" width="20" height="20" rx="5"/>
               <circle cx="12" cy="12" r="5"/>
               <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"/>
             </svg>
           </a>
+          <button type="button" id="footer-ig-qr-btn" class="footer-social__zalo" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; border: none; cursor: pointer; padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 700;" title="Quét mã QR Instagram @jewelryphatdat">
+            QR IG
+          </button>
           <a href="${siteInfo.zalo}" target="_blank" rel="noopener" class="footer-social__zalo" aria-label="Zalo">Zalo</a>
           <a href="${siteInfo.phoneHref}" aria-label="Gọi ${siteInfo.phoneDisplay}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -108,6 +117,9 @@ export function createFooter() {
   footer.querySelector('#footer-btn-warranty').addEventListener('click', () => openWarrantyLookupModal());
   footer.querySelector('#footer-btn-size').addEventListener('click', () => openGlobalSizeGuide('ruler'));
   footer.querySelector('#footer-btn-gift').addEventListener('click', () => openGiftFinderModal());
+  footer.querySelector('#footer-ig-qr-btn').addEventListener('click', () => {
+    openLightboxModal([siteInfo.instagramQr || './images/instagram-qr.png'], 0, 'Mã QR Instagram @jewelryphatdat — Phát Đạt Jewelry');
+  });
 
   return footer;
 }
