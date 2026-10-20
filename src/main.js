@@ -18,6 +18,7 @@ import { createContactDrawer } from './components/contact-drawer.js';
 import { createBottomNav } from './components/bottom-nav.js';
 import { createFloatingContact } from './components/floating-contact.js';
 import { initCompareFloatingBar } from './components/feedback-modal.js';
+import { applyComfortPrefs } from './data/wishlist-store.js';
 
 // Import router
 import { registerRoute, initRouter } from './router.js';
@@ -42,6 +43,7 @@ import { initDataSync } from './services/supabase.js';
 
 // ── Initialize Application ──
 function init() {
+  applyComfortPrefs();
   const app = document.getElementById('app');
   app.innerHTML = '';
 

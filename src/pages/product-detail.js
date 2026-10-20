@@ -18,7 +18,9 @@ import {
   toggleCompareProduct,
   trackProductEvent,
   getCustomProductReviews,
-  addCustomProductReview
+  addCustomProductReview,
+  isOwnedJewelry,
+  toggleOwnedJewelry
 } from '../data/wishlist-store.js';
 import {
   showToast,
@@ -29,7 +31,9 @@ import {
   openFengShuiMatcherModal,
   openWarrantyLookupModal,
   openVirtualTryOnModal,
-  openDigitalGiftCardModal
+  openDigitalGiftCardModal,
+  openCoupleBuilderModal,
+  openFaceHandStylingModal
 } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
@@ -167,6 +171,9 @@ export function renderProductDetail(container, params = {}) {
     <button type="button" class="pd-skintone-btn" data-bg="radial-gradient(circle, #244743 0%, #112624 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
       <span style="width: 12px; height: 12px; border-radius: 50%; background: #143F3B; border: 1px solid rgba(0,0,0,0.1);"></span> Nhung Ngọc Lục Bảo
     </button>
+    <button type="button" id="pdp-toggle-loupe-btn" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 16px; border: 1px solid var(--color-brand-primary); background: #fff; color: var(--color-brand-primary); font-size: 11.5px; font-weight: 700; cursor: pointer;" title="Bật kính lúp soi chi tiết giác cắt đá 2.2x">
+      🔍 Kính Lúp Soi Đá 2.2x
+    </button>
     <button type="button" id="pdp-open-vto-btn" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 16px; border: 1px solid var(--color-accent-gold); background: linear-gradient(135deg, #1E5D57, #143F3B); color: #F3D184; font-size: 11.5px; font-weight: 700; cursor: pointer;">
       📹 Ướm Thử Bằng Camera / Ảnh
     </button>
@@ -174,6 +181,54 @@ export function renderProductDetail(container, params = {}) {
   skinToneBar.querySelector('#pdp-open-vto-btn').addEventListener('click', () => {
     openVirtualTryOnModal(product);
   });
+
+  // Interactive 2.2x Magnifying Loupe on main gallery item
+  let loupeEnabled = false;
+  const loupeBtn = skinToneBar.querySelector('#pdp-toggle-loupe-btn');
+  const firstGalleryItem = galleryInner.querySelector('.pdp-gallery__item');
+  if (firstGalleryItem && loupeBtn) {
+    firstGalleryItem.style.position = 'relative';
+    firstGalleryItem.style.overflow = 'hidden';
+    const loupeLens = document.createElement('div');
+    loupeLens.style.cssText = `
+      display: none; position: absolute; width: 150px; height: 150px; border-radius: 50%;
+      border: 2.5px solid var(--color-accent-gold); box-shadow: 0 10px 28px rgba(0,0,0,0.28), inset 0 0 14px rgba(255,255,255,0.65);
+      pointer-events: none; z-index: 15; background-repeat: no-repeat; background-color: #fff;
+    `;
+    firstGalleryItem.appendChild(loupeLens);
+
+    const updateLoupePos = (e) => {
+      if (!loupeEnabled) return;
+      const rect = firstGalleryItem.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+        loupeLens.style.display = 'none';
+        return;
+      }
+      loupeLens.style.display = 'block';
+      loupeLens.style.left = `${x - 75}px`;
+      loupeLens.style.top = `${y - 75}px`;
+      loupeLens.style.backgroundImage = `url('${galleryImages[0]}')`;
+      loupeLens.style.backgroundSize = `${rect.width * 2.2}px ${rect.height * 2.2}px`;
+      loupeLens.style.backgroundPosition = `-${x * 2.2 - 75}px -${y * 2.2 - 75}px`;
+    };
+
+    firstGalleryItem.addEventListener('mousemove', updateLoupePos);
+    firstGalleryItem.addEventListener('touchmove', updateLoupePos, { passive: true });
+    firstGalleryItem.addEventListener('mouseleave', () => { loupeLens.style.display = 'none'; });
+
+    loupeBtn.addEventListener('click', () => {
+      loupeEnabled = !loupeEnabled;
+      loupeBtn.style.background = loupeEnabled ? 'var(--color-brand-primary)' : '#fff';
+      loupeBtn.style.color = loupeEnabled ? '#fff' : 'var(--color-brand-primary)';
+      loupeBtn.textContent = loupeEnabled ? '🔍 Đang Bật Kính Lúp (Di chuột lên ảnh)' : '🔍 Kính Lúp Soi Đá 2.2x';
+      if (!loupeEnabled) loupeLens.style.display = 'none';
+      else showToast('Đã bật Kính Lúp 2.2x! Hãy di chuột hoặc chạm lên ảnh chính để soi chi tiết đá & bạc.', 'info', 2800);
+    });
+  }
   skinToneBar.querySelectorAll('.pd-skintone-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       skinToneBar.querySelectorAll('.pd-skintone-btn').forEach(b => {
@@ -221,6 +276,7 @@ export function renderProductDetail(container, params = {}) {
   const heartFill = isLiked ? '#D4380D' : 'none';
   const heartColor = isLiked ? '#D4380D' : 'currentColor';
   const inCompare = isCompared(product.id);
+  const inOwnedBox = isOwnedJewelry(product.id);
 
   const subRow = document.createElement('div');
   subRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--color-border-light); padding-bottom: 12px;';
@@ -232,7 +288,10 @@ export function renderProductDetail(container, params = {}) {
       <span style="color: var(--color-border);">|</span>
       <span style="color: var(--color-text-secondary); font-family: monospace;">Mã: ${product.reference}</span>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+      <button type="button" id="pdp-owned-btn" style="background: ${inOwnedBox ? '#FAF4E8' : '#f4f7f6'}; color: ${inOwnedBox ? '#8A6218' : 'var(--color-text-primary)'}; border: 1px solid ${inOwnedBox ? 'var(--color-accent-gold)' : 'var(--color-border)'}; border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;" title="Lưu vào Tủ Trang Sức Của Tôi để theo dõi lịch đánh bóng bạc định kỳ">
+        ${inOwnedBox ? '💎 Đã trong Tủ Bạc' : '💎 Tủ Bạc'}
+      </button>
       <button type="button" id="pdp-compare-btn" style="background: ${inCompare ? 'var(--color-brand-primary)' : '#f4f7f6'}; color: ${inCompare ? '#fff' : 'var(--color-text-primary)'}; border: 1px solid var(--color-border); border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer;" title="So sánh sản phẩm">
         ${inCompare ? '✓ Đang so sánh' : '⚖️ So sánh'}
       </button>
@@ -250,6 +309,22 @@ export function renderProductDetail(container, params = {}) {
     </div>
   `;
   info.appendChild(subRow);
+
+  subRow.querySelector('#pdp-owned-btn').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const nowOwned = toggleOwnedJewelry(product.id);
+    btn.textContent = nowOwned ? '💎 Đã trong Tủ Bạc' : '💎 Tủ Bạc';
+    btn.style.background = nowOwned ? '#FAF4E8' : '#f4f7f6';
+    btn.style.color = nowOwned ? '#8A6218' : 'var(--color-text-primary)';
+    btn.style.borderColor = nowOwned ? 'var(--color-accent-gold)' : 'var(--color-border)';
+    showToast(
+      nowOwned
+        ? `Đã thêm "${product.name}" vào Tủ Bạc Của Tôi (Theo dõi lịch làm sáng bạc định kỳ tại mục Yêu thích)!`
+        : `Đã gỡ "${product.name}" khỏi Tủ Bạc Của Tôi.`,
+      nowOwned ? 'success' : 'info',
+      3000
+    );
+  });
 
   subRow.querySelector('#pdp-share-btn').addEventListener('click', () => shareProductLink(product));
   subRow.querySelector('#pdp-qr-btn').addEventListener('click', () => openQrTagModal(product));
@@ -408,9 +483,17 @@ export function renderProductDetail(container, params = {}) {
         <input type="checkbox" id="pdp-engrave-toggle" style="accent-color: var(--color-brand-primary); width: 16px; height: 16px; cursor: pointer;">
         <span>✒️ Khắc Laser Tên / Ngày Kỷ Niệm Lên Trang Sức (Miễn phí)</span>
       </label>
-      <button type="button" id="pdp-fengshui-check-btn" style="background: #FFF9EB; border: 1px solid #E5C158; color: #7A5411; border-radius: 14px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-        🔮 Tư vấn hợp mệnh
-      </button>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+        <button type="button" id="pdp-couple-builder-btn" style="background: #FDF2F8; border: 1px solid #F472B6; color: #9D174D; border-radius: 14px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+          💑 Thiết kế Cặp Đôi
+        </button>
+        <button type="button" id="pdp-styling-check-btn" style="background: #EFF6FF; border: 1px solid #93C5FD; color: #1E40AF; border-radius: 14px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+          👗 Hợp dáng mặt/tay
+        </button>
+        <button type="button" id="pdp-fengshui-check-btn" style="background: #FFF9EB; border: 1px solid #E5C158; color: #7A5411; border-radius: 14px; padding: 3px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+          🔮 Tư vấn hợp mệnh
+        </button>
+      </div>
     </div>
     <div id="pdp-engrave-pane" style="display: none; margin-top: 12px;">
       <div style="display: flex; gap: 8px; margin-bottom: 8px;">
@@ -446,6 +529,12 @@ export function renderProductDetail(container, params = {}) {
 
   engraveBox.querySelector('#pdp-fengshui-check-btn').addEventListener('click', () => {
     openFengShuiMatcherModal();
+  });
+  engraveBox.querySelector('#pdp-couple-builder-btn').addEventListener('click', () => {
+    openCoupleBuilderModal(product);
+  });
+  engraveBox.querySelector('#pdp-styling-check-btn').addEventListener('click', () => {
+    openFaceHandStylingModal();
   });
 
   engraveToggle.addEventListener('change', () => {

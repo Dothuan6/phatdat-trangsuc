@@ -219,8 +219,9 @@ export async function renderAdmin(container) {
           <h4 style="margin: 0 0 4px 0; font-size: 15px; color: var(--color-brand-primary);">Thao tác nhanh Backoffice</h4>
           <p style="margin: 0; font-size: 13px; color: var(--color-text-secondary);">Thêm sản phẩm mới, in tem QR trưng bày tại quầy hoặc kiểm tra thông tin liên hệ của khách hàng.</p>
         </div>
-        <div style="display: flex; gap: 10px;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
           <button class="admin-btn admin-btn--primary" id="btn-quick-add-prod">+ Thêm Sản Phẩm Mới</button>
+          <button class="admin-btn admin-btn--outline" id="btn-print-showroom-standee">🖨️ In Standee QR Trợ Lý Quầy Kính</button>
           <button class="admin-btn admin-btn--outline" id="btn-quick-inquiries">Xem ${pendingContacts.length} Yêu Cầu Tư Vấn</button>
         </div>
       </div>
@@ -284,6 +285,60 @@ export async function renderAdmin(container) {
       setTimeout(() => openProductModal(), 100);
     });
     contentArea.querySelector('#btn-quick-inquiries').addEventListener('click', () => switchTab('contacts'));
+    contentArea.querySelector('#btn-print-showroom-standee').addEventListener('click', () => {
+      const base = `${window.location.origin}${window.location.pathname}`;
+      const qrCatalog = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&color=143F3B&data=${encodeURIComponent(base + '#/jewelry')}`;
+      const qrStyle = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&color=143F3B&data=${encodeURIComponent(base + '#/info/style-guide')}`;
+      const qrStores = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&color=143F3B&data=${encodeURIComponent(base + '#/stores')}`;
+      const win = window.open('', '_blank', 'width=900,height=700');
+      if (!win) {
+        showToast('Vui lòng cho phép mở cửa sổ bật lên (Pop-up) để in Standee QR!', 'warning');
+        return;
+      }
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Standee QR Quầy Kính - Phát Đạt Jewelry</title>
+          <style>
+            body { font-family: Georgia, serif; margin: 24px; color: #143F3B; text-align: center; background: #FAF8F4; }
+            .standee { border: 3px solid #C99738; border-radius: 16px; padding: 32px 24px; background: #fff; max-width: 780px; margin: 0 auto; }
+            .qr-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px; }
+            .qr-box { border: 1.5px dashed #1E5D57; border-radius: 12px; padding: 16px 10px; }
+            @media print { .no-print { display: none; } body { background: #fff; margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="margin-bottom: 18px;">
+            <button onclick="window.print()" style="background: #1E5D57; color: #fff; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer;">🖨️ In Standee Để Bàn Quầy Kính (Khổ A4)</button>
+          </div>
+          <div class="standee">
+            <div style="font-family: sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; color: #C99738;">✦ PHÁT ĐẠT JEWELRY · TRANG SỨC BẠC CHUẨN S925 ✦</div>
+            <h1 style="margin: 10px 0 8px; font-size: 28px;">Trải Nghiệm Thử Trang Sức & Chọn Quà Thông Minh</h1>
+            <p style="font-family: sans-serif; font-size: 14px; color: #555; margin: 0;">Quét mã QR bằng Camera điện thoại hoặc Zalo để trải nghiệm ngay tại quầy:</p>
+            <div class="qr-grid">
+              <div class="qr-box">
+                <img src="${qrCatalog}" width="160" height="160" alt="QR Catalog">
+                <div style="font-family: sans-serif; font-weight: 700; font-size: 14px; margin-top: 8px;">1. Xem Toàn Bộ Mẫu & Ướm Thử Camera Ảo</div>
+                <div style="font-family: sans-serif; font-size: 11.5px; color: #666; margin-top: 4px;">Soi giác cắt 2.2x & khắc Laser tên</div>
+              </div>
+              <div class="qr-box">
+                <img src="${qrStyle}" width="160" height="160" alt="QR Style">
+                <div style="font-family: sans-serif; font-weight: 700; font-size: 14px; margin-top: 8px;">2. Cẩm Nang Phối Đồ & Đá Hợp Mệnh</div>
+                <div style="font-family: sans-serif; font-size: 11.5px; color: #666; margin-top: 4px;">Đo size nhẫn & Chọn đá Ngũ Hành</div>
+              </div>
+              <div class="qr-box">
+                <img src="${qrStores}" width="160" height="160" alt="QR Warranty">
+                <div style="font-family: sans-serif; font-weight: 700; font-size: 14px; margin-top: 8px;">3. Bảo Hành Làm Sáng Bạc Trọn Đời</div>
+                <div style="font-family: sans-serif; font-size: 11.5px; color: #666; margin-top: 4px;">Hotline / Zalo: ${siteSettings.phoneDisplay || '0898 025 013'}</div>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    });
     contentArea.querySelectorAll('.overview-qr-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const item = products.find(p => p.id === btn.dataset.id);

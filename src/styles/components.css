@@ -1699,4 +1699,15 @@ body.is-admin-view .floating-contact-hub {
   display: none !important;
 }
 
+/* Comfort Reading & Eye Care Accessibility Modes (Vòng 9) */
+html.pd-comfort-large-text {
+  font-size: 112%;
+}
+
+body.pd-comfort-warm-tone {
+  background-color: #F7F2E7 !important;
+  filter: sepia(0.12) contrast(0.98);
+}
+
+
 

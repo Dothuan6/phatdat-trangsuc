@@ -6,6 +6,7 @@ import { addCustomerContact } from '../services/supabase.js';
 import { showToast } from '../components/feedback-modal.js';
 import { createAccordion } from '../components/accordion.js';
 import { siteInfo } from '../data/site-info.js';
+import { formatPrice } from '../data/products.js';
 
 export function renderContact(container) {
   const page = document.createElement('div');
@@ -103,6 +104,48 @@ export function renderContact(container) {
           <span style="font-size: 11px; font-weight: 700; color: var(--color-accent-gold); text-transform: uppercase; letter-spacing: 0.12em;">GIẢI ĐÁP THẮC MẮC NHANH</span>
           <h2 style="font-family: var(--font-display); font-size: 22px; color: var(--color-brand-primary); margin: 4px 0 16px;">Câu Hỏi Thường Gặp (FAQ)</h2>
           <div id="contact-faq-container"></div>
+
+          <!-- Group & Event Gift Budget Estimator (Vòng 6) -->
+          <div style="margin-top: 28px; background: linear-gradient(135deg, #FAF6EE 0%, #F4F9F8 100%); border: 1px solid #E5DEC9; border-radius: 12px; padding: 20px;">
+            <span style="font-size: 11px; font-weight: 700; color: #8A6218; text-transform: uppercase; letter-spacing: 0.1em;">🎁 DÀNH CHO NHÓM BẠN · SỰ KIỆN · DOANH NGHIỆP</span>
+            <h3 style="font-family: var(--font-display); font-size: 19px; color: var(--color-brand-primary); margin: 4px 0 10px;">
+              Ước Tính Ngân Sách Quà Tặng Số Lượng Nhiều
+            </h3>
+            <p style="font-size: 12.5px; color: var(--color-text-secondary); margin: 0 0 12px; line-height: 1.5;">
+              Đặt quà tặng nhóm bạn thân, quà 8/3 · 20/10 hoặc tri ân đối tác kèm khắc tên riêng & hộp quà nhung đồng bộ:
+            </p>
+            <div style="margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin-bottom: 4px;">
+                <span>Số lượng phần quà:</span>
+                <strong id="grp-qty-label" style="color: var(--color-brand-primary);">5 phần quà</strong>
+              </div>
+              <input type="range" id="grp-qty-range" min="2" max="50" value="5" style="width: 100%; accent-color: var(--color-brand-primary); cursor: pointer;">
+            </div>
+            <div style="margin-bottom: 12px;">
+              <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Mức ngân sách mỗi món:</label>
+              <select id="grp-tier-select" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--color-border); font-size: 12.5px; background: #fff;">
+                <option value="179000">Gói Thanh Lịch (~179.000₫/món - Bông tai / Nhẫn Bạc 925)</option>
+                <option value="249000" selected>Gói Tinh Tế (~249.000₫/món - Dây chuyền / Lắc tay Cỏ Ba Lá)</option>
+                <option value="329000">Gói Cao Cấp (~329.000₫/món - Trang sức đính đá Moissanite)</option>
+              </select>
+            </div>
+            <div style="background: #fff; border: 1px solid var(--color-border-light); border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                <span>Ưu đãi số lượng (<span id="grp-disc-pct">5%</span>):</span>
+                <strong id="grp-disc-val" style="color: #059669;">-62.250₫</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: var(--color-brand-primary); border-top: 1px dashed var(--color-border); padding-top: 6px;">
+                <span>Tổng ngân sách dự kiến:</span>
+                <span id="grp-total-val">1.182.750₫</span>
+              </div>
+              <div style="font-size: 11.5px; color: #8A6218; margin-top: 6px;">
+                ✓ Tặng miễn phí 100% Hộp quà nhung + Thiệp viết tay + Khắc Laser theo danh sách tên.
+              </div>
+            </div>
+            <button type="button" id="grp-apply-to-form-btn" style="width: 100%; background: var(--color-accent-gold); color: #143F3B; border: none; border-radius: 6px; padding: 9px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              ✨ Điền Cấu Hình Quà Nhóm Vào Phiếu Tư Vấn
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -144,6 +187,37 @@ export function renderContact(container) {
 
   faqs.forEach((item, idx) => {
     faqContainer.appendChild(createAccordion(item.q, item.a, idx === 0));
+  });
+
+  // Group Gift Estimator Logic
+  const qtyRange = page.querySelector('#grp-qty-range');
+  const tierSelect = page.querySelector('#grp-tier-select');
+  function updateGroupEstimator() {
+    const qty = parseInt(qtyRange.value, 10) || 5;
+    const unitPrice = parseInt(tierSelect.value, 10) || 249000;
+    const discPct = qty >= 20 ? 12 : (qty >= 10 ? 8 : 5);
+    const rawTotal = qty * unitPrice;
+    const discAmount = Math.round((rawTotal * discPct) / 100);
+    const finalTotal = rawTotal - discAmount;
+
+    page.querySelector('#grp-qty-label').textContent = `${qty} phần quà`;
+    page.querySelector('#grp-disc-pct').textContent = `${discPct}%`;
+    page.querySelector('#grp-disc-val').textContent = `-${formatPrice(discAmount)}`;
+    page.querySelector('#grp-total-val').textContent = formatPrice(finalTotal);
+    return { qty, unitPrice, discPct, finalTotal };
+  }
+  qtyRange.addEventListener('input', updateGroupEstimator);
+  tierSelect.addEventListener('change', updateGroupEstimator);
+  updateGroupEstimator();
+
+  page.querySelector('#grp-apply-to-form-btn').addEventListener('click', () => {
+    const est = updateGroupEstimator();
+    selectedTopic = 'Tư vấn chọn quà & viết thiệp';
+    const msgInput = page.querySelector('#ct-message');
+    msgInput.value = `Tôi muốn tư vấn gói ${est.qty} phần quà trang sức Bạc S925 (Đơn giá ~${formatPrice(est.unitPrice)}/món, ưu đãi nhóm ${est.discPct}%, dự kiến ${formatPrice(est.finalTotal)}) kèm hộp nhung và khắc tên theo danh sách.`;
+    msgInput.focus();
+    msgInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast('Đã điền cấu hình quà tặng nhóm vào biểu mẫu! Bạn chỉ cần nhập Tên & SĐT để gửi.', 'success');
   });
 
   // Form submission

@@ -8,9 +8,13 @@ import {
   showToast,
   openGiftFinderModal,
   openFengShuiMatcherModal,
-  openWarrantyLookupModal
+  openWarrantyLookupModal,
+  openCoupleBuilderModal,
+  openAnniversaryReminderModal,
+  openFaceHandStylingModal
 } from './feedback-modal.js';
 import { openGlobalSizeGuide } from './size-guide-modal.js';
+import { getComfortPrefs, saveComfortPrefs, applyComfortPrefs } from '../data/wishlist-store.js';
 
 export function createContactDrawer() {
   const overlay = document.createElement('div');
@@ -58,7 +62,7 @@ export function createContactDrawer() {
         </form>
       </div>
 
-      <!-- 4 Smart Jewelry Tools -->
+      <!-- 7 Smart Jewelry Tools -->
       <div style="margin-bottom: 18px;">
         <div style="font-size: 11.5px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Công cụ tiện ích độc quyền</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -68,11 +72,33 @@ export function createContactDrawer() {
           <button type="button" id="cd-tool-gift" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🎁 Trợ lý chọn quà 30s
           </button>
+          <button type="button" id="cd-tool-couple" style="background: #FDF2F8; border: 1px solid #FBCFE8; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #9D174D;">
+            💑 Thiết kế Nhẫn/Vòng đôi
+          </button>
+          <button type="button" id="cd-tool-styling" style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #1E40AF;">
+            👗 Chọn theo dáng mặt/tay
+          </button>
           <button type="button" id="cd-tool-fengshui" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🔮 Chọn đá hợp mệnh
           </button>
-          <button type="button" id="cd-tool-warranty" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
-            🛡️ Tra cứu thẻ bảo hành
+          <button type="button" id="cd-tool-reminder" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #166534;">
+            📅 Sổ tay nhắc kỷ niệm
+          </button>
+          <button type="button" id="cd-tool-warranty" style="grid-column: 1 / -1; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            🛡️ Tra cứu Thẻ Bảo Hành Điện Tử bằng Số Điện Thoại
+          </button>
+        </div>
+      </div>
+
+      <!-- Comfort Reading & Eye Care Mode (Vòng 9) -->
+      <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;">
+        <div style="font-size: 11.5px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 8px;">👁️ Chế độ hiển thị dịu mắt & dễ đọc:</div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="cd-comfort-font" style="flex: 1; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">
+            🔠 Chữ lớn dễ đọc (A+)
+          </button>
+          <button type="button" id="cd-comfort-warm" style="flex: 1; padding: 7px 10px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">
+            🌙 Nền ấm dịu mắt
           </button>
         </div>
       </div>
@@ -155,6 +181,45 @@ export function createContactDrawer() {
   drawer.querySelector('#cd-tool-warranty').addEventListener('click', () => {
     closeDrawer();
     openWarrantyLookupModal();
+  });
+  drawer.querySelector('#cd-tool-couple').addEventListener('click', () => {
+    closeDrawer();
+    openCoupleBuilderModal();
+  });
+  drawer.querySelector('#cd-tool-styling').addEventListener('click', () => {
+    closeDrawer();
+    openFaceHandStylingModal();
+  });
+  drawer.querySelector('#cd-tool-reminder').addEventListener('click', () => {
+    closeDrawer();
+    openAnniversaryReminderModal();
+  });
+
+  // Comfort Mode Toggles
+  const fontBtn = drawer.querySelector('#cd-comfort-font');
+  const warmBtn = drawer.querySelector('#cd-comfort-warm');
+  function syncComfortButtons() {
+    const prefs = getComfortPrefs();
+    applyComfortPrefs(prefs);
+    fontBtn.style.background = prefs.largeText ? 'var(--color-brand-primary)' : '#fff';
+    fontBtn.style.color = prefs.largeText ? '#fff' : 'var(--color-text-primary)';
+    warmBtn.style.background = prefs.warmTone ? 'var(--color-brand-primary)' : '#fff';
+    warmBtn.style.color = prefs.warmTone ? '#fff' : 'var(--color-text-primary)';
+  }
+  syncComfortButtons();
+
+  fontBtn.addEventListener('click', () => {
+    const cur = getComfortPrefs();
+    const next = saveComfortPrefs({ largeText: !cur.largeText });
+    syncComfortButtons();
+    showToast(next.largeText ? 'Đã bật Chế độ chữ lớn dễ đọc (A+)!' : 'Đã trở về cỡ chữ tiêu chuẩn.', 'info', 2200);
+  });
+
+  warmBtn.addEventListener('click', () => {
+    const cur = getComfortPrefs();
+    const next = saveComfortPrefs({ warmTone: !cur.warmTone });
+    syncComfortButtons();
+    showToast(next.warmTone ? 'Đã bật Chế độ nền ấm dịu mắt!' : 'Đã trở về màu nền tiêu chuẩn.', 'info', 2200);
   });
 
   return { overlay, drawer, open: openDrawer, close: closeDrawer };

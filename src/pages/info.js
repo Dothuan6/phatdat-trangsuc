@@ -7,7 +7,10 @@ import { siteInfo } from '../data/site-info.js';
 import {
   openGiftFinderModal,
   openFengShuiMatcherModal,
-  openWarrantyLookupModal
+  openWarrantyLookupModal,
+  openCoupleBuilderModal,
+  openFaceHandStylingModal,
+  openAnniversaryReminderModal
 } from '../components/feedback-modal.js';
 import { openGlobalSizeGuide } from '../components/size-guide-modal.js';
 
@@ -37,6 +40,26 @@ export const infoPages = {
         <li>Sản phẩm còn nguyên tem, hộp quà và chưa qua sử dụng.</li>
         <li>Đổi mới 1-1 hoặc hoàn tiền 100% nếu sản phẩm có lỗi chế tác hoặc vận chuyển.</li>
       </ul>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
   gifting: {
@@ -62,6 +85,26 @@ export const infoPages = {
         <li><a href="#/jewelry?price=200-300"><strong>200.000₫ – 300.000₫</strong></a> — Dây chuyền Cỏ Ba Lá xà cừ, lắc tay đính đá CZ, bông tai ngọc trai.</li>
         <li><a href="#/jewelry?price=above-300"><strong>Trên 300.000₫</strong></a> — Nhẫn & dây chuyền đá Moissanite lấp lánh cao cấp.</li>
       </ul>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
   'size-guide': {
@@ -95,6 +138,26 @@ export const infoPages = {
       <h2>Lắc tay & Dây chuyền</h2>
       <p>Lắc tay bạc 925 tiêu chuẩn dài <strong>16cm + 3cm dây nối tăng đơ</strong> (vừa vặn mọi cổ tay từ 14–18.5cm). Dây chuyền tiêu chuẩn <strong>40–45cm</strong> tôn xương quai xanh.</p>
       <p>Hầu hết các mẫu nhẫn hở (Freesize) tại Phát Đạt Jewelry có thể nhẹ nhàng bóp/nới từ Size 5 đến Size 8.</p>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
   warranty: {
@@ -116,6 +179,26 @@ export const infoPages = {
         <li><strong>Bảo hành gắn đá CZ tấm & hàn dây:</strong> Hỗ trợ miễn phí trong 12 tháng đầu sử dụng.</li>
         <li><strong>Xi mạ lại vàng 18K / Bạch kim:</strong> Hỗ trợ chi phí gốc ưu đãi dành riêng cho khách hàng Phát Đạt.</li>
       </ul>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
   'style-guide': {
@@ -155,6 +238,26 @@ export const infoPages = {
         <li><strong>Bước 2 — Lau nhẹ bằng khăn chuyên dụng:</strong> Sau khi đeo cả ngày, dùng khăn lau bạc (được Phát Đạt tặng kèm miễn phí) lau nhẹ mồ hôi trước khi cất vào hộp.</li>
         <li><strong>Bước 3 — Làm sáng nhanh trong 2 phút:</strong> Nếu bạc bị xỉn nhẹ do lưu huỳnh trong mồ hôi, bạn có thể dùng một chút kem đánh răng và bàn chải mềm chà nhẹ dưới nước ấm, hoặc mang trực tiếp đến cửa hàng Phát Đạt để được đánh bóng siêu âm miễn phí trọn đời!</li>
       </ul>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
   cookies: {
@@ -170,6 +273,26 @@ export const infoPages = {
     body: () => `
       <p>Phát Đạt Jewelry mong muốn mọi khách hàng đều có thể sử dụng website dễ dàng: giao diện tương thích di động, hình ảnh sắc nét có mô tả thay thế và hỗ trợ điều hướng bằng bàn phím.</p>
       <p>Nếu bạn cần tư vấn trực tiếp qua cuộc gọi hoặc video Zalo, hãy liên hệ Hotline <strong>${siteInfo.phoneDisplay}</strong>.</p>
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
       ${contactBlock()}`,
   },
 };
@@ -204,6 +327,46 @@ export function renderInfo(container, params = {}) {
 
   const neckBtn = page.querySelector('#info-open-necklace-viz');
   if (neckBtn) neckBtn.addEventListener('click', () => openGlobalSizeGuide('necklace'));
+
+  // Interactive Gemstone Explorer handler (Vòng 8)
+  const gemSpecs = {
+    moissanite: {
+      title: '✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương',
+      html: '• <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>• <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>• <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.'
+    },
+    cz: {
+      title: '💎 Đá Cubic Zirconia Chuẩn 5A — Trong Suốt & Thanh Lịch',
+      html: '• <strong>Độ cứng Mohs:</strong> 8.5 / 10 (Giữ giác cắt sắc nét trong sinh hoạt hằng ngày)<br>• <strong>Chiết suất ánh sáng:</strong> 2.15 – 2.18 (Độ trong suốt tinh khiết, bắt sáng dịu mắt)<br>• <strong>Phù hợp nhất:</strong> Bông tai đính đá tấm, dây chuyền đeo đi làm hằng ngày, lắc tay nữ tính.'
+    },
+    mop: {
+      title: '🐚 Xà Cừ Thiên Nhiên & Ngọc Trai — Ánh Xà Cừ Độc Bản',
+      html: '• <strong>Đặc tính tự nhiên:</strong> Mỗi mặt xà cừ có vân ánh hồng - trắng ngà độc nhất vô nhị, dịu nhẹ với làn da<br>• <strong>Ý nghĩa phong thủy:</strong> Biểu tượng của sự bình an, may mắn và vẻ đẹp quý phái vượt thời gian<br>• <strong>Lưu ý bảo quản:</strong> Tránh ngâm nước nóng hoặc hóa chất tẩy rửa mạnh để giữ lớp xà cừ bóng mịn.'
+    },
+    s925: {
+      title: '🛡️ Bạc Chuẩn S925 Phủ Xi Bạch Kim Rhodium / Vàng 18K',
+      html: '• <strong>Thành phần chuẩn quốc tế:</strong> 92.5% Bạc nguyên chất kết hợp 7.5% hợp kim quý giúp khung trang sức cứng cáp, giữ chấu đá chắc chắn<br>• <strong>An toàn cho da:</strong> 100% Không chứa Niken (Nickel-free), không gây ngứa hay kích ứng da nhạy cảm<br>• <strong>Đặc quyền Phát Đạt:</strong> Bảo hành đánh bóng & làm sáng siêu âm miễn phí trọn đời tại cửa hàng.'
+    }
+  };
+
+  const gemDetail = page.querySelector('#gem-exp-detail');
+  page.querySelectorAll('.gem-exp-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const spec = gemSpecs[btn.dataset.gem];
+      if (!spec || !gemDetail) return;
+      page.querySelectorAll('.gem-exp-btn').forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-primary)';
+        b.style.borderColor = 'var(--color-border)';
+      });
+      btn.style.background = 'var(--color-brand-primary)';
+      btn.style.color = '#fff';
+      btn.style.borderColor = 'var(--color-brand-primary)';
+      gemDetail.innerHTML = `
+        <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">${spec.title}</div>
+        <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">${spec.html}</div>
+      `;
+    });
+  });
 
   container.appendChild(page);
 }

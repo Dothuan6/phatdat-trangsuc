@@ -8,7 +8,10 @@ import {
   getCompareProductIds,
   toggleCompareProduct,
   clearCompareList,
-  trackProductEvent
+  trackProductEvent,
+  getAnniversaryReminders,
+  addAnniversaryReminder,
+  deleteAnniversaryReminder
 } from '../data/wishlist-store.js';
 import { products, getProductById, formatPrice } from '../data/products.js';
 import { siteInfo } from '../data/site-info.js';
@@ -2061,7 +2064,571 @@ export function openDigitalGiftCardModal(product, options = {}) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// 14. CONVENIENCE SHORTCUTS
+// 14. COUPLE & FRIENDSHIP RING / BRACELET BUILDER (VÒNG 1)
+// ══════════════════════════════════════════════════════════════
+
+export function openCoupleBuilderModal(initialProduct = null) {
+  const pairCandidates = products.filter(p => p.category === 'rings' || p.category === 'bracelets');
+  const pool = pairCandidates.length >= 2 ? pairCandidates : products.slice(0, 8);
+
+  let item1 = (initialProduct && (initialProduct.category === 'rings' || initialProduct.category === 'bracelets'))
+    ? initialProduct
+    : pool[0];
+  let item2 = pool.find(p => p.id !== item1.id && p.category === item1.category) || pool[1] || pool[0];
+
+  let engrave1 = 'Minh ♥ 20.10';
+  let engrave2 = 'Anh ♥ 20.10';
+  let size1 = (item1.availableSizes && item1.availableSizes[0]) || 'Freesize';
+  let size2 = (item2.availableSizes && item2.availableSizes[0]) || 'Freesize';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 780px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>💑 Xưởng Thiết Kế Nhẫn & Vòng Đôi Khắc Laser Kép</h3>
+          <div style="font-size: 12px; opacity: 0.88;">Phối cặp nhẫn/vòng Bạc S925 tình nhân hoặc tri kỷ · Miễn phí khắc tên đôi & Hộp nhung đôi</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div class="pd-callback-body" style="padding: 18px 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 16px;">
+          <!-- Piece 1 -->
+          <div style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-brand-primary); text-transform: uppercase; margin-bottom: 8px;">
+              💍 Món Trang Sức 1 (Bạn / Nam)
+            </div>
+            <select id="cb-select-1" class="pd-callback-input" style="margin-bottom: 10px; font-size: 13px;">
+              ${pool.map(p => `<option value="${p.id}" ${p.id === item1.id ? 'selected' : ''}>${p.name} — ${formatPrice(p.price)}</option>`).join('')}
+            </select>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <img id="cb-img-1" src="${item1.images[0]}" alt="${item1.name}" style="width: 58px; height: 58px; object-fit: contain; background: #fff; border-radius: 8px; border: 1px solid var(--color-border-light); padding: 4px;">
+              <div style="flex: 1;">
+                <label style="font-size: 11.5px; color: var(--color-text-secondary); display: block; margin-bottom: 3px;">Kích cỡ món 1:</label>
+                <input type="text" id="cb-size-1" value="${size1}" class="pd-callback-input" style="padding: 6px 10px; font-size: 12.5px;">
+              </div>
+            </div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); display: block; margin-bottom: 4px;">✒️ Chữ khắc Laser lên món 1:</label>
+            <input type="text" id="cb-eng-1" maxlength="18" value="${engrave1}" class="pd-callback-input" style="padding: 7px 10px; font-size: 13px;" placeholder="VD: Minh ♥ 20.10">
+          </div>
+
+          <!-- Piece 2 -->
+          <div style="background: #FAF6EE; border: 1px solid #E5DEC9; border-radius: 10px; padding: 14px;">
+            <div style="font-size: 12px; font-weight: 700; color: #8A6218; text-transform: uppercase; margin-bottom: 8px;">
+              💖 Món Trang Sức 2 (Người Thương / Tri Kỷ)
+            </div>
+            <select id="cb-select-2" class="pd-callback-input" style="margin-bottom: 10px; font-size: 13px;">
+              ${pool.map(p => `<option value="${p.id}" ${p.id === item2.id ? 'selected' : ''}>${p.name} — ${formatPrice(p.price)}</option>`).join('')}
+            </select>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+              <img id="cb-img-2" src="${item2.images[0]}" alt="${item2.name}" style="width: 58px; height: 58px; object-fit: contain; background: #fff; border-radius: 8px; border: 1px solid var(--color-border-light); padding: 4px;">
+              <div style="flex: 1;">
+                <label style="font-size: 11.5px; color: var(--color-text-secondary); display: block; margin-bottom: 3px;">Kích cỡ món 2:</label>
+                <input type="text" id="cb-size-2" value="${size2}" class="pd-callback-input" style="padding: 6px 10px; font-size: 12.5px;">
+              </div>
+            </div>
+            <label style="font-size: 11.5px; font-weight: 600; color: var(--color-text-primary); display: block; margin-bottom: 4px;">✒️ Chữ khắc Laser lên món 2:</label>
+            <input type="text" id="cb-eng-2" maxlength="18" value="${engrave2}" class="pd-callback-input" style="padding: 7px 10px; font-size: 13px;" placeholder="VD: Anh ♥ 20.10">
+          </div>
+        </div>
+
+        <!-- Quick Symbol Bar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <span style="font-size: 12px; color: var(--color-text-secondary);">Chèn ký hiệu đôi:</span>
+            ${[' ♥ ', ' ∞ ', ' ★ ', ' 🍀 ', ' ♔ ', ' ♕ '].map(sym => `
+              <button type="button" class="cb-sym-btn" data-sym="${sym}" style="border: 1px solid var(--color-border); background: #fff; border-radius: 6px; padding: 3px 9px; font-size: 12.5px; cursor: pointer;">${sym.trim()}</button>
+            `).join('')}
+          </div>
+          <span style="font-size: 12px; color: var(--color-brand-primary); font-weight: 700;">🎁 Tặng kèm Hộp Nhung Đôi + 2 Thiệp Viết Tay</span>
+        </div>
+
+        <!-- Dual Silver Band Engraving Live Simulation -->
+        <div style="background: linear-gradient(135deg, #143F3B 0%, #1E5D57 100%); border-radius: 12px; padding: 16px; color: #fff; text-align: center; border: 1px solid var(--color-accent-gold);">
+          <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent-gold); margin-bottom: 10px; font-weight: 700;">
+            ✦ Mô Phỏng Khắc Laser Trên Cặp Bạc S925 ✦
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div style="background: linear-gradient(135deg, #E2E5E8 0%, #F8F9FA 48%, #CFD4D8 52%, #EBEEF0 100%); border-radius: 30px; padding: 10px 16px; color: #2C3539; box-shadow: inset 0 2px 5px rgba(0,0,0,0.18); border: 1.5px solid #BDC3C7;">
+              <div style="font-size: 10px; color: #667; text-transform: uppercase;">Món 1 (<span id="cb-band-name-1">${item1.name}</span>)</div>
+              <div id="cb-band-text-1" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; letter-spacing: 0.06em; margin-top: 2px;">${engrave1}</div>
+            </div>
+            <div style="background: linear-gradient(135deg, #E2E5E8 0%, #F8F9FA 48%, #CFD4D8 52%, #EBEEF0 100%); border-radius: 30px; padding: 10px 16px; color: #2C3539; box-shadow: inset 0 2px 5px rgba(0,0,0,0.18); border: 1.5px solid #C99738;">
+              <div style="font-size: 10px; color: #667; text-transform: uppercase;">Món 2 (<span id="cb-band-name-2">${item2.name}</span>)</div>
+              <div id="cb-band-text-2" style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 700; letter-spacing: 0.06em; margin-top: 2px;">${engrave2}</div>
+            </div>
+          </div>
+          <div style="margin-top: 12px; font-size: 13.5px; display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <span>Tổng giá trị cặp đôi: <strong id="cb-total-price" style="color: #F3D184; font-size: 17px;">${formatPrice(item1.price + item2.price)}</strong></span>
+            <span style="font-size: 11.5px; background: rgba(255,255,255,0.14); padding: 2px 10px; border-radius: 12px;">✓ Miễn phí khắc Laser 2 món</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="cb-close-btn" style="flex: 0 0 auto;">Đóng</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="pd-dialog-btn" id="cb-callback-btn" style="background: var(--color-accent-gold); color: #143F3B; border: none; font-weight: 700;">
+            📞 Đặt Làm Cặp Này (Gọi Lại)
+          </button>
+          <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="cb-zalo-btn">
+            💬 Gửi Mẫu Cặp Đôi Qua Zalo
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#cb-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  const sel1 = overlay.querySelector('#cb-select-1');
+  const sel2 = overlay.querySelector('#cb-select-2');
+  const eng1Input = overlay.querySelector('#cb-eng-1');
+  const eng2Input = overlay.querySelector('#cb-eng-2');
+  const size1Input = overlay.querySelector('#cb-size-1');
+  const size2Input = overlay.querySelector('#cb-size-2');
+
+  function refreshPreview() {
+    item1 = pool.find(p => p.id === sel1.value) || pool[0];
+    item2 = pool.find(p => p.id === sel2.value) || pool[0];
+    engrave1 = eng1Input.value.trim() || 'Minh ♥ 20.10';
+    engrave2 = eng2Input.value.trim() || 'Anh ♥ 20.10';
+
+    overlay.querySelector('#cb-img-1').src = item1.images[0];
+    overlay.querySelector('#cb-img-2').src = item2.images[0];
+    overlay.querySelector('#cb-band-name-1').textContent = item1.name;
+    overlay.querySelector('#cb-band-name-2').textContent = item2.name;
+    overlay.querySelector('#cb-band-text-1').textContent = engrave1;
+    overlay.querySelector('#cb-band-text-2').textContent = engrave2;
+    overlay.querySelector('#cb-total-price').textContent = formatPrice(item1.price + item2.price);
+  }
+
+  [sel1, sel2, eng1Input, eng2Input].forEach(el => el.addEventListener('input', refreshPreview));
+
+  overlay.querySelectorAll('.cb-sym-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sym = btn.dataset.sym;
+      if ((eng1Input.value + sym).length <= 18) eng1Input.value += sym;
+      if ((eng2Input.value + sym).length <= 18) eng2Input.value += sym;
+      refreshPreview();
+    });
+  });
+
+  overlay.querySelector('#cb-zalo-btn').addEventListener('click', () => {
+    const msg = `[Phát Đạt Jewelry] Tôi muốn đặt tư vấn CẶP TRANG SỨC ĐÔI KHẮC LASER:\n1. Món 1: ${item1.name} (${item1.reference}) | Size: ${size1Input.value} | Khắc: "${engrave1}"\n2. Món 2: ${item2.name} (${item2.reference}) | Size: ${size2Input.value} | Khắc: "${engrave2}"\n- Tổng giá trị cặp: ${formatPrice(item1.price + item2.price)} (Tặng hộp nhung đôi & thiệp)`;
+    try {
+      navigator.clipboard.writeText(msg);
+      showToast('Đã sao chép cấu hình Cặp Trang Sức Đôi! Bạn chỉ cần Dán (Paste) vào Zalo.', 'success', 4000);
+    } catch (e) {}
+    setTimeout(() => {
+      window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+    }, 450);
+  });
+
+  overlay.querySelector('#cb-callback-btn').addEventListener('click', () => {
+    close();
+    openQuickCallbackModal([item1, item2], {
+      selectedInfo: `Cặp đôi khắc Laser: Món 1 [${size1Input.value} - Khắc "${engrave1}"] & Món 2 [${size2Input.value} - Khắc "${engrave2}"]`,
+      giftCardNote: 'Đóng gói Hộp Nhung Đôi Tình Nhân'
+    });
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 15. ANNIVERSARY & GIFT REMINDER PLANNER MODAL (VÒNG 3)
+// ══════════════════════════════════════════════════════════════
+
+export function openAnniversaryReminderModal() {
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 680px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>📅 Sổ Tay Nhắc Lịch Kỷ Niệm & Quà Tặng Người Thương</h3>
+          <div style="font-size: 12px; opacity: 0.88;">Lưu ngày sinh nhật, kỷ niệm ngày cưới/yêu & nhận gợi ý quà trang sức Bạc S925 tinh tế</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div class="pd-callback-body" style="padding: 18px 20px;">
+        <!-- Add New Reminder Form -->
+        <form id="ar-add-form" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+            + Thêm Ngày Kỷ Niệm / Sinh Nhật Quan Trọng
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 11.5px; font-weight: 600; display: block; margin-bottom: 3px;">Dịp kỷ niệm *</label>
+              <input type="text" id="ar-title" required placeholder="VD: Sinh nhật vợ yêu, Kỷ niệm 2 năm..." class="pd-callback-input" style="padding: 7px 10px; font-size: 12.5px;">
+            </div>
+            <div>
+              <label style="font-size: 11.5px; font-weight: 600; display: block; margin-bottom: 3px;">Người nhận quà *</label>
+              <input type="text" id="ar-recipient" required placeholder="VD: Minh Thư, Mẹ yêu..." class="pd-callback-input" style="padding: 7px 10px; font-size: 12.5px;">
+            </div>
+            <div>
+              <label style="font-size: 11.5px; font-weight: 600; display: block; margin-bottom: 3px;">Ngày diễn ra *</label>
+              <input type="date" id="ar-date" required value="${new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10)}" class="pd-callback-input" style="padding: 6px 10px; font-size: 12.5px;">
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <select id="ar-cat" class="pd-callback-input" style="width: auto; padding: 6px 12px; font-size: 12.5px;">
+              <option value="necklaces">Gợi ý: Dây chuyền & Mặt dây</option>
+              <option value="rings">Gợi ý: Nhẫn Bạc / Moissanite</option>
+              <option value="bracelets">Gợi ý: Lắc tay & Vòng tay</option>
+              <option value="earrings">Gợi ý: Bông tai thanh lịch</option>
+            </select>
+            <button type="submit" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 8px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+              💾 Lưu Vào Sổ Tay Kỷ Niệm
+            </button>
+          </div>
+        </form>
+
+        <!-- Saved Reminders List -->
+        <div id="ar-list-container"></div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="ar-close-btn">Đóng</button>
+        <button type="button" class="pd-dialog-btn" id="ar-register-zalo-remind" style="background: var(--color-accent-gold); color: #143F3B; border: none; font-weight: 700;">
+          🔔 Nhờ Phát Đạt Nhắc Trước 7 Ngày Qua Zalo/SĐT
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#ar-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  const listEl = overlay.querySelector('#ar-list-container');
+
+  function calcDaysUntil(dateStr) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const parts = (dateStr || '').split('-');
+    if (parts.length < 3) return 0;
+    let target = new Date(today.getFullYear(), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    if (target < today) {
+      target = new Date(today.getFullYear() + 1, parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+    return Math.round((target - today) / 86400000);
+  }
+
+  function downloadIcsFile(rem) {
+    const cleanDate = (rem.dateStr || '').replace(/-/g, '');
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Phat Dat Jewelry//Gift Reminder//VN',
+      'BEGIN:VEVENT',
+      `DTSTART;VALUE=DATE:${cleanDate}`,
+      `SUMMARY:[Quà tặng Phát Đạt Jewelry] ${rem.title} - Tặng ${rem.recipient}`,
+      `DESCRIPTION:Chuẩn bị quà trang sức Bạc S925 tặng ${rem.recipient} tại Phát Đạt Jewelry (Hotline/Zalo: 0898 025 013).`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `lich-ky-niem-${rem.id}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Đã tải file lịch (.ICS)! Bạn có thể mở để thêm vào Lịch Điện Thoại / Google Calendar.', 'success');
+  }
+
+  function renderList() {
+    const reminders = getAnniversaryReminders();
+    if (reminders.length === 0) {
+      listEl.innerHTML = `<div style="text-align: center; padding: 24px; color: var(--color-text-secondary); font-size: 13px;">Chưa có lịch kỷ niệm nào. Hãy thêm ngày đặc biệt của người thương ở trên nhé!</div>`;
+      return;
+    }
+
+    listEl.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        ${reminders.map(rem => {
+          const daysLeft = calcDaysUntil(rem.dateStr);
+          const suggestedProd = products.find(p => p.category === rem.categoryHint) || products[0];
+          const badgeText = daysLeft === 0 ? '🎉 Hôm nay!' : `⏳ Còn ${daysLeft} ngày`;
+          return `
+            <div style="border: 1px solid var(--color-border); border-radius: 10px; padding: 12px 14px; background: #fff; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div style="flex: 1; min-width: 200px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <strong style="font-size: 14px; color: var(--color-brand-primary);">${rem.title}</strong>
+                  <span style="background: #FAF4E8; color: #8A6218; border: 1px solid var(--color-accent-gold); border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700;">${badgeText}</span>
+                </div>
+                <div style="font-size: 12.5px; color: var(--color-text-secondary); margin-top: 3px;">
+                  👤 Người nhận: <strong>${rem.recipient}</strong> · 📅 Ngày: ${rem.dateStr}
+                </div>
+                <div style="font-size: 12px; color: var(--color-brand-primary); margin-top: 4px;">
+                  💎 Gợi ý quà: <a href="#/product/${suggestedProd.id}" class="ar-prod-link" style="color: var(--color-brand-primary); font-weight: 600; text-decoration: underline;">${suggestedProd.name} (${formatPrice(suggestedProd.price)})</a>
+                </div>
+              </div>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button type="button" class="ar-ics-btn" data-id="${rem.id}" style="background: #F4F9F8; color: var(--color-brand-primary); border: 1px solid #C5DEDB; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 600; cursor: pointer;" title="Tải vào Lịch điện thoại">
+                  📲 Lưu Lịch .ICS
+                </button>
+                <button type="button" class="ar-del-btn" data-id="${rem.id}" style="background: #FFF1F0; color: #CF1322; border: 1px solid #FFA39E; border-radius: 6px; padding: 6px 9px; font-size: 11.5px; cursor: pointer;" title="Xóa">
+                  ✕
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    listEl.querySelectorAll('.ar-prod-link').forEach(a => a.addEventListener('click', close));
+    listEl.querySelectorAll('.ar-ics-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const found = reminders.find(r => r.id === btn.dataset.id);
+        if (found) downloadIcsFile(found);
+      });
+    });
+    listEl.querySelectorAll('.ar-del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteAnniversaryReminder(btn.dataset.id);
+        renderList();
+        showToast('Đã xóa ngày kỷ niệm khỏi sổ tay.', 'info');
+      });
+    });
+  }
+
+  overlay.querySelector('#ar-add-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = overlay.querySelector('#ar-title').value.trim();
+    const recipient = overlay.querySelector('#ar-recipient').value.trim();
+    const dateStr = overlay.querySelector('#ar-date').value;
+    const categoryHint = overlay.querySelector('#ar-cat').value;
+    if (!title || !recipient) return;
+
+    addAnniversaryReminder({ title, recipient, dateStr, categoryHint });
+    overlay.querySelector('#ar-title').value = '';
+    overlay.querySelector('#ar-recipient').value = '';
+    renderList();
+    showToast(`Đã lưu lịch kỷ niệm "${title}" thành công!`, 'success');
+  });
+
+  overlay.querySelector('#ar-register-zalo-remind').addEventListener('click', () => {
+    const reminders = getAnniversaryReminders();
+    const first = reminders[0];
+    close();
+    openQuickCallbackModal(products[0], {
+      selectedInfo: first ? `Đăng ký nhắc lịch quà tặng: ${first.title} (${first.dateStr}) cho ${first.recipient}` : 'Đăng ký nhắc lịch kỷ niệm & tư vấn quà tặng VIP'
+    });
+  });
+
+  renderList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 16. FACE SHAPE, NECKLINE & HAND STYLING ADVISOR (VÒNG 4)
+// ══════════════════════════════════════════════════════════════
+
+export function openFaceHandStylingModal() {
+  const FACE_PROFILES = {
+    round: {
+      name: '😊 Khuôn Mặt Tròn Phúc Hậu',
+      rule: 'Nên chọn bông tai dáng dài giọt nước, tua rua thanh mảnh hoặc dây chuyền chữ Y / mặt dây rơi nhẹ (45cm) để tạo hiệu ứng khuôn mặt thon gọn, thanh thoát hơn.',
+      avoid: 'Tránh bông tai bản tròn quá to ôm sát dái tai hoặc vòng cổ choker quá sát.',
+      categories: ['earrings', 'necklaces']
+    },
+    oval: {
+      name: '✨ Khuôn Mặt Trái Xoan Cân Đối',
+      rule: 'Dáng mặt lý tưởng phù hợp với hầu hết mọi kiểu trang sức! Đặc biệt tôn nét quý phái khi đeo bông tai nụ đá Moissanite, cỏ ba lá xà cừ hoặc dây chuyền 40–45cm.',
+      avoid: 'Tránh bông tai quá dài vượt quá cằm làm mặt trông dài hơn.',
+      categories: ['earrings', 'necklaces']
+    },
+    square: {
+      name: '💎 Khuôn Mặt Vuông / Góc Cạnh Cá Tính',
+      rule: 'Ưu tiên trang sức có đường cong mềm mại: bông tai tròn, họa tiết cánh hoa, cỏ 4 lá, giọt sương hoặc dây chuyền mặt tròn/trái tim giúp làm dịu đường nét góc cạnh.',
+      avoid: 'Tránh các mẫu bông tai hình vuông sắc nhọn hoặc hình học góc cạnh.',
+      categories: ['earrings', 'necklaces']
+    },
+    heart: {
+      name: '💖 Khuôn Mặt Trái Tim / Cằm V-Line',
+      rule: 'Rất hợp với bông tai dáng chùm nhẹ ở phần đuôi (giọt nước, chuông nhỏ) và dây chuyền ôm nhẹ xương quai xanh giúp cân bằng phần trán và cằm thon.',
+      avoid: 'Tránh bông tai hình tam giác ngược phần trên to phần dưới nhọn.',
+      categories: [' neck', 'earrings', 'necklaces']
+    }
+  };
+
+  const HAND_PROFILES = {
+    slender: {
+      name: '🖐️ Ngón Tay Thon Dài Thanh Mảnh',
+      rule: 'Phù hợp tuyệt vời với nhẫn đính đá chủ Moissanite, nhẫn kép (double-band) hoặc lắc tay chuỗi hạt ngọc / cỏ ba lá giúp bàn tay thêm đầy đặn, sang trọng.',
+      categories: ['rings', 'bracelets']
+    },
+    petite: {
+      name: '🌸 Bàn Tay Nhỏ Nhắn / Ngón Tay Ngắn',
+      rule: 'Nên chọn nhẫn bản mảnh (dưới 2.5mm), mặt nhẫn hình giọt nước, trái tim hoặc đính đá tấm thanh thoát và lắc tay dây mảnh có xích phụ giúp ngón tay trông dài hơn.',
+      categories: ['rings', 'bracelets']
+    },
+    full: {
+      name: '✨ Bàn Tay Đầy Đặn / Khớp Tay Rõ',
+      rule: 'Ưu tiên nhẫn Freesize hở nhẹ hoặc nhẫn mặt hoa/cỏ ba lá kích thước vừa phải và vòng tay đính charm tạo điểm nhấn thu hút ánh nhìn vào trung tâm viên đá.',
+      categories: ['rings', 'bracelets']
+    }
+  };
+
+  let activeMode = 'face'; // 'face' | 'hand'
+  let selectedKey = 'round';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" style="max-width: 700px; width: 100%; max-height: 92vh; display: flex; flex-direction: column;" role="dialog" aria-modal="true">
+      <div class="pd-callback-header">
+        <div>
+          <h3>👗 Cố Vấn Chọn Trang Sức Theo Dáng Mặt & Bàn Tay</h3>
+          <div style="font-size: 12px; opacity: 0.88;">Bí quyết chọn kiểu Bông tai, Dây chuyền, Nhẫn & Lắc tay tôn nét đẹp tự nhiên nhất</div>
+        </div>
+        <button type="button" class="modal-close-x" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div class="pd-callback-body" style="padding: 18px 20px;">
+        <!-- Mode Switcher -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button type="button" id="fhs-tab-face" style="flex: 1; padding: 10px; border-radius: 8px; border: 2px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;">
+            👩 Dáng Khuôn Mặt & Cổ Áo (Bông tai / Dây chuyền)
+          </button>
+          <button type="button" id="fhs-tab-hand" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 13px; font-weight: 600; cursor: pointer;">
+            🖐️ Dáng Bàn Tay & Cổ Tay (Nhẫn / Lắc tay)
+          </button>
+        </div>
+
+        <div id="fhs-options-bar" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin-bottom: 16px;"></div>
+        <div id="fhs-advice-box"></div>
+      </div>
+
+      <div class="pd-callback-footer" style="justify-content: space-between;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="fhs-close-btn">Đóng</button>
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--primary" id="fhs-zalo-btn">
+          💬 Nhờ Chuyên Viên Xem Ảnh & Tư Vấn Qua Zalo
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  const close = () => {
+    overlay.classList.remove('is-visible');
+    setTimeout(() => overlay.remove(), 250);
+  };
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.querySelector('#fhs-close-btn').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  const tabFace = overlay.querySelector('#fhs-tab-face');
+  const tabHand = overlay.querySelector('#fhs-tab-hand');
+  const optionsBar = overlay.querySelector('#fhs-options-bar');
+  const adviceBox = overlay.querySelector('#fhs-advice-box');
+
+  function renderAdvisor() {
+    const dict = activeMode === 'face' ? FACE_PROFILES : HAND_PROFILES;
+    if (!dict[selectedKey]) selectedKey = Object.keys(dict)[0];
+    const current = dict[selectedKey];
+
+    optionsBar.innerHTML = Object.entries(dict).map(([k, val]) => `
+      <button type="button" class="fhs-opt-btn" data-key="${k}" style="
+        padding: 10px 12px; border-radius: 8px; text-align: left; font-size: 12.5px; cursor: pointer;
+        border: ${k === selectedKey ? '2px solid var(--color-brand-primary)' : '1px solid var(--color-border)'};
+        background: ${k === selectedKey ? '#F4F9F8' : '#fff'};
+        font-weight: ${k === selectedKey ? '700' : '500'};
+        color: ${k === selectedKey ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'};
+      ">${val.name}</button>
+    `).join('');
+
+    optionsBar.querySelectorAll('.fhs-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedKey = btn.dataset.key;
+        renderAdvisor();
+      });
+    });
+
+    const recommended = products.filter(p => current.categories.includes(p.category)).slice(0, 3);
+
+    adviceBox.innerHTML = `
+      <div style="background: #FAF6EE; border: 1px solid #E5DEC9; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;">
+        <div style="font-size: 14px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+          💡 Quy Tắc Vàng Cho ${current.name}:
+        </div>
+        <p style="font-size: 13px; color: var(--color-text-primary); line-height: 1.6; margin: 0 0 6px;">
+          ✓ <strong>Nên chọn:</strong> ${current.rule}
+        </p>
+        ${current.avoid ? `<p style="font-size: 12.5px; color: #8A6218; margin: 0;">• <strong>Lưu ý nhỏ:</strong> ${current.avoid}</p>` : ''}
+      </div>
+
+      <div style="font-size: 12.5px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">
+        ✨ Các Mẫu Trang Sức Bạc S925 Tôn Dáng Nhất Cho Bạn:
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px;">
+        ${recommended.map(p => `
+          <a href="#/product/${p.id}" class="fhs-prod-card" style="text-decoration: none; color: inherit; border: 1px solid var(--color-border-light); border-radius: 8px; padding: 10px; background: #fff; display: flex; align-items: center; gap: 10px;">
+            <img src="${p.images[0]}" alt="${p.name}" style="width: 52px; height: 52px; object-fit: contain; border-radius: 6px; background: #fafaf8; flex-shrink: 0;">
+            <div style="min-width: 0;">
+              <div style="font-size: 12.5px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
+              <div style="font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-top: 2px;">${formatPrice(p.price)}</div>
+            </div>
+          </a>
+        `).join('')}
+      </div>
+    `;
+
+    adviceBox.querySelectorAll('.fhs-prod-card').forEach(a => a.addEventListener('click', close));
+  }
+
+  tabFace.addEventListener('click', () => {
+    activeMode = 'face';
+    selectedKey = 'round';
+    tabFace.style.background = 'var(--color-brand-primary)';
+    tabFace.style.color = '#fff';
+    tabHand.style.background = '#fff';
+    tabHand.style.color = 'var(--color-text-primary)';
+    renderAdvisor();
+  });
+
+  tabHand.addEventListener('click', () => {
+    activeMode = 'hand';
+    selectedKey = 'slender';
+    tabHand.style.background = 'var(--color-brand-primary)';
+    tabHand.style.color = '#fff';
+    tabFace.style.background = '#fff';
+    tabFace.style.color = 'var(--color-text-primary)';
+    renderAdvisor();
+  });
+
+  overlay.querySelector('#fhs-zalo-btn').addEventListener('click', () => {
+    close();
+    window.open(siteInfo.zalo, '_blank', 'noopener,noreferrer');
+  });
+
+  renderAdvisor();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 17. CONVENIENCE SHORTCUTS
 // ══════════════════════════════════════════════════════════════
 
 export const toast = {
@@ -2083,8 +2650,12 @@ export const modal = {
   fengShui: openFengShuiMatcherModal,
   warranty: openWarrantyLookupModal,
   virtualTryOn: openVirtualTryOnModal,
-  digitalGiftCard: openDigitalGiftCardModal
+  digitalGiftCard: openDigitalGiftCardModal,
+  coupleBuilder: openCoupleBuilderModal,
+  anniversaryReminder: openAnniversaryReminderModal,
+  faceHandStyling: openFaceHandStylingModal
 };
+
 
 
 

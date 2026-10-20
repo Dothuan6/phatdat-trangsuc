@@ -229,3 +229,129 @@ export function addCustomProductReview(productId, reviewObj) {
   }
 }
 
+// ── 8. MY JEWELRY BOX & SILVER CARE TRACKER (TỦ TRANG SỨC CÁ NHÂN) ──
+const OWNED_BOX_KEY = 'phatdat_owned_jewelry';
+
+export function getOwnedJewelryList() {
+  try {
+    const raw = localStorage.getItem(OWNED_BOX_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function isOwnedJewelry(productId) {
+  return getOwnedJewelryList().some(item => item.productId === productId);
+}
+
+export function toggleOwnedJewelry(productId, customNote = '') {
+  let list = getOwnedJewelryList();
+  const exists = list.some(item => item.productId === productId);
+  if (exists) {
+    list = list.filter(item => item.productId !== productId);
+  } else {
+    const now = new Date();
+    const nextPolish = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000); // 90 days recommended polish cycle
+    list.unshift({
+      productId,
+      addedDate: now.toLocaleDateString('vi-VN'),
+      lastPolishedDate: now.toLocaleDateString('vi-VN'),
+      nextPolishDate: nextPolish.toLocaleDateString('vi-VN'),
+      note: customNote || 'Bảo hành đánh bóng miễn phí trọn đời tại Phát Đạt Jewelry'
+    });
+  }
+  localStorage.setItem(OWNED_BOX_KEY, JSON.stringify(list));
+  window.dispatchEvent(new CustomEvent('owned-box-updated', { detail: { list } }));
+  return !exists;
+}
+
+export function markJewelryPolishedToday(productId) {
+  const list = getOwnedJewelryList();
+  const now = new Date();
+  const nextPolish = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  const updated = list.map(item => {
+    if (item.productId === productId) {
+      return {
+        ...item,
+        lastPolishedDate: now.toLocaleDateString('vi-VN'),
+        nextPolishDate: nextPolish.toLocaleDateString('vi-VN')
+      };
+    }
+    return item;
+  });
+  localStorage.setItem(OWNED_BOX_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new CustomEvent('owned-box-updated', { detail: { list: updated } }));
+  return updated;
+}
+
+// ── 9. ANNIVERSARY & GIFT REMINDER PLANNER (LỊCH NHẮC KỶ NIỆM & QUÀ TẶNG) ──
+const REMINDERS_KEY = 'phatdat_anniversary_reminders';
+
+const DEFAULT_REMINDERS = [
+  {
+    id: 'rem-default-1',
+    title: 'Ngày Phụ Nữ Việt Nam 20/10',
+    recipient: 'Mẹ & Người thương',
+    dateStr: `${new Date().getFullYear()}-10-20`,
+    categoryHint: 'necklaces',
+    note: 'Gợi ý: Dây chuyền Cỏ Ba Lá hoặc Nhẫn Moissanite kèm hộp nhung xanh'
+  }
+];
+
+export function getAnniversaryReminders() {
+  try {
+    const raw = localStorage.getItem(REMINDERS_KEY);
+    return raw ? JSON.parse(raw) : DEFAULT_REMINDERS;
+  } catch (e) {
+    return DEFAULT_REMINDERS;
+  }
+}
+
+export function addAnniversaryReminder(reminder) {
+  const list = getAnniversaryReminders();
+  const entry = {
+    id: 'rem-' + Date.now(),
+    title: (reminder.title || 'Kỷ niệm đặc biệt').trim(),
+    recipient: (reminder.recipient || 'Người thương').trim(),
+    dateStr: reminder.dateStr || new Date().toISOString().slice(0, 10),
+    categoryHint: reminder.categoryHint || 'necklaces',
+    note: (reminder.note || 'Tặng kèm hộp quà nhung & thiệp viết tay').trim()
+  };
+  list.unshift(entry);
+  localStorage.setItem(REMINDERS_KEY, JSON.stringify(list));
+  return list;
+}
+
+export function deleteAnniversaryReminder(id) {
+  const list = getAnniversaryReminders().filter(r => r.id !== id);
+  localStorage.setItem(REMINDERS_KEY, JSON.stringify(list));
+  return list;
+}
+
+// ── 10. COMFORT READING & ACCESSIBILITY PREFERENCES ──
+const COMFORT_KEY = 'phatdat_comfort_prefs';
+
+export function getComfortPrefs() {
+  try {
+    const raw = localStorage.getItem(COMFORT_KEY);
+    return raw ? JSON.parse(raw) : { largeText: false, warmTone: false };
+  } catch (e) {
+    return { largeText: false, warmTone: false };
+  }
+}
+
+export function applyComfortPrefs(prefs = getComfortPrefs()) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('pd-comfort-large-text', !!prefs.largeText);
+  document.body.classList.toggle('pd-comfort-warm-tone', !!prefs.warmTone);
+}
+
+export function saveComfortPrefs(prefs) {
+  const merged = { ...getComfortPrefs(), ...prefs };
+  localStorage.setItem(COMFORT_KEY, JSON.stringify(merged));
+  applyComfortPrefs(merged);
+  return merged;
+}
+
+
