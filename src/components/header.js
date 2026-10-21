@@ -369,6 +369,7 @@ export function openSearchDrawer() {
       <div class="search-drawer__top">
         ${SVG_ICONS.search}
         <input type="text" class="search-drawer__input" placeholder="Tìm nhẫn, dây chuyền cỏ ba lá, đá moissanite..." autofocus>
+        <button type="button" id="search-voice-btn" style="background: none; border: none; font-size: 18px; cursor: pointer; color: var(--color-brand-primary); padding: 4px 8px;" title="Tìm kiếm bằng giọng nói Tiếng Việt">🎙️</button>
         <button class="search-drawer__close" aria-label="Close search">✕</button>
       </div>
 
@@ -480,6 +481,52 @@ export function openSearchDrawer() {
       navigate(`/search/${encodeURIComponent(val)}`);
     }
   });
+
+  // Voice Search (Round 38)
+  const voiceBtn = drawer.querySelector('#search-voice-btn');
+  if (voiceBtn) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'vi-VN';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        voiceBtn.textContent = '🔴';
+        inputEl.placeholder = 'Đang lắng nghe bạn nói...';
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        inputEl.value = transcript;
+        inputEl.dispatchEvent(new Event('input'));
+        addRecentSearch(transcript);
+      };
+
+      recognition.onerror = () => {
+        voiceBtn.textContent = '🎙️';
+        inputEl.placeholder = 'Tìm nhẫn, dây chuyền cỏ ba lá, đá moissanite...';
+      };
+
+      recognition.onend = () => {
+        voiceBtn.textContent = '🎙️';
+        inputEl.placeholder = 'Tìm nhẫn, dây chuyền cỏ ba lá, đá moissanite...';
+      };
+
+      voiceBtn.addEventListener('click', () => {
+        try {
+          recognition.start();
+        } catch (e) {
+          recognition.stop();
+        }
+      });
+    } else {
+      voiceBtn.addEventListener('click', () => {
+        alert('Trình duyệt hiện tại chưa hỗ trợ nhận diện giọng nói. Bạn hãy gõ từ khóa tìm kiếm nhé!');
+      });
+    }
+  }
 
   // Render initial featured products
   renderSearchResults(products.slice(0, 6));

@@ -37,7 +37,11 @@ import {
   openChainVisualizerModal,
   openWristSizerModal,
   openUnboxingPreviewModal,
-  openSilverRescueModal
+  openSilverRescueModal,
+  openDiamondFireModal,
+  openRingStackingModal,
+  openCertificateModal,
+  openPendantScaleModal
 } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
@@ -175,6 +179,9 @@ export function renderProductDetail(container, params = {}) {
     <button type="button" class="pd-skintone-btn" data-bg="radial-gradient(circle, #244743 0%, #112624 100%)" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 11.5px; font-weight: 500; cursor: pointer;">
       <span style="width: 12px; height: 12px; border-radius: 50%; background: #143F3B; border: 1px solid rgba(0,0,0,0.1);"></span> Nhung Ngọc Lục Bảo
     </button>
+    <button type="button" id="pdp-toggle-candlelight-btn" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 16px; border: 1px solid #C99738; background: #FAF5E8; color: #8A6218; font-size: 11.5px; font-weight: 700; cursor: pointer;" title="Chuyển chế độ ánh đèn tiệc tối (Candlelight Glow)">
+      🕯️ Ánh Đèn Tiệc Tối
+    </button>
     <button type="button" id="pdp-toggle-loupe-btn" style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 16px; border: 1px solid var(--color-brand-primary); background: #fff; color: var(--color-brand-primary); font-size: 11.5px; font-weight: 700; cursor: pointer;" title="Bật kính lúp soi chi tiết giác cắt đá 2.2x">
       🔍 Kính Lúp Soi Đá 2.2x
     </button>
@@ -231,6 +238,23 @@ export function renderProductDetail(container, params = {}) {
       loupeBtn.textContent = loupeEnabled ? '🔍 Đang Bật Kính Lúp (Di chuột lên ảnh)' : '🔍 Kính Lúp Soi Đá 2.2x';
       if (!loupeEnabled) loupeLens.style.display = 'none';
       else showToast('Đã bật Kính Lúp 2.2x! Hãy di chuột hoặc chạm lên ảnh chính để soi chi tiết đá & bạc.', 'info', 2800);
+    });
+  }
+
+  // Candlelight Glow Ambiance Toggle (Round 39)
+  let candlelightEnabled = false;
+  const candleBtn = skinToneBar.querySelector('#pdp-toggle-candlelight-btn');
+  if (candleBtn) {
+    candleBtn.addEventListener('click', () => {
+      candlelightEnabled = !candlelightEnabled;
+      candleBtn.style.background = candlelightEnabled ? 'linear-gradient(135deg, #C99738 0%, #A4791E 100%)' : '#FAF5E8';
+      candleBtn.style.color = candlelightEnabled ? '#fff' : '#8A6218';
+      candleBtn.textContent = candlelightEnabled ? '🕯️ Đang Bật Ánh Nến Tiệc Tối' : '🕯️ Ánh Đèn Tiệc Tối';
+      galleryInner.querySelectorAll('.pdp-gallery__item').forEach(itemEl => {
+        itemEl.style.filter = candlelightEnabled ? 'sepia(0.18) contrast(1.18) brightness(1.08)' : 'none';
+        itemEl.style.background = candlelightEnabled ? 'radial-gradient(circle, #2A2318 0%, #120F0A 100%)' : '';
+      });
+      showToast(candlelightEnabled ? 'Đã bật Ánh Nến Tiệc Tối! Xem độ lấp lánh phản quang của đá dưới ánh đèn vàng.' : 'Đã trở về ánh sáng ban ngày tự nhiên.', 'info', 2500);
     });
   }
   skinToneBar.querySelectorAll('.pd-skintone-btn').forEach(btn => {
@@ -352,12 +376,64 @@ export function renderProductDetail(container, params = {}) {
   // Price
   const priceEl = document.createElement('div');
   priceEl.className = 'pdp-info__price';
-  priceEl.style.cssText = 'font-size: 26px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 20px; display: flex; align-items: baseline; gap: 8px;';
+  priceEl.style.cssText = 'font-size: 26px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 14px; display: flex; align-items: baseline; gap: 8px;';
   priceEl.innerHTML = `
     <span>${formatPrice(product.price)}</span>
     <span style="font-size: 13px; font-weight: 400; color: var(--color-text-secondary);">(Đã bao gồm hộp quà & bảo hành)</span>
   `;
   info.appendChild(priceEl);
+
+  // Live Showroom Stock & Ready-to-Try Finder (Round 33)
+  const stockEl = document.createElement('div');
+  stockEl.style.cssText = 'background: #F4F9F8; border: 1px solid #C5DEDB; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;';
+  stockEl.innerHTML = `
+    <div style="font-size: 12.5px;">
+      <div style="font-weight: 700; color: #1E5D57; display: flex; align-items: center; gap: 6px;">
+        <span style="color: #27ae60; font-size: 14px;">●</span> Có sẵn tại quầy Showroom Tân Vĩnh Lộc
+      </div>
+      <div style="color: var(--color-text-secondary); font-size: 11.5px; margin-top: 2px;">
+        Sẵn sàng thử mẫu trực tiếp. Quý khách có thể yêu cầu nhân viên giữ mẫu 2 giờ trước khi ghé tiệm.
+      </div>
+    </div>
+    <button type="button" id="pdp-reserve-showroom-btn" style="background: #fff; border: 1px solid var(--color-brand-primary); color: var(--color-brand-primary); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap;">
+      📌 Giữ mẫu 2 giờ
+    </button>
+  `;
+  stockEl.querySelector('#pdp-reserve-showroom-btn').addEventListener('click', () => {
+    const msg = encodeURIComponent(`Chào tiệm Phát Đạt, tôi muốn giữ mẫu trang sức [${product.name} - Mã: ${product.reference}] tại quầy trong 2 giờ tới để ghé thử trực tiếp.`);
+    window.open(`${siteInfo.zalo}?text=${msg}`, '_blank', 'noopener,noreferrer');
+  });
+  info.appendChild(stockEl);
+
+  // Quick Jewelry Assistant Chips (Rounds 31, 32, 40)
+  const assistantRow = document.createElement('div');
+  assistantRow.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px;';
+  assistantRow.innerHTML = `
+    ${product.category === 'rings' ? `
+      <button type="button" id="pdp-open-stack-btn" style="background: #FDFBF7; border: 1px solid #EEDFCA; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+        💍 Phối Nhẫn Xếp Tầng
+      </button>
+    ` : ''}
+    ${product.category === 'necklaces' ? `
+      <button type="button" id="pdp-open-pendant-scale-btn" style="background: #FDF9F3; border: 1px solid #EADBBA; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+        ✨ Thước Đo Tỷ Lệ Mặt Dây
+      </button>
+    ` : ''}
+    <button type="button" id="pdp-open-fire-btn" style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      💎 Soi Độ Lửa Đá Moissanite
+    </button>
+    <button type="button" id="pdp-open-cert-btn" style="background: #FAF5E8; border: 1px solid #C99738; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      📜 Chứng Thư Kiểm Định S925
+    </button>
+  `;
+  const stackBtn = assistantRow.querySelector('#pdp-open-stack-btn');
+  if (stackBtn) stackBtn.addEventListener('click', () => openRingStackingModal(product.id));
+  const pendantBtn = assistantRow.querySelector('#pdp-open-pendant-scale-btn');
+  if (pendantBtn) pendantBtn.addEventListener('click', () => openPendantScaleModal(product));
+  assistantRow.querySelector('#pdp-open-fire-btn').addEventListener('click', () => openDiamondFireModal());
+  assistantRow.querySelector('#pdp-open-cert-btn').addEventListener('click', () => openCertificateModal(product));
+  info.appendChild(assistantRow);
+
 
   // Variant: Sizes & Size Guide
   if (product.availableSizes && product.availableSizes.length > 0) {

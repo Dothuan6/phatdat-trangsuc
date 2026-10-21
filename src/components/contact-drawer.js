@@ -17,7 +17,13 @@ import {
   openWristSizerModal,
   openUnboxingPreviewModal,
   openStyleQuizModal,
-  openSilverRescueModal
+  openSilverRescueModal,
+  openDiamondFireModal,
+  openRingStackingModal,
+  openLovedOnesSizeModal,
+  openMenConciergeModal,
+  openCertificateModal,
+  openPendantScaleModal
 } from './feedback-modal.js';
 import { openGlobalSizeGuide } from './size-guide-modal.js';
 import {
@@ -108,6 +114,24 @@ export function createContactDrawer() {
           </button>
           <button type="button" id="cd-tool-reminder" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             📅 Nhắc ngày kỷ niệm
+          </button>
+          <button type="button" id="cd-tool-loved" style="background: #FDF4F8; border: 1px solid #FBCFE8; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #9D174D;">
+            👥 Sổ đo size người thân
+          </button>
+          <button type="button" id="cd-tool-stacking" style="background: #FDFBF7; border: 1px solid #EEDFCA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            💍 Phối nhẫn xếp tầng
+          </button>
+          <button type="button" id="cd-tool-fire" style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #1E40AF;">
+            💎 Soi độ lửa Moissanite
+          </button>
+          <button type="button" id="cd-tool-men" style="background: #0F2A27; border: 1px solid #C99738; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #F3D184;">
+            🎩 Nam giới chọn quà bí mật
+          </button>
+          <button type="button" id="cd-tool-cert" style="background: #fff; border: 1px solid var(--color-accent-gold); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            📜 Chứng thư kiểm định S925
+          </button>
+          <button type="button" id="cd-tool-pendant" style="background: #FDF9F3; border: 1px solid #EADBBA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            ✨ Đo tỷ lệ mặt dây & dáng người
           </button>
           <button type="button" id="cd-tool-warranty" style="grid-column: 1 / -1; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🛡️ Tra cứu Thẻ Bảo Hành Điện Tử bằng Số Điện Thoại
@@ -277,6 +301,30 @@ export function createContactDrawer() {
   drawer.querySelector('#cd-tool-rescue').addEventListener('click', () => {
     closeDrawer();
     openSilverRescueModal();
+  });
+  drawer.querySelector('#cd-tool-loved').addEventListener('click', () => {
+    closeDrawer();
+    openLovedOnesSizeModal();
+  });
+  drawer.querySelector('#cd-tool-stacking').addEventListener('click', () => {
+    closeDrawer();
+    openRingStackingModal();
+  });
+  drawer.querySelector('#cd-tool-fire').addEventListener('click', () => {
+    closeDrawer();
+    openDiamondFireModal();
+  });
+  drawer.querySelector('#cd-tool-men').addEventListener('click', () => {
+    closeDrawer();
+    openMenConciergeModal();
+  });
+  drawer.querySelector('#cd-tool-cert').addEventListener('click', () => {
+    closeDrawer();
+    openCertificateModal();
+  });
+  drawer.querySelector('#cd-tool-pendant').addEventListener('click', () => {
+    closeDrawer();
+    openPendantScaleModal();
   });
 
   // Currency Selector events

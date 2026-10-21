@@ -54,6 +54,19 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 29. **Trải Nghiệm Cài Đặt Web App PWA Thông Minh (`initPwaInstallBanner`)**: Thông báo cài đặt ứng dụng nhẹ nhàng cho Android và iOS Safari, hỗ trợ lướt xem mượt mà kể cả khi mạng yếu.
 30. **Chế Độ Trình Chiếu iPad Cho Quầy Kính Showroom (Kiosk Mode trong Backoffice)**: Chế độ full-screen dành cho tư vấn viên tại cửa hàng, hiển thị lookbook ảnh lớn, chạm mở lúp soi đá và mã QR tư vấn tại quầy.
 
+#### D. Giai Đoạn 4: Trải Nghiệm Chuyên Sâu, Công Nghệ Ánh Sáng & Thu Cũ Lên Đời (Vòng 31 - 40)
+31. **Mô Phỏng Độ Lửa & Tán Sắc Ánh Sáng Đá Moissanite (`openDiamondFireModal`)**: Giả lập góc xoay ánh sáng và các điều kiện môi trường quang học (Ánh đèn tiệc tối, Nắng tự nhiên, Ánh đèn Showroom, Ánh nến lãng mạn), hiển thị tia lửa cầu vồng rực rỡ đặc trưng của giác cắt Hearts & Arrows.
+32. **Phòng Thử Nghiệm Phối Nhẫn Xếp Tầng (`openRingStackingModal`)**: Mix & match tự do 1-3 chiếc nhẫn trên cùng một ngón tay (nhẫn đá chủ Solitaire + nhẫn đai Eternity + nhẫn uốn lượn Chevron), chọn màu xi (Bạch Kim / Vàng Hồng / Vàng 18K) và gửi trọn bộ sang Zalo tư vấn.
+33. **Trạng Thái Tồn Kho Showroom & Đặt Giữ Hàng 2 Giờ (`#pdp-reserve-showroom-btn`)**: Hiển thị tem xanh "Có sẵn tại Showroom Tân Vĩnh Lộc" kèm tính năng đặt giữ mẫu trang sức 2 giờ trước khi khách ghé tiệm để thử trực tiếp tại quầy kính.
+34. **Thước Đo Tỷ Lệ Mặt Dây & Vóc Dáng Cơ Thể (`openPendantScaleModal`)**: Mô phỏng SVG trực quan kích thước mặt dây (6mm – 25mm) trên các dáng người (Thon thả <1m58, Cân đối 1m58–1m68, Cao ráo >1m68) và so sánh kích thước 1:1 với vật thật (Đồng xu 1.000đ, 2.000đ, 5.000đ, Hạt cà phê).
+35. **Cẩm Nang Kim Loại Quý & Chính Sách Thu Đổi Nâng Cấp (Trade-in)** (`#/info/precious-metals`): Minh bạch đặc tính Bạc Ý S925 phủ 3 lớp Rhodium, Đá Moissanite kiểm định GRA, bảng tính bảo lưu giá trị thu đổi 60–70% và kết nối chuyên viên thẩm định giá.
+36. **Sổ Đo Size Người Thân & Gia Đình (`openLovedOnesSizeModal`)**: Quản lý danh bạ số đo (size nhẫn, chu vi cổ tay, độ dài dây chuyền) của người yêu, bố mẹ, bạn bè để chọn quà tặng chuẩn xác 100% không sợ sai kích cỡ.
+37. **Trợ Lý Tư Vấn Quà Tặng Kín Đáo Dành Cho Nam Giới (`openMenConciergeModal`)**: Giao diện thiết kế riêng cho phái mạnh, chọn nhanh ngân sách, phong cách người thương và dịp tặng để chuyên viên nữ tư vấn hỗ trợ trọn gói từ size đến thiệp viết tay bí mật.
+38. **Tìm Kiếm Bằng Giọng Nói Tiếng Việt (`initVoiceSearch`)**: Tích hợp Web Speech API tiếng Việt (`vi-VN`) với nút micro tương tác trên thanh tìm kiếm header, nhận diện giọng nói tức thì (*"dây chuyền cỏ ba lá"*, *"nhẫn cầu hôn moissanite"*, v.v.).
+39. **Chế Độ Ánh Nến Tiệc Tối Cho Ảnh Chi Tiết (`#pdp-toggle-candlelight-btn`)**: Nút chuyển đổi hiệu ứng ánh sáng quang học trên trang chi tiết sản phẩm giữa ánh sáng ban ngày tự nhiên và ánh nến tiệc tối ấm áp (`sepia/contrast/glow`).
+40. **Chứng Thư Kiểm Định Bạc S925 & Dấu Niêm Phong Hologram (`openCertificateModal`)**: Thẻ kiểm định chất lượng điện tử chính thức của Phát Đạt Jewelry với mã kiểm định duy nhất, thông số 4C, dấu bảo hành trọn đời và hỗ trợ in ấn trực tiếp.
+
+
 ---
 
 ### 3. Tối Ưu Hóa Responsive Đa Thiết Bị

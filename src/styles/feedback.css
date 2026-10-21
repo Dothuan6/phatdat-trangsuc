@@ -946,4 +946,119 @@
   font-size: 13px;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PHASE 4 EXPANSION: DIAMOND FIRE, RING STACKING, CERTIFICATE & SIZES
+   ══════════════════════════════════════════════════════════════ */
+
+/* Diamond Fire & Light Dispersion Stage (Round 31) */
+.pd-diamond-fire-stage {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.4);
+  transition: background 0.4s ease;
+}
+
+.pd-gem-sparkle-core {
+  width: 90px;
+  height: 90px;
+  position: relative;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.85));
+  animation: gentlePulse 3s infinite alternate ease-in-out;
+}
+
+@keyframes gentlePulse {
+  0% { transform: scale(0.97) rotate(0deg); }
+  100% { transform: scale(1.03) rotate(3deg); }
+}
+
+/* Ring Stacking Studio (Round 32) */
+.pd-ring-stack-stage {
+  background: radial-gradient(circle, #FFFFFF 0%, #F5F3ED 100%);
+  border: 1px solid #E2DED5;
+  border-radius: 12px;
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+/* Certificate of Authenticity (Round 40) */
+.pd-cert-canvas {
+  background: linear-gradient(135deg, #FCFBF7 0%, #FFFFFF 50%, #FAF7EE 100%);
+  border: 2px solid #C99738;
+  border-radius: 12px;
+  padding: 24px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(201, 151, 56, 0.15);
+  font-family: var(--font-body);
+}
+
+.pd-cert-canvas::before {
+  content: '';
+  position: absolute;
+  top: 6px; left: 6px; right: 6px; bottom: 6px;
+  border: 1px dashed rgba(201, 151, 56, 0.5);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Loved Ones Size Book Cards (Round 36) */
+.pd-loved-ones-card {
+  background: #ffffff;
+  border: 1px solid #E2EBE7;
+  border-radius: 10px;
+  padding: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.pd-loved-ones-card:hover {
+  border-color: var(--color-brand-primary);
+  box-shadow: 0 4px 12px rgba(30, 93, 87, 0.08);
+}
+
+/* Pendant Proportion & Body Scale Estimator (Round 34) */
+.pd-pendant-scale-stage {
+  background: radial-gradient(circle at 50% 30%, #FDFBF8 0%, #F5F1E8 100%);
+  border: 1px solid #E8DFD1;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.pd-pendant-svg-wrap {
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.pd-pendant-advisor-box {
+  background: #FFFFFF;
+  border: 1.5px solid #C5DEDB;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+
+
+
 

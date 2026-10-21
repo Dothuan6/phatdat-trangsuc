@@ -295,6 +295,116 @@ export const infoPages = {
       </div>
       ${contactBlock()}`,
   },
+  'precious-metals': {
+    title: 'Kim Loại Quý, Đá Moissanite & Chính Sách Thu Đổi Nâng Cấp Bạc S925',
+    image: G(7),
+    body: () => `
+      <p>Trang sức tại <strong>Phát Đạt Jewelry</strong> được chế tác từ hợp kim Bạc Ý S925 nguyên chuẩn phối Bạch kim Rhodium chống xỉn và đá Moissanite kiểm định quang học. Chúng tôi cam kết bảo lưu giá trị sản phẩm trọn đời và hỗ trợ chính sách <strong>Thu cũ - Đổi mới (Trade-in)</strong> minh bạch, tiện lợi nhất cho quý khách hàng.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 20px 0;">
+        <div style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px;">
+          <div style="font-weight: 700; color: var(--color-brand-primary); font-size: 14px; margin-bottom: 4px;">🛡️ Bạc Ý S925 Xi Bạch Kim</div>
+          <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5;">Hàm lượng bạc 92.5% đạt chuẩn quốc tế, phủ 3 lớp Rhodium cao cấp chống ố vàng, sáng bóng tựa vàng trắng.</div>
+        </div>
+        <div style="background: #FDFBF7; border: 1px solid #EEDFCA; border-radius: 10px; padding: 14px;">
+          <div style="font-weight: 700; color: #8A6218; font-size: 14px; margin-bottom: 4px;">💎 Đá Moissanite Kiểm Định</div>
+          <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5;">Độ cứng 9.25 Mohs chỉ sau kim cương thiên nhiên, giác cắt Hearts & Arrows tán sắc 7 màu vĩnh cửu.</div>
+        </div>
+        <div style="background: #FAF5E8; border: 1px solid #EADBBA; border-radius: 10px; padding: 14px;">
+          <div style="font-weight: 700; color: #6D4C13; font-size: 14px; margin-bottom: 4px;">🔄 Bảo Lưu Giá Trị 60 – 70%</div>
+          <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5;">Dễ dàng lên đời mẫu trang sức mới hoặc đổi size, giữ vững giá trị đầu tư cho món trang sức của bạn.</div>
+        </div>
+      </div>
+
+      <h2>1. Biểu Phí & Tỷ Lệ Thu Đổi Nâng Cấp (Trade-in)</h2>
+      <table>
+        <tr><th>Thời Gian Sở Hữu</th><th>Quy Định Thu Đổi</th><th>Giá Trị Khấu Trừ / Bảo Lưu</th></tr>
+        <tr><td><strong>Trong 7 ngày đầu</strong></td><td>Đổi mẫu mới hoặc đổi size khi sản phẩm còn nguyên hộp & tem</td><td><strong>Đổi 1-1 Miễn Phí (100% Giá Trị)</strong></td></tr>
+        <tr><td><strong>Từ 8 ngày – 6 tháng</strong></td><td>Thu cũ lên đời mẫu mới Moissanite hoặc Bạc mẫu mới</td><td><strong>Bảo lưu 70%</strong> giá trị hóa đơn cũ</td></tr>
+        <tr><td><strong>Từ 6 – 12 tháng</strong></td><td>Thu đổi nâng cấp dòng trang sức cao cấp hơn</td><td><strong>Bảo lưu 60%</strong> giá trị hóa đơn cũ</td></tr>
+        <tr><td><strong>Trên 12 tháng</strong></td><td>Định giá theo trọng lượng bạc tại thời điểm thu + Ưu đãi</td><td><strong>Giảm 15%</strong> cho món trang sức mới lên đời</td></tr>
+      </table>
+
+      <h2>2. Bộ Tính Giá Trị Thu Đổi Tương Tác (Ước Tính Nhanh)</h2>
+      <div id="info-tradein-calc" style="background: #FAF9F5; border: 1.5px solid #DFC9A8; border-radius: 12px; padding: 18px; margin: 18px 0 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+              Loại trang sức muốn thu đổi:
+            </label>
+            <select id="tradein-cat" class="admin-form-input" style="width: 100%; font-size: 13px;">
+              <option value="Nhẫn Bạc Ý S925">Nhẫn Bạc Ý S925</option>
+              <option value="Dây Chuyền & Mặt Dây S925">Dây Chuyền & Mặt Dây S925</option>
+              <option value="Lắc Tay / Vòng Tay S925">Lắc Tay / Vòng Tay S925</option>
+              <option value="Trang Sức Đính Đá Moissanite">Trang Sức Đính Đá Moissanite</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+              Thời gian đã sử dụng:
+            </label>
+            <select id="tradein-time" class="admin-form-input" style="width: 100%; font-size: 13px;">
+              <option value="0.7">Dưới 6 tháng (Bảo lưu 70%)</option>
+              <option value="0.6">Từ 6 đến 12 tháng (Bảo lưu 60%)</option>
+              <option value="0.5">Trên 1 năm (Ưu đãi trợ giá 50%)</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+              Giá gốc sản phẩm (VNĐ):
+            </label>
+            <select id="tradein-price" class="admin-form-input" style="width: 100%; font-size: 13px;">
+              <option value="350000">350.000 ₫ (Dòng bạc cơ bản)</option>
+              <option value="650000">650.000 ₫ (Dòng đính đá CZ 5A)</option>
+              <option value="1200000">1.200.000 ₫ (Moissanite 1 Carat)</option>
+              <option value="2500000">2.500.000 ₫ (Moissanite Cao Cấp)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #E0D3BE; border-radius: 8px; padding: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div style="font-size: 11.5px; color: var(--color-text-secondary); text-transform: uppercase; font-weight: 600;">Giá Trị Thu Đổi Dự Kiến:</div>
+            <div id="tradein-result-val" style="font-size: 20px; font-weight: 800; color: #D4380D;">245.000 ₫</div>
+            <div style="font-size: 11px; color: #27ae60; margin-top: 2px;">✓ Được trừ trực tiếp khi quý khách chọn sản phẩm mới</div>
+          </div>
+          <button type="button" id="tradein-zalo-btn" class="btn" style="background: var(--color-brand-primary); color: #fff; font-size: 12.5px; padding: 10px 16px;">
+            💬 Gửi Ảnh Mẫu Để Thẩm Định Zalo
+          </button>
+        </div>
+      </div>
+
+      <h2>3. Thu Mua & Làm Sáng Bạc Cũ Khách Mang Đến</h2>
+      <p>Ngay cả khi bạn sở hữu trang sức Bạc không mua tại Phát Đạt Jewelry, showroom chúng tôi vẫn sẵn lòng:</p>
+      <ul>
+        <li><strong>Đo quang phổ kiểm tra tuổi bạc miễn phí</strong> bằng thiết bị chuyên dụng.</li>
+        <li><strong>Vệ sinh siêu âm & đánh bóng làm mới</strong> lấy liền trong 15 phút.</li>
+        <li><strong>Hỗ trợ thu mua lại theo giá bạc nguyên liệu thị trường</strong> để bạn dễ dàng đổi sang mẫu mới ưng ý hơn.</li>
+      </ul>
+
+      <h2>4. Bàn Soi So Sánh Đá Quý & Chất Liệu Bạc S925 (Tương Tác)</h2>
+      <div id="info-gem-explorer" style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 12px; padding: 18px; margin: 16px 0 24px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 10px;">
+          💎 Bấm chọn loại đá hoặc lớp xi mạ để xem thông số quang học & độ bền:
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;">
+          <button type="button" class="gem-exp-btn is-active" data-gem="moissanite" style="padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-primary); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer;">✨ Đá Moissanite Cao Cấp</button>
+          <button type="button" class="gem-exp-btn" data-gem="cz" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">💎 Đá CZ (Cubic Zirconia 5A)</button>
+          <button type="button" class="gem-exp-btn" data-gem="mop" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🐚 Xà Cừ & Ngọc Trai Tự Nhiên</button>
+          <button type="button" class="gem-exp-btn" data-gem="s925" style="padding: 7px 14px; border-radius: 20px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer;">🛡️ Bạc Ý S925 Xi Bạch Kim / Vàng 18K</button>
+        </div>
+        <div id="gem-exp-detail" style="background: #ffffff; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 16px;">
+          <div style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">✨ Đá Moissanite — Độ Lửa Rực Rỡ Vượt Kim Cương</div>
+          <div style="font-size: 13px; color: var(--color-text-secondary); line-height: 1.6;">
+            • <strong>Độ cứng Mohs:</strong> 9.25 / 10 (Chống trầy xước cực cao, bền bỉ trọn đời)<br>
+            • <strong>Chiết suất ánh sáng (Brilliance):</strong> 2.65 – 2.69 (Tán sắc cầu vồng rực rỡ dưới ánh đèn tiệc & nắng tự nhiên)<br>
+            • <strong>Phù hợp nhất:</strong> Nhẫn cầu hôn, nhẫn dự tiệc, mặt dây chuyền Solitaire sang trọng.
+          </div>
+        </div>
+      </div>
+      ${contactBlock()}`,
+  },
+
 };
 
 export function renderInfo(container, params = {}) {
@@ -327,6 +437,41 @@ export function renderInfo(container, params = {}) {
 
   const neckBtn = page.querySelector('#info-open-necklace-viz');
   if (neckBtn) neckBtn.addEventListener('click', () => openGlobalSizeGuide('necklace'));
+
+  // Interactive Trade-in Calculator (Round 35)
+  const tradeinCalc = page.querySelector('#info-tradein-calc');
+  if (tradeinCalc) {
+    const catSel = tradeinCalc.querySelector('#tradein-cat');
+    const timeSel = tradeinCalc.querySelector('#tradein-time');
+    const priceSel = tradeinCalc.querySelector('#tradein-price');
+    const resultVal = tradeinCalc.querySelector('#tradein-result-val');
+    const zaloBtn = tradeinCalc.querySelector('#tradein-zalo-btn');
+
+    function updateTradein() {
+      const price = Number(priceSel.value) || 350000;
+      const rate = Number(timeSel.value) || 0.7;
+      const est = Math.round(price * rate);
+      resultVal.textContent = est.toLocaleString('vi-VN') + ' ₫';
+    }
+
+    if (catSel && timeSel && priceSel && resultVal) {
+      catSel.addEventListener('change', updateTradein);
+      timeSel.addEventListener('change', updateTradein);
+      priceSel.addEventListener('change', updateTradein);
+      updateTradein();
+    }
+
+    if (zaloBtn) {
+      zaloBtn.addEventListener('click', () => {
+        const cat = catSel.value;
+        const timeText = timeSel.options[timeSel.selectedIndex].text;
+        const priceText = priceSel.options[priceSel.selectedIndex].text;
+        const estText = resultVal.textContent;
+        const msg = encodeURIComponent(`Chào Phát Đạt Jewelry, tôi muốn tư vấn chính sách Thu cũ đổi mới cho món trang sức [${cat}], thời gian dùng [${timeText}], giá gốc [${priceText}], ước tính thu [${estText}]. Tôi gửi hình sản phẩm để tiệm thẩm định giúp nhé!`);
+        window.open(`${siteInfo.zalo}?text=${msg}`, '_blank', 'noopener,noreferrer');
+      });
+    }
+  }
 
   // Interactive Gemstone Explorer handler (Vòng 8)
   const gemSpecs = {

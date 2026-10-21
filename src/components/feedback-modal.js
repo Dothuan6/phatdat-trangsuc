@@ -17,7 +17,10 @@ import {
   getUserJewelrySizes,
   saveUserJewelrySizes,
   formatConvertedPrice,
-  getSelectedCurrency
+  getSelectedCurrency,
+  getLovedOnesSizes,
+  saveLovedOneSize,
+  deleteLovedOneSize
 } from '../data/wishlist-store.js';
 import { products, getProductById, formatPrice } from '../data/products.js';
 import { siteInfo } from '../data/site-info.js';
@@ -3466,6 +3469,760 @@ export function openSilverRescueModal() {
   });
 }
 
+// ══════════════════════════════════════════════════════════════
+// 23. INTERACTIVE 4C & DIAMOND FIRE SIMULATOR (ROUND 31)
+// ══════════════════════════════════════════════════════════════
+
+export function openDiamondFireModal() {
+  let stoneCut = 'round'; // 'round', 'cushion', 'princess', 'emerald'
+  let lightAmbiance = 'daylight'; // 'daylight', 'showroom', 'party'
+
+  const { overlay, close } = createModalBase({
+    title: 'Mô Phỏng Độ Lửa & Tán Sắc Đá Moissanite',
+    subtitle: 'Soi hiệu ứng tán sắc ánh sáng 7 màu dưới các môi trường thực tế',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const ambianceStyles = {
+      daylight: {
+        bg: 'radial-gradient(circle, #EBF5F3 0%, #B5D2CB 100%)',
+        textColor: '#1E5D57',
+        label: '☀️ Ánh Sáng Tự Nhiên (5500K)',
+        desc: 'Độ phản chiếu trong suốt thuần khiết, lộ rõ từng giác cắt vi mô đối xứng Hearts & Arrows.',
+        fireColor: 'rgba(255,255,255,0.9)'
+      },
+      showroom: {
+        bg: 'radial-gradient(circle, #2D271D 0%, #15120C 100%)',
+        textColor: '#F3D184',
+        label: '💡 Đèn Showroom Hoàng Gia (3000K)',
+        desc: 'Ánh vàng ấm kích hoạt độ tán sắc lửa cầu vồng rực rỡ đặc trưng của đá Moissanite cao cấp.',
+        fireColor: 'rgba(243, 209, 132, 0.95)'
+      },
+      party: {
+        bg: 'radial-gradient(circle, #1F192E 0%, #090610 100%)',
+        textColor: '#D8B4FE',
+        label: '🥂 Ánh Đèn Dạ Tiệc Tối (Sparkle Night)',
+        desc: 'Độ lấp lánh (Scintillation) đạt đỉnh cao khi di chuyển, bắt trọn mọi ánh nhìn từ xa.',
+        fireColor: 'rgba(216, 180, 254, 0.95)'
+      }
+    };
+
+    const cur = ambianceStyles[lightAmbiance];
+
+    body.innerHTML = `
+      <!-- Ambiance Selector -->
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 8px;">
+          1. Chọn môi trường ánh sáng:
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+          <button type="button" class="amb-btn" data-amb="daylight" style="padding: 8px 6px; border-radius: 6px; border: 1.5px solid ${lightAmbiance === 'daylight' ? 'var(--color-brand-primary)' : '#dde5e2'}; background: ${lightAmbiance === 'daylight' ? 'var(--color-brand-light)' : '#fff'}; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;">
+            ☀️ Tự Nhiên
+          </button>
+          <button type="button" class="amb-btn" data-amb="showroom" style="padding: 8px 6px; border-radius: 6px; border: 1.5px solid ${lightAmbiance === 'showroom' ? 'var(--color-brand-primary)' : '#dde5e2'}; background: ${lightAmbiance === 'showroom' ? 'var(--color-brand-light)' : '#fff'}; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;">
+            💡 Quầy Tiệm
+          </button>
+          <button type="button" class="amb-btn" data-amb="party" style="padding: 8px 6px; border-radius: 6px; border: 1.5px solid ${lightAmbiance === 'party' ? 'var(--color-brand-primary)' : '#dde5e2'}; background: ${lightAmbiance === 'party' ? 'var(--color-brand-light)' : '#fff'}; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center;">
+            🥂 Tiệc Tối
+          </button>
+        </div>
+      </div>
+
+      <!-- Fire Stage Simulation -->
+      <div class="pd-diamond-fire-stage" style="background: ${cur.bg};">
+        <svg viewBox="0 0 160 160" class="pd-gem-sparkle-core" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Brilliant Diamond Cut Silhouette -->
+          <polygon points="45,45 115,45 140,80 80,145 20,80" fill="url(#fireGradient)" stroke="#FFFFFF" stroke-width="1.8"/>
+          <polygon points="45,45 80,75 115,45" fill="rgba(255,255,255,0.7)"/>
+          <polygon points="20,80 80,75 45,45" fill="rgba(200,240,255,0.4)"/>
+          <polygon points="140,80 80,75 115,45" fill="rgba(255,230,200,0.4)"/>
+          <polygon points="20,80 80,145 80,75" fill="rgba(240,200,255,0.5)"/>
+          <polygon points="140,80 80,145 80,75" fill="rgba(200,255,240,0.5)"/>
+
+          <!-- Sparkle Cross Star -->
+          <line x1="80" y1="20" x2="80" y2="140" stroke="#FFF" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <line x1="20" y1="80" x2="140" y2="80" stroke="#FFF" stroke-width="1.5" stroke-dasharray="3 3"/>
+
+          <defs>
+            <linearGradient id="fireGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+              <stop offset="25%" stop-color="#70E4EF" stop-opacity="0.7"/>
+              <stop offset="50%" stop-color="#FFDD55" stop-opacity="0.8"/>
+              <stop offset="75%" stop-color="#FF66AA" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#AA66FF" stop-opacity="0.8"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div style="position: absolute; bottom: 10px; font-size: 11px; font-weight: 700; color: ${cur.textColor}; background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 12px; backdrop-filter: blur(4px);">
+          ${cur.label}
+        </div>
+      </div>
+
+      <!-- Description & 4C Spec -->
+      <div style="background: #FAF8F5; border: 1px solid #EEDFCA; border-radius: 8px; padding: 12px 14px; margin: 14px 0 0; font-size: 12.5px; line-height: 1.55;">
+        <div style="font-weight: 700; color: #8A6218; margin-bottom: 2px;">
+          💎 Chỉ số quang học đá Moissanite Phát Đạt:
+        </div>
+        <div style="color: var(--color-text-secondary); margin-bottom: 6px;">
+          ${cur.desc}
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px; border-top: 1px dashed #DFC9A8; padding-top: 6px; font-weight: 600; color: var(--color-brand-primary);">
+          <span>Độ cứng Mohs: <strong>9.25/10</strong></span>
+          <span>Chiết suất: <strong>2.65 - 2.69</strong></span>
+          <span>Giác cắt: <strong>Hearts & Arrows (57 giác)</strong></span>
+        </div>
+      </div>
+    `;
+
+    body.querySelectorAll('.amb-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        lightAmbiance = btn.dataset.amb;
+        render();
+      });
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="fire-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="fire-zalo-btn" style="flex: 1.5; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Nhận video quay viên đá thực tế qua Zalo
+    </button>
+  `;
+
+  footer.querySelector('#fire-close-btn').addEventListener('click', close);
+  footer.querySelector('#fire-zalo-btn').addEventListener('click', () => {
+    close();
+    const msg = encodeURIComponent('Chào Phát Đạt Jewelry, tôi muốn nhận video quay thực tế độ lửa của các mẫu nhẫn/mặt dây đính đá Moissanite.');
+    window.open(`${siteInfo.zalo}?text=${msg}`, '_blank', 'noopener,noreferrer');
+  });
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 24. RING STACKING & LAYERING STUDIO (ROUND 32)
+// ══════════════════════════════════════════════════════════════
+
+export function openRingStackingModal(initialRingId = null) {
+  const ringProducts = products.filter(p => p.category === 'rings');
+  let ring1 = ringProducts.find(p => p.id === initialRingId) || ringProducts[0] || products[0];
+  let ring2 = ringProducts[1] || products[1];
+
+  const { overlay, close } = createModalBase({
+    title: 'Xưởng Phối Nhẫn Xếp Tầng (Ring Stacking Studio)',
+    subtitle: 'Thử nghiệm phối ghép 2 mẫu nhẫn đeo chồng sành điệu trên cùng một ngón tay',
+    maxWidth: '620px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const totalOriginal = (ring1.price || 0) + (ring2.price || 0);
+    const comboDiscount = Math.round(totalOriginal * 0.1); // -10% combo
+    const finalComboPrice = totalOriginal - comboDiscount;
+
+    body.innerHTML = `
+      <div class="pd-ring-stack-stage">
+        <!-- Visual Finger SVG & Stacked Rings -->
+        <svg viewBox="0 0 200 180" style="width: 100%; height: 100%;" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Finger Contour -->
+          <path d="M70,0 C70,40 68,110 65,180 L135,180 C132,110 130,40 130,0 Z" fill="#FBF6F0" stroke="#DFCFC0" stroke-width="2"/>
+          <path d="M75,35 C85,38 115,38 125,35" stroke="#EADCCF" stroke-width="2" stroke-linecap="round"/>
+          <path d="M73,125 C85,128 115,128 127,125" stroke="#EADCCF" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- Ring 1 (Top / Solitaire) -->
+          <rect x="63" y="65" width="74" height="14" rx="4" fill="url(#silverGradient)" stroke="#8FA09C" stroke-width="1.5"/>
+          <circle cx="100" cy="62" r="8" fill="#C99738" stroke="#FFFFFF" stroke-width="1.8"/>
+          <polygon points="100,56 102,62 100,68 98,62" fill="#FFFFFF"/>
+
+          <!-- Ring 2 (Bottom / Chevron or Band) -->
+          <rect x="63" y="82" width="74" height="12" rx="3" fill="url(#silverGradient)" stroke="#8FA09C" stroke-width="1.5"/>
+          <!-- Small Eternity Dots -->
+          <circle cx="76" cy="88" r="2" fill="#FFF"/>
+          <circle cx="88" cy="88" r="2" fill="#FFF"/>
+          <circle cx="100" cy="88" r="2" fill="#FFF"/>
+          <circle cx="112" cy="88" r="2" fill="#FFF"/>
+          <circle cx="124" cy="88" r="2" fill="#FFF"/>
+
+          <defs>
+            <linearGradient id="silverGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#CFD6D4"/>
+              <stop offset="50%" stop-color="#FFFFFF"/>
+              <stop offset="100%" stop-color="#B0BCB9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div style="position: absolute; top: 12px; right: 12px; background: rgba(30, 93, 87, 0.9); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 14px;">
+          Set Nhẫn Tầng: Đẹp & Vừa Khít
+        </div>
+      </div>
+
+      <!-- Ring Pickers -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--color-brand-primary); text-transform: uppercase; margin-bottom: 6px;">💍 Nhẫn chính (Mặt nổi):</div>
+          <select id="stack-ring-1" class="admin-form-input" style="font-size: 12.5px; padding: 6px 8px; width: 100%;">
+            ${ringProducts.map(p => `
+              <option value="${p.id}" ${p.id === ring1.id ? 'selected' : ''}>${p.name} (${formatPrice(p.price, '₫', false)})</option>
+            `).join('')}
+          </select>
+        </div>
+
+        <div style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px;">
+          <div style="font-size: 11px; font-weight: 700; color: #8A6218; text-transform: uppercase; margin-bottom: 6px;">✨ Nhẫn phụ (Đai kẹp tầng):</div>
+          <select id="stack-ring-2" class="admin-form-input" style="font-size: 12.5px; padding: 6px 8px; width: 100%;">
+            ${ringProducts.map(p => `
+              <option value="${p.id}" ${p.id === ring2.id ? 'selected' : ''}>${p.name} (${formatPrice(p.price, '₫', false)})</option>
+            `).join('')}
+          </select>
+        </div>
+      </div>
+
+      <!-- Combo Price Banner -->
+      <div style="background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%); color: #fff; border-radius: 10px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #F3D184;">Ưu đãi Combo Nhẫn Tầng (-10%)</div>
+          <div style="font-size: 20px; font-weight: 700; color: #FFF; margin-top: 2px;">
+            ${formatPrice(finalComboPrice, '₫', false)}
+            <span style="font-size: 13px; text-decoration: line-through; opacity: 0.7; font-weight: 400; margin-left: 6px;">${formatPrice(totalOriginal, '₫', false)}</span>
+          </div>
+        </div>
+        <div style="background: rgba(201,151,56,0.3); border: 1px solid #C99738; padding: 4px 10px; border-radius: 16px; font-size: 11.5px; font-weight: 700; color: #FFF8E7;">
+          Tiết kiệm ${formatPrice(comboDiscount, '₫', false)}
+        </div>
+      </div>
+    `;
+
+    body.querySelector('#stack-ring-1').addEventListener('change', (e) => {
+      ring1 = ringProducts.find(p => p.id === e.target.value) || ring1;
+      render();
+    });
+
+    body.querySelector('#stack-ring-2').addEventListener('change', (e) => {
+      ring2 = ringProducts.find(p => p.id === e.target.value) || ring2;
+      render();
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="stack-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="stack-zalo-btn" style="flex: 1.5; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Đặt tư vấn trọn bộ Nhẫn Tầng qua Zalo
+    </button>
+  `;
+
+  footer.querySelector('#stack-close-btn').addEventListener('click', close);
+  footer.querySelector('#stack-zalo-btn').addEventListener('click', () => {
+    close();
+    const msg = encodeURIComponent(`Chào Phát Đạt, tôi muốn được tư vấn set nhẫn tầng đôi gồm: [${ring1.name}] và [${ring2.name}].`);
+    window.open(`${siteInfo.zalo}?text=${msg}`, '_blank', 'noopener,noreferrer');
+  });
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 25. SỔ ĐO SIZE NGƯỜI THÂN & GIA ĐÌNH (ROUND 36)
+// ══════════════════════════════════════════════════════════════
+
+export function openLovedOnesSizeModal() {
+  const { overlay, close } = createModalBase({
+    title: 'Sổ Đo Trang Sức Người Thân & Gia Đình',
+    subtitle: 'Lưu sẵn size nhẫn, cổ tay & dây chuyền của người thương để luôn tặng quà đúng ý',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const list = getLovedOnesSizes();
+
+    body.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;">
+        ${list.map(item => `
+          <div class="pd-loved-ones-card">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-weight: 700; font-size: 14px; color: var(--color-brand-primary);">${item.name}</span>
+                <span style="background: var(--color-brand-light); color: var(--color-brand-primary); font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${item.relation}</span>
+              </div>
+              <div style="font-size: 12.5px; color: var(--color-text-primary); margin-top: 6px; line-height: 1.5;">
+                💍 Nhẫn: <strong>${item.ringSize}</strong> · 📏 Cổ tay: <strong>${item.wristSize}</strong> · ✨ Dây: <strong>${item.chainLength}</strong>
+              </div>
+              ${item.note ? `<div style="font-size: 11.5px; color: var(--color-text-secondary); margin-top: 2px; font-style: italic;">📝 ${item.note}</div>` : ''}
+            </div>
+            <button type="button" class="del-loved-btn" data-id="${item.id}" style="background: none; border: none; color: #c0392b; font-size: 16px; cursor: pointer; padding: 4px;" title="Xóa">✕</button>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- Add New Member Form Toggle -->
+      <div style="background: #FDFBF7; border: 1px dashed var(--color-accent-gold); border-radius: 10px; padding: 14px;">
+        <h4 style="margin: 0 0 10px; font-size: 13.5px; color: #8A6218;">+ Thêm hồ sơ người thân mới:</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+          <input type="text" id="lo-name" class="pd-callback-input" placeholder="Tên / Biệt danh (vd: Bạn gái)">
+          <input type="text" id="lo-rel" class="pd-callback-input" placeholder="Quan hệ (vd: Người yêu)">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+          <input type="text" id="lo-ring" class="pd-callback-input" placeholder="Size nhẫn (vd: Size 6)">
+          <input type="text" id="lo-wrist" class="pd-callback-input" placeholder="Cổ tay (vd: 15cm)">
+          <input type="text" id="lo-chain" class="pd-callback-input" placeholder="Cỡ dây (vd: 42cm)">
+        </div>
+        <input type="text" id="lo-note" class="pd-callback-input" placeholder="Ghi chú sở thích (vd: Thích xi bạch kim, không thích đính nhiều đá)" style="margin-bottom: 10px;">
+        <button type="button" id="lo-save-btn" style="width: 100%; padding: 9px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+          Lưu Vào Sổ Đo Của Tôi
+        </button>
+      </div>
+    `;
+
+    body.querySelectorAll('.del-loved-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        deleteLovedOneSize(btn.dataset.id);
+        render();
+      });
+    });
+
+    body.querySelector('#lo-save-btn').addEventListener('click', () => {
+      const name = body.querySelector('#lo-name').value.trim();
+      if (!name) {
+        showToast('Vui lòng nhập tên người thân!', 'warning');
+        return;
+      }
+      saveLovedOneSize({
+        name,
+        relation: body.querySelector('#lo-rel').value.trim() || 'Người thân',
+        ringSize: body.querySelector('#lo-ring').value.trim() || 'Freesize',
+        wristSize: body.querySelector('#lo-wrist').value.trim() || '16 cm',
+        chainLength: body.querySelector('#lo-chain').value.trim() || '45 cm',
+        note: body.querySelector('#lo-note').value.trim()
+      });
+      showToast('Đã thêm hồ sơ số đo người thân!', 'success');
+      render();
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="loved-close-btn" style="width: 100%; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng sổ đo
+    </button>
+  `;
+  footer.querySelector('#loved-close-btn').addEventListener('click', close);
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 26. MEN'S CONFIDENTIAL GIFT CONCIERGE (ROUND 37)
+// ══════════════════════════════════════════════════════════════
+
+export function openMenConciergeModal() {
+  const { overlay, close } = createModalBase({
+    title: 'Trợ Lý Quà Tặng Kín Đáo Dành Cho Nam Giới',
+    subtitle: 'Bảo mật 100% · Giúp chàng chuẩn bị món quà bất ngờ hoàn hảo nhất',
+    maxWidth: '540px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  let budget = '1-2tr';
+  let vibe = 'sweet'; // 'sweet', 'modern', 'luxury'
+  let occasion = 'birthday';
+
+  body.innerHTML = `
+    <div style="background: #0F2A27; color: #FFF; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 12.5px; line-height: 1.6;">
+      🔒 <strong>Lời nhắn dành riêng cho phái mạnh:</strong><br>
+      Đừng lo nếu bạn chưa biết size nhẫn hay người thương thích kiểu gì. Hãy chọn 3 thông tin nhanh bên dưới, chuyên viên nữ tư vấn của Phát Đạt sẽ bí mật hỗ trợ bạn chuẩn bị từ kích cỡ đến thiệp chúc mừng viết tay trọn gói.
+    </div>
+
+    <!-- Budget Selection -->
+    <div style="margin-bottom: 14px;">
+      <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+        1. Khoảng ngân sách dự kiến:
+      </label>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+        <button type="button" class="men-budget-btn is-active" data-val="under-1tr" style="padding: 8px 6px; border-radius: 6px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-light); color: var(--color-brand-primary); font-size: 11.5px; font-weight: 700; cursor: pointer; text-align: center;">Dưới 1 Triệu</button>
+        <button type="button" class="men-budget-btn" data-val="1-2tr" style="padding: 8px 6px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">1 – 2 Triệu</button>
+        <button type="button" class="men-budget-btn" data-val="above-2tr" style="padding: 8px 6px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">Trên 2 Triệu</button>
+      </div>
+    </div>
+
+    <!-- Girlfriend Style -->
+    <div style="margin-bottom: 14px;">
+      <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+        2. Tính cách & phong cách của nàng:
+      </label>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+        <button type="button" class="men-vibe-btn is-active" data-val="sweet" style="padding: 8px 6px; border-radius: 6px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-light); color: var(--color-brand-primary); font-size: 11.5px; font-weight: 700; cursor: pointer; text-align: center;">🌸 Dịu dàng, nữ tính</button>
+        <button type="button" class="men-vibe-btn" data-val="modern" style="padding: 8px 6px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">💼 Tinh tế, công sở</button>
+        <button type="button" class="men-vibe-btn" data-val="luxury" style="padding: 8px 6px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">👑 Sang trọng, kiêu sa</button>
+      </div>
+    </div>
+
+    <!-- Occasion -->
+    <div style="margin-bottom: 16px;">
+      <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+        3. Dịp tặng quà:
+      </label>
+      <select id="men-occasion-sel" class="admin-form-input" style="font-size: 13px; width: 100%;">
+        <option value="Sinh nhật nàng">🎂 Sinh nhật người thương</option>
+        <option value="Kỷ niệm ngày yêu / Ngày cưới">💍 Kỷ niệm ngày yêu / Ngày cưới</option>
+        <option value="Cầu hôn bất ngờ">✨ Cầu hôn bất ngờ</option>
+        <option value="Ngày 20/10 hoặc 8/3">🌹 Quà tặng 20/10 hoặc 8/3</option>
+        <option value="Tặng bất ngờ / Làm lành">🎁 Tạo bất ngờ / Làm lành ngọt ngào</option>
+      </select>
+    </div>
+  `;
+
+  // Sync button toggles
+  body.querySelectorAll('.men-budget-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      budget = btn.dataset.val;
+      body.querySelectorAll('.men-budget-btn').forEach(b => {
+        b.style.borderColor = 'var(--color-border)';
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-primary)';
+      });
+      btn.style.borderColor = 'var(--color-brand-primary)';
+      btn.style.background = 'var(--color-brand-light)';
+      btn.style.color = 'var(--color-brand-primary)';
+    });
+  });
+
+  body.querySelectorAll('.men-vibe-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      vibe = btn.dataset.val;
+      body.querySelectorAll('.men-vibe-btn').forEach(b => {
+        b.style.borderColor = 'var(--color-border)';
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-primary)';
+      });
+      btn.style.borderColor = 'var(--color-brand-primary)';
+      btn.style.background = 'var(--color-brand-light)';
+      btn.style.color = 'var(--color-brand-primary)';
+    });
+  });
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="men-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="men-send-zalo-btn" style="flex: 1.8; padding: 11px; background: #0F2A27; color: #FFF8E7; border: 1px solid #C99738; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Nhận gợi ý kín đáo qua Zalo
+    </button>
+  `;
+
+  footer.querySelector('#men-close-btn').addEventListener('click', close);
+  footer.querySelector('#men-send-zalo-btn').addEventListener('click', () => {
+    const occ = body.querySelector('#men-occasion-sel').value;
+    const msg = encodeURIComponent(`Chào chuyên viên Phát Đạt, tôi là khách hàng nam muốn nhờ tiệm tư vấn kín đáo món quà cho dịp [${occ}], ngân sách khoảng [${budget}], phong cách nàng [${vibe}]. Nhờ tiệm gợi ý 2 mẫu đẹp và hỗ trợ chuẩn bị hộp quà thiệp viết tay nhé!`);
+    close();
+    window.open(`${siteInfo.zalo}?text=${msg}`, '_blank', 'noopener,noreferrer');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 27. CERTIFICATE OF AUTHENTICITY & GRA SEAL (ROUND 40)
+// ══════════════════════════════════════════════════════════════
+
+export function openCertificateModal(product = null) {
+  const prod = product || products[0];
+  const certId = 'PD-' + Math.floor(100000 + Math.random() * 900000);
+
+  const { overlay, close } = createModalBase({
+    title: 'Chứng Thư Kiểm Định Bạc S925 & Đá Quý',
+    subtitle: 'Thẻ kiểm định chính thức bảo lưu chất lượng & nguồn gốc chế tác',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div class="pd-cert-canvas">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #C99738; padding-bottom: 12px; margin-bottom: 14px;">
+        <div>
+          <div style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #1E5D57; letter-spacing: 0.05em;">PHÁT ĐẠT JEWELRY</div>
+          <div style="font-size: 11px; text-transform: uppercase; color: #A4791E; font-weight: 600;">Certificate of Authenticity</div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 10px; color: var(--color-text-secondary);">MÃ KIỂM ĐỊNH</div>
+          <div style="font-family: monospace; font-size: 14px; font-weight: 700; color: #D4380D;">${certId}</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+        <img src="${prod.images[0]}" alt="${prod.name}" style="width: 72px; height: 72px; object-fit: cover; border-radius: 6px; border: 1.5px solid #C99738;">
+        <div style="font-size: 12.5px; line-height: 1.6;">
+          <div style="font-weight: 700; color: var(--color-brand-primary); font-size: 14px;">${prod.name}</div>
+          <div>Mã chuẩn: <strong>${prod.reference}</strong> · Tiêu chuẩn: <strong>Bạc Ý S925</strong></div>
+          <div>Đá chủ: <strong>${prod.stones || 'Moissanite Hearts & Arrows'}</strong></div>
+          <div>Lớp xi phủ: <strong>Bạch Kim Rodium 3 lớp chống xỉn</strong></div>
+        </div>
+      </div>
+
+      <div style="background: #FDFBF7; border: 1px solid #EEDFCA; border-radius: 6px; padding: 10px; font-size: 11.5px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; margin-bottom: 14px;">
+        <div>
+          <div style="color: var(--color-text-secondary); font-size: 10px;">ĐỘ TINH KHIẾT</div>
+          <div style="font-weight: 700; color: var(--color-brand-primary);">S925 (92.5%)</div>
+        </div>
+        <div>
+          <div style="color: var(--color-text-secondary); font-size: 10px;">ĐỘ CẮT (CUT)</div>
+          <div style="font-weight: 700; color: var(--color-brand-primary);">Excellent</div>
+        </div>
+        <div>
+          <div style="color: var(--color-text-secondary); font-size: 10px;">NƯỚC ĐÁ (COLOR)</div>
+          <div style="font-weight: 700; color: var(--color-brand-primary);">D (Trắng sạch)</div>
+        </div>
+        <div>
+          <div style="color: var(--color-text-secondary); font-size: 10px;">BẢO HÀNH</div>
+          <div style="font-weight: 700; color: #27ae60;">Trọn Đời</div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--color-text-secondary); border-top: 1px dashed #DFC9A8; padding-top: 10px;">
+        <div>Dấu chứng nhận bảo hành làm sáng siêu âm miễn phí trọn đời</div>
+        <div style="font-weight: 700; color: #C99738; letter-spacing: 0.05em;">★ GENUINE GUARANTEED ★</div>
+      </div>
+    </div>
+  `;
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="cert-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng chứng thư
+    </button>
+    <button type="button" id="cert-print-btn" style="flex: 1.2; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      🖨️ In Chứng Thư
+    </button>
+  `;
+
+  footer.querySelector('#cert-close-btn').addEventListener('click', close);
+  footer.querySelector('#cert-print-btn').addEventListener('click', () => {
+    window.print();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 28. PENDANT PROPORTION & BODY SCALE ESTIMATOR (ROUND 34)
+// ══════════════════════════════════════════════════════════════
+
+export function openPendantScaleModal(product = null) {
+  let pendantSize = 12; // default 12mm
+  if (product && product.specs && product.specs.size) {
+    const num = parseFloat(product.specs.size);
+    if (!isNaN(num) && num >= 5 && num <= 30) pendantSize = Math.round(num);
+  }
+  let bodyFrame = 'balanced'; // 'petite', 'balanced', 'tall'
+  let compareItem = 'coin1k'; // 'none', 'coin1k', 'coin2k', 'coin5k', 'coffee'
+
+  const { overlay, close } = createModalBase({
+    title: 'Thước Đo Tỷ Lệ Mặt Dây & Vóc Dáng Cơ Thể',
+    subtitle: 'So sánh trực quan kích thước mặt dây với đồng xu & vóc dáng người đeo',
+    maxWidth: '580px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const pxSize = pendantSize * 3.8;
+
+    const compareObjects = {
+      none: { name: 'Không so sánh', diameter: 0, desc: '' },
+      coffee: { name: 'Hạt Cà Phê (10mm)', diameter: 10, color: '#6F4E37', desc: 'Tương đương 1 hạt cà phê' },
+      coin1k: { name: 'Đồng xu 1.000đ (19mm)', diameter: 19, color: '#C5A059', desc: 'Đường kính 19mm chuẩn' },
+      coin2k: { name: 'Đồng xu 2.000đ (22mm)', diameter: 22, color: '#D4AF37', desc: 'Đường kính 22mm chuẩn' },
+      coin5k: { name: 'Đồng xu 5.000đ (25mm)', diameter: 25, color: '#B38B34', desc: 'Đường kính 25mm chuẩn' },
+    };
+
+    const selCompare = compareObjects[compareItem];
+
+    let advice = '';
+    if (bodyFrame === 'petite') {
+      if (pendantSize <= 10) {
+        advice = `🌟 <strong>Rất hài hòa!</strong> Với vóc dáng thon thả (&lt; 1m58), mặt dây ${pendantSize}mm giúp phần cổ thanh thoát, nhẹ nhàng, tôn nét nữ tính tự nhiên.`;
+      } else if (pendantSize <= 15) {
+        advice = `✨ <strong>Nổi bật vừa vặn:</strong> Mặt dây ${pendantSize}mm tạo điểm nhấn rõ nét nhưng vẫn giữ được nét thanh mảnh khi phối với áo cổ tròn hoặc sơ mi.`;
+      } else {
+        advice = `💎 <strong>Điểm nhấn ấn tượng:</strong> Mặt dây ${pendantSize}mm khá nổi bật trên vóc dáng nhỏ. Rất thích hợp khi bạn đi tiệc hoặc diện trang phục tối giản để mặt dây làm tâm điểm!`;
+      }
+    } else if (bodyFrame === 'balanced') {
+      if (pendantSize < 8) {
+        advice = `🌿 <strong>Dịu dàng tối giản:</strong> Kích thước ${pendantSize}mm thích hợp cho phong cách Minimalist hằng ngày, tinh tế và kín đáo.`;
+      } else if (pendantSize <= 16) {
+        advice = `🌟 <strong>Tỷ lệ vàng hoàn hảo!</strong> Với vóc dáng cân đối (1m58 – 1m68), mặt dây ${pendantSize}mm đạt sự cân bằng tuyệt đối giữa sự sang trọng và nét thanh lịch.`;
+      } else {
+        advice = `👑 <strong>Quyền quý dạ tiệc:</strong> Mặt dây ${pendantSize}mm tạo sức hút thị giác mạnh mẽ, tôn lên nét quyến rũ quý phái.`;
+      }
+    } else {
+      if (pendantSize < 10) {
+        advice = `🌿 <strong>Hạt ngọc thanh mảnh:</strong> Mặt dây ${pendantSize}mm mang lại cảm giác nhẹ nhàng, nên mix layer 2 sợi để thêm phần phong cách.`;
+      } else if (pendantSize <= 18) {
+        advice = `🌟 <strong>Rất cân xứng & cuốn hút:</strong> Chiều cao &gt; 1m68 giúp tôn trọn vẻ đẹp của mặt dây ${pendantSize}mm mà không hề có cảm giác nặng nề.`;
+      } else {
+        advice = `👑 <strong>Tuyên ngôn phong cách:</strong> Mặt dây ${pendantSize}mm khẳng định cá tính và sự quyền lực trong mọi buổi tiệc.`;
+      }
+    }
+
+    body.innerHTML = `
+      <div class="pd-pendant-scale-stage">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-brand-primary); font-weight: 700; margin-bottom: 8px;">
+          Mô Phỏng Thực Tế: Mặt Dây ${pendantSize}mm ${compareItem !== 'none' ? `vs ${selCompare.name}` : ''}
+        </div>
+
+        <div class="pd-pendant-svg-wrap">
+          <svg viewBox="0 0 360 210" width="100%" height="210" style="display: block; margin: 0 auto;">
+            <defs>
+              <linearGradient id="pSkinGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FDF0E6"/>
+                <stop offset="60%" stop-color="#F5DAC5"/>
+                <stop offset="100%" stop-color="#EAC1A5"/>
+              </linearGradient>
+              <radialGradient id="pGemGrad" cx="35%" cy="35%" r="70%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="40%" stop-color="#E0F7FA"/>
+                <stop offset="80%" stop-color="#00BCD4"/>
+                <stop offset="100%" stop-color="#006064"/>
+              </radialGradient>
+            </defs>
+
+            ${bodyFrame === 'petite' ? `
+              <path d="M125,0 C128,60 115,100 60,135 C30,150 15,185 15,210 L345,210 C345,185 330,150 300,135 C245,100 232,60 235,0 Z" fill="url(#pSkinGrad)" stroke="rgba(180,120,80,0.2)" stroke-width="1.5"/>
+              <path d="M135,135 Q180,165 225,135" fill="none" stroke="rgba(180,120,80,0.35)" stroke-width="2" stroke-linecap="round"/>
+            ` : bodyFrame === 'balanced' ? `
+              <path d="M120,0 C124,65 110,105 50,140 C20,155 10,185 10,210 L350,210 C350,185 340,155 310,140 C250,105 236,65 240,0 Z" fill="url(#pSkinGrad)" stroke="rgba(180,120,80,0.2)" stroke-width="1.5"/>
+              <path d="M130,140 Q180,172 230,140" fill="none" stroke="rgba(180,120,80,0.35)" stroke-width="2" stroke-linecap="round"/>
+            ` : `
+              <path d="M115,0 C120,70 100,110 40,145 C15,160 5,190 5,210 L355,210 C355,190 345,160 320,145 C260,110 240,70 245,0 Z" fill="url(#pSkinGrad)" stroke="rgba(180,120,80,0.2)" stroke-width="1.5"/>
+              <path d="M125,145 Q180,180 235,145" fill="none" stroke="rgba(180,120,80,0.35)" stroke-width="2" stroke-linecap="round"/>
+            `}
+
+            <path d="M145,15 Q180,155 215,15" fill="none" stroke="#C99738" stroke-width="1.8" stroke-dasharray="2 1.5"/>
+
+            <g transform="translate(180, 132)">
+              <rect x="-2" y="-9" width="4" height="7" rx="1.5" fill="#C99738"/>
+              <circle cx="0" cy="${pxSize / 2}" r="${pxSize / 2}" fill="url(#pGemGrad)" stroke="#C99738" stroke-width="2"/>
+              <polygon points="0,${pxSize/2 - pxSize/4} ${pxSize/5},${pxSize/2} 0,${pxSize/2 + pxSize/4} -${pxSize/5},${pxSize/2}" fill="#FFFFFF" opacity="0.9"/>
+              <text x="0" y="${pxSize + 14}" text-anchor="middle" font-size="11" font-weight="700" fill="#143F3B">${pendantSize}mm</text>
+            </g>
+
+            ${compareItem !== 'none' ? `
+              <g transform="translate(285, 120)">
+                <circle cx="0" cy="0" r="${(selCompare.diameter * 3.8) / 2}" fill="${selCompare.color}" opacity="0.85" stroke="#FFFFFF" stroke-width="1.5"/>
+                <text x="0" y="3" text-anchor="middle" font-size="9.5" font-weight="700" fill="#FFFFFF">${selCompare.diameter}mm</text>
+                <text x="0" y="${(selCompare.diameter * 3.8) / 2 + 13}" text-anchor="middle" font-size="10" font-weight="600" fill="#666">${compareItem === 'coffee' ? 'Hạt Cà Phê' : 'Đồng Xu'}</text>
+              </g>
+            ` : ''}
+          </svg>
+        </div>
+      </div>
+
+      <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary);">🔍 Kích thước mặt dây:</span>
+          <span style="font-size: 15px; font-weight: 800; color: #D4380D;"><span id="pendant-slider-val">${pendantSize}</span> mm</span>
+        </div>
+        <input type="range" id="pendant-size-slider" min="6" max="25" step="1" value="${pendantSize}" class="pd-range-slider" style="cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--color-text-secondary); margin-top: 6px;">
+          <span>6mm (Hạt nụ)</span>
+          <span>10mm (Thanh lịch)</span>
+          <span>15mm (Chuẩn tiệc)</span>
+          <span>25mm (Bản lớn)</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+          👤 Chọn vóc dáng của bạn để nhận cố vấn tỷ lệ:
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+          <button type="button" class="pd-frame-btn ${bodyFrame === 'petite' ? 'is-active' : ''}" data-frame="petite" style="padding: 8px 6px; border-radius: 6px; border: ${bodyFrame === 'petite' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${bodyFrame === 'petite' ? 'var(--color-brand-light)' : '#fff'}; color: ${bodyFrame === 'petite' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            🌸 Thon thả (&lt; 1m58)
+          </button>
+          <button type="button" class="pd-frame-btn ${bodyFrame === 'balanced' ? 'is-active' : ''}" data-frame="balanced" style="padding: 8px 6px; border-radius: 6px; border: ${bodyFrame === 'balanced' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${bodyFrame === 'balanced' ? 'var(--color-brand-light)' : '#fff'}; color: ${bodyFrame === 'balanced' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            🌿 Cân đối (1m58–1m68)
+          </button>
+          <button type="button" class="pd-frame-btn ${bodyFrame === 'tall' ? 'is-active' : ''}" data-frame="tall" style="padding: 8px 6px; border-radius: 6px; border: ${bodyFrame === 'tall' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${bodyFrame === 'tall' ? 'var(--color-brand-light)' : '#fff'}; color: ${bodyFrame === 'tall' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            👑 Cao ráo (&gt; 1m68)
+          </button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+          🪙 So sánh kích thước trực quan với vật thật:
+        </label>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          ${Object.keys(compareObjects).map(k => `
+            <button type="button" class="pd-coin-toggle-btn ${compareItem === k ? 'is-active' : ''}" data-item="${k}" style="padding: 6px 10px; border-radius: 6px; border: ${compareItem === k ? '1.5px solid #C99738' : '1px solid var(--color-border)'}; background: ${compareItem === k ? '#FFF8E7' : '#fff'}; color: ${compareItem === k ? '#8A6218' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+              ${compareObjects[k].name}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="pd-pendant-advisor-box">
+        ${advice}
+      </div>
+    `;
+
+    const slider = body.querySelector('#pendant-size-slider');
+    if (slider) {
+      slider.addEventListener('input', (e) => {
+        pendantSize = Number(e.target.value);
+        render();
+      });
+    }
+
+    body.querySelectorAll('.pd-frame-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bodyFrame = btn.dataset.frame;
+        render();
+      });
+    });
+
+    body.querySelectorAll('.pd-coin-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        compareItem = btn.dataset.item;
+        render();
+      });
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="pendant-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="pendant-zalo-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Gửi số đo để tiệm tư vấn Zalo
+    </button>
+  `;
+
+  footer.querySelector('#pendant-close-btn').addEventListener('click', close);
+  footer.querySelector('#pendant-zalo-btn').addEventListener('click', () => {
+    const text = encodeURIComponent(`Chào Phát Đạt Jewelry, mình đang xem mặt dây chuyền kích thước khoảng ${pendantSize}mm với dáng người [${bodyFrame === 'petite' ? 'Thon thả <1m58' : bodyFrame === 'balanced' ? 'Cân đối 1m58-1m68' : 'Cao ráo >1m68'}]. Nhờ tiệm gửi ảnh mẫu thật đeo trên cổ thực tế giúp mình nhé!`);
+    close();
+    window.open(`${siteInfo.zalo}?text=${text}`, '_blank', 'noopener,noreferrer');
+  });
+
+  render();
+}
+
+
+
+
 
 // ══════════════════════════════════════════════════════════════
 // 17. CONVENIENCE SHORTCUTS
@@ -3499,7 +4256,13 @@ export const modal = {
   unboxingPreview: openUnboxingPreviewModal,
   styleQuiz: openStyleQuizModal,
   splitCompare: openSplitScreenCompareModal,
-  silverRescue: openSilverRescueModal
+  silverRescue: openSilverRescueModal,
+  diamondFire: openDiamondFireModal,
+  ringStacking: openRingStackingModal,
+  lovedOnesSize: openLovedOnesSizeModal,
+  menConcierge: openMenConciergeModal,
+  certificate: openCertificateModal,
+  pendantScale: openPendantScaleModal
 };
 
 

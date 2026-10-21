@@ -63,7 +63,8 @@ export function createFooter() {
           <a href="#/info/gifting">${t('footer.service2')}</a> &nbsp;·&nbsp;
           <a href="#/info/warranty">Bảo hành</a> &nbsp;·&nbsp;
           <a href="#/info/size-guide">Hướng dẫn chọn size</a> &nbsp;·&nbsp;
-          <a href="#/info/style-guide">Cẩm nang phối đồ</a>
+          <a href="#/info/style-guide">Cẩm nang phối đồ</a> &nbsp;·&nbsp;
+          <a href="#/info/precious-metals">Kim loại quý & Thu đổi</a>
         </p>
       </div>
 

@@ -439,5 +439,59 @@ export function saveUserJewelrySizes(sizes) {
   return merged;
 }
 
+// ── 14. LOVED ONES SIZE BOOK (SỔ ĐO SIZE NGƯỜI THÂN - ROUND 36) ──
+const LOVED_ONES_KEY = 'phatdat_loved_ones_sizes';
+
+const DEFAULT_LOVED_ONES = [
+  {
+    id: 'lo-1',
+    name: 'Người yêu / Bạn gái',
+    relation: 'Người thương',
+    ringSize: 'Size 6 (16mm)',
+    wristSize: '15.5 cm',
+    chainLength: '42 cm (Princess)',
+    note: 'Thích nhẫn đính đá Moissanite & xi Bạch Kim'
+  },
+  {
+    id: 'lo-2',
+    name: 'Mẹ yêu',
+    relation: 'Mẹ',
+    ringSize: 'Size 8 (18mm)',
+    wristSize: '17.0 cm',
+    chainLength: '45 - 50 cm',
+    note: 'Hợp mặt đá Xà cừ phong thủy hoặc Cỏ 4 lá'
+  }
+];
+
+export function getLovedOnesSizes() {
+  try {
+    const raw = localStorage.getItem(LOVED_ONES_KEY);
+    return raw ? JSON.parse(raw) : DEFAULT_LOVED_ONES;
+  } catch (e) {
+    return DEFAULT_LOVED_ONES;
+  }
+}
+
+export function saveLovedOneSize(entry) {
+  const list = getLovedOnesSizes();
+  const existingIdx = list.findIndex(item => item.id === entry.id);
+  if (existingIdx >= 0) {
+    list[existingIdx] = { ...list[existingIdx], ...entry };
+  } else {
+    list.push({ ...entry, id: 'lo-' + Date.now() });
+  }
+  localStorage.setItem(LOVED_ONES_KEY, JSON.stringify(list));
+  window.dispatchEvent(new CustomEvent('loved-ones-updated', { detail: { list } }));
+  return list;
+}
+
+export function deleteLovedOneSize(id) {
+  const list = getLovedOnesSizes().filter(item => item.id !== id);
+  localStorage.setItem(LOVED_ONES_KEY, JSON.stringify(list));
+  window.dispatchEvent(new CustomEvent('loved-ones-updated', { detail: { list } }));
+  return list;
+}
+
+
 
 
