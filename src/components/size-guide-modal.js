@@ -3,6 +3,9 @@
 // VISUALIZER & SILVER CARE MODAL — Phát Đạt Jewelry
 // ============================================================
 
+import { openChainVisualizerModal, openWristSizerModal, openSilverRescueModal } from './feedback-modal.js';
+
+
 export function createSizeGuideModal() {
   const overlay = document.createElement('div');
   overlay.className = 'size-guide-overlay';
@@ -155,9 +158,13 @@ export function createSizeGuideModal() {
             </svg>
           </div>
 
-          <div id="necklace-len-desc" style="background: #fff; border-left: 3px solid var(--color-brand-primary); padding: 10px 12px; font-size: 13px; color: var(--color-text-primary); border-radius: 4px;">
+          <div id="necklace-len-desc" style="background: #fff; border-left: 3px solid var(--color-brand-primary); padding: 10px 12px; font-size: 13px; color: var(--color-text-primary); border-radius: 4px; margin-bottom: 12px;">
             <strong>Dây 45cm (40cm + 5cm dây nối):</strong> Độ dài chuẩn phổ biến nhất tại Phát Đạt Jewelry. Mặt dây chuyền nằm ngay dưới hõm cổ, giúp tôn xương quai xanh thanh thoát.
           </div>
+
+          <button type="button" id="sg-open-chain-visualizer-btn" style="width: 100%; padding: 10px 16px; background: linear-gradient(135deg, #1E5D57 0%, #143F3B 100%); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            ✨ Mở Thước Kéo Xương Quai Xanh Tương Tác 38 – 60cm →
+          </button>
         </div>
       </div>
 
@@ -216,7 +223,10 @@ export function createSizeGuideModal() {
         <div style="background-color: var(--color-bg-secondary); border-radius: 6px; padding: 12px 14px; font-size: 13px; line-height: 1.65; margin-bottom: 16px;">
           <p style="margin: 0 0 6px 0;">• <strong>Cổ tay 13.5 – 15 cm:</strong> Chọn lắc dài <strong>16 cm</strong></p>
           <p style="margin: 0 0 6px 0;">• <strong>Cổ tay 15 – 16.5 cm (Chuẩn nữ VN):</strong> Chọn lắc dài <strong>17 – 18 cm</strong></p>
-          <p style="margin: 0; color: var(--color-brand-primary);">* Tất cả lắc tay Phát Đạt đều có <strong>đoạn xích phụ 3cm</strong> giúp tăng giảm linh hoạt.</p>
+          <p style="margin: 0 0 10px 0; color: var(--color-brand-primary);">* Tất cả lắc tay Phát Đạt đều có <strong>đoạn xích phụ 3cm</strong> giúp tăng giảm linh hoạt.</p>
+          <button type="button" id="sg-open-wrist-sizer-btn" style="width: 100%; padding: 8px 12px; background: #fff; border: 1.5px solid var(--color-brand-primary); color: var(--color-brand-primary); border-radius: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+            📏 Thước Kéo Đo Chu Vi Cổ Tay Ảo & Tư Vấn Độ Ôm →
+          </button>
         </div>
 
         <h4 style="font-size: 15px; margin-bottom: 8px; color: var(--color-brand-primary);">2. Bí quyết giữ Bạc 925 luôn sáng bóng tại nhà</h4>
@@ -230,6 +240,9 @@ export function createSizeGuideModal() {
           <div style="background: #f8faf9; border: 1px solid var(--color-border-light); padding: 10px 12px; border-radius: 6px;">
             <strong>🛡️ Bảo hành trọn đời:</strong> Bất kỳ lúc nào trang sức cần đánh bóng hoặc kiểm tra ổ đá, bạn chỉ cần ghé cửa hàng Phát Đạt Jewelry để được vệ sinh bằng máy siêu âm hoàn toàn miễn phí!
           </div>
+          <button type="button" id="sg-open-silver-rescue-btn" style="width: 100%; padding: 9px 14px; background: var(--color-brand-light); border: 1px solid var(--color-brand-primary); color: var(--color-brand-primary); border-radius: 6px; font-size: 12.5px; font-weight: 700; cursor: pointer; margin-top: 4px;">
+            🧼 Xem Cẩm Nang Cấp Cứu Bạc Xỉn Màu & 3 Công Thức Làm Sáng Nhanh →
+          </button>
         </div>
       </div>
 
@@ -382,6 +395,30 @@ export function createSizeGuideModal() {
     if (e.target === overlay) close();
   });
   modal.querySelector('.size-guide-close').addEventListener('click', close);
+
+  const chainVisBtn = modal.querySelector('#sg-open-chain-visualizer-btn');
+  if (chainVisBtn) {
+    chainVisBtn.addEventListener('click', () => {
+      close();
+      openChainVisualizerModal();
+    });
+  }
+
+  const wristSizerBtn = modal.querySelector('#sg-open-wrist-sizer-btn');
+  if (wristSizerBtn) {
+    wristSizerBtn.addEventListener('click', () => {
+      close();
+      openWristSizerModal();
+    });
+  }
+
+  const silverRescueBtn = modal.querySelector('#sg-open-silver-rescue-btn');
+  if (silverRescueBtn) {
+    silverRescueBtn.addEventListener('click', () => {
+      close();
+      openSilverRescueModal();
+    });
+  }
 
   return { open, close };
 }

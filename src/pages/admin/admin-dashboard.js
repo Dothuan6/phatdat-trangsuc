@@ -114,6 +114,10 @@ export async function renderAdmin(container) {
             <span id="admin-db-status-text">${dbStatus.success ? 'Supabase Online' : 'Chế độ Lưu Cục Bộ (Offline)'}</span>
           </div>
 
+          <button type="button" id="btn-open-kiosk-mode" class="admin-btn admin-btn--outline" style="border-color: var(--color-accent-gold); color: #8A6218; background: #FAF5E8; font-weight: 700; gap: 6px;" title="Chế độ trình chiếu iPad tại quầy bán hàng cho khách xem">
+            <span>📱 iPad Kiosk Quầy</span>
+          </button>
+
           <a href="#/" target="_blank" class="admin-view-site-link">
             <span>Xem Website</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -1691,6 +1695,79 @@ export async function renderAdmin(container) {
       navigate('/admin/login');
     }
   });
+
+  // Showroom Kiosk Tablet Mode (Round 30)
+  function launchKioskMode() {
+    const kiosk = document.createElement('div');
+    kiosk.className = 'admin-kiosk-mode';
+    kiosk.innerHTML = `
+      <div class="admin-kiosk-header">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="/images/logo.png" alt="Phát Đạt" style="height: 44px; filter: brightness(0) invert(1);">
+          <div>
+            <div style="font-size: 15px; font-weight: 700; letter-spacing: 0.05em; color: #FFF8E7;">PHÁT ĐẠT JEWELRY · SHOWROOM LOOKBOOK</div>
+            <div style="font-size: 11px; color: #D5EBE6;">Chế độ trình chiếu iPad tại quầy · Chạm mẫu để xem chi tiết & soi lúp</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="kiosk-exit-btn" style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            ✕ Thoát Kiosk
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-kiosk-body">
+        ${products.map(p => `
+          <div class="admin-kiosk-card">
+            <img src="${p.images[0]}" alt="${p.name}" style="width: 100%; height: 220px; object-fit: cover;">
+            <div style="padding: 16px; display: flex; flex-direction: column; flex: 1;">
+              <div style="font-size: 11px; text-transform: uppercase; color: var(--color-text-secondary); font-weight: 600; letter-spacing: 0.05em;">${p.reference} · ${p.category}</div>
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--color-brand-primary); margin: 4px 0 8px;">${p.name}</h4>
+              <div style="font-size: 16px; font-weight: 700; color: #D4380D; margin-bottom: 12px;">${formatPrice(p.price)}</div>
+              <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 16px; flex: 1; line-height: 1.5;">
+                ${p.materials} · ${p.stones}
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button type="button" class="kiosk-view-pdp-btn" data-id="${p.id}" style="padding: 9px; background: var(--color-brand-light); border: 1px solid var(--color-brand-primary); color: var(--color-brand-primary); border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                  🔍 Xem chi tiết
+                </button>
+                <button type="button" class="kiosk-qr-btn" data-id="${p.id}" style="padding: 9px; background: var(--color-brand-primary); border: none; color: #fff; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                  📱 Mã QR
+                </button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    document.body.appendChild(kiosk);
+
+    kiosk.querySelector('#kiosk-exit-btn').addEventListener('click', () => {
+      kiosk.remove();
+    });
+
+    kiosk.querySelectorAll('.kiosk-view-pdp-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        kiosk.remove();
+        window.open(`#/product/${btn.dataset.id}`, '_blank');
+      });
+    });
+
+    kiosk.querySelectorAll('.kiosk-qr-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prod = products.find(p => p.id === btn.dataset.id);
+        if (prod) {
+          openQrTagModal(prod);
+        }
+      });
+    });
+  }
+
+  const kioskTriggerBtn = page.querySelector('#btn-open-kiosk-mode');
+  if (kioskTriggerBtn) {
+    kioskTriggerBtn.addEventListener('click', launchKioskMode);
+  }
 
   // Initial render Overview
   renderOverviewTab();

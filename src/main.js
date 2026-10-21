@@ -19,6 +19,7 @@ import { createBottomNav } from './components/bottom-nav.js';
 import { createFloatingContact } from './components/floating-contact.js';
 import { initCompareFloatingBar } from './components/feedback-modal.js';
 import { applyComfortPrefs } from './data/wishlist-store.js';
+import { initPwaInstallBanner } from './components/pwa-install-banner.js';
 
 // Import router
 import { registerRoute, initRouter } from './router.js';
@@ -99,6 +100,9 @@ function init() {
 
   // Initialize router
   initRouter(main);
+
+  // Initialize PWA Smart Install Banner
+  initPwaInstallBanner();
 
   // Synchronize initial data in background
   initDataSync();

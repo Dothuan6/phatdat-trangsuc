@@ -12,10 +12,22 @@ import {
   openCoupleBuilderModal,
   openAnniversaryReminderModal,
   openFaceHandStylingModal,
-  openLightboxModal
+  openLightboxModal,
+  openChainVisualizerModal,
+  openWristSizerModal,
+  openUnboxingPreviewModal,
+  openStyleQuizModal,
+  openSilverRescueModal
 } from './feedback-modal.js';
 import { openGlobalSizeGuide } from './size-guide-modal.js';
-import { getComfortPrefs, saveComfortPrefs, applyComfortPrefs } from '../data/wishlist-store.js';
+import {
+  getComfortPrefs,
+  saveComfortPrefs,
+  applyComfortPrefs,
+  getSelectedCurrency,
+  setSelectedCurrency,
+  CURRENCY_RATES
+} from '../data/wishlist-store.js';
 
 export function createContactDrawer() {
   const overlay = document.createElement('div');
@@ -63,33 +75,61 @@ export function createContactDrawer() {
         </form>
       </div>
 
-      <!-- 7 Smart Jewelry Tools -->
+      <!-- 12 Smart Jewelry Tools (Phase 1, 2, 3) -->
       <div style="margin-bottom: 18px;">
         <div style="font-size: 11.5px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Công cụ tiện ích độc quyền</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
           <button type="button" id="cd-tool-ruler" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
-            📏 Đo nhẫn trên màn hình
+            📏 Đo nhẫn màn hình
           </button>
-          <button type="button" id="cd-tool-gift" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
-            🎁 Trợ lý chọn quà 30s
+          <button type="button" id="cd-tool-wrist" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            📐 Thước đo cổ tay
+          </button>
+          <button type="button" id="cd-tool-chain" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            ✨ Xương quai xanh
+          </button>
+          <button type="button" id="cd-tool-quiz" style="background: #FDFBF7; border: 1px solid #EEDFCA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            🎯 Trắc nghiệm phong cách
+          </button>
+          <button type="button" id="cd-tool-unboxing" style="background: #FDF4E8; border: 1px solid #FED7AA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #9A3412;">
+            🎁 Mở hộp quà VIP
+          </button>
+          <button type="button" id="cd-tool-rescue" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #166534;">
+            🧼 Cấp cứu bạc xỉn màu
           </button>
           <button type="button" id="cd-tool-couple" style="background: #FDF2F8; border: 1px solid #FBCFE8; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #9D174D;">
-            💑 Thiết kế Nhẫn/Vòng đôi
+            💑 Nhẫn/Vòng đôi kép
           </button>
           <button type="button" id="cd-tool-styling" style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #1E40AF;">
-            👗 Chọn theo dáng mặt/tay
+            👗 Dáng mặt & cổ áo
           </button>
           <button type="button" id="cd-tool-fengshui" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🔮 Chọn đá hợp mệnh
           </button>
-          <button type="button" id="cd-tool-reminder" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #166534;">
-            📅 Sổ tay nhắc kỷ niệm
+          <button type="button" id="cd-tool-reminder" style="background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
+            📅 Nhắc ngày kỷ niệm
           </button>
           <button type="button" id="cd-tool-warranty" style="grid-column: 1 / -1; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🛡️ Tra cứu Thẻ Bảo Hành Điện Tử bằng Số Điện Thoại
           </button>
         </div>
       </div>
+
+      <!-- Currency Switcher Preview (Round 28) -->
+      <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11.5px; font-weight: 700; color: var(--color-brand-primary);">💱 Tiền tệ hiển thị tham khảo:</span>
+          <span style="font-size: 10px; color: var(--color-text-secondary);">(Giao dịch gốc bằng VNĐ)</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;" id="cd-currency-selector">
+          ${Object.values(CURRENCY_RATES).map(c => `
+            <button type="button" class="cd-curr-btn ${getSelectedCurrency() === c.code ? 'is-active' : ''}" data-code="${c.code}" style="padding: 6px 4px; border-radius: 6px; border: 1px solid ${getSelectedCurrency() === c.code ? 'var(--color-brand-primary)' : 'var(--color-border)'}; background: ${getSelectedCurrency() === c.code ? 'var(--color-brand-primary)' : '#fff'}; color: ${getSelectedCurrency() === c.code ? '#fff' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; white-space: nowrap;">
+              ${c.flag} ${c.code}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
 
       <!-- Comfort Reading & Eye Care Mode (Vòng 9) -->
       <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;">
@@ -217,6 +257,44 @@ export function createContactDrawer() {
   drawer.querySelector('#cd-tool-reminder').addEventListener('click', () => {
     closeDrawer();
     openAnniversaryReminderModal();
+  });
+  drawer.querySelector('#cd-tool-wrist').addEventListener('click', () => {
+    closeDrawer();
+    openWristSizerModal();
+  });
+  drawer.querySelector('#cd-tool-chain').addEventListener('click', () => {
+    closeDrawer();
+    openChainVisualizerModal();
+  });
+  drawer.querySelector('#cd-tool-quiz').addEventListener('click', () => {
+    closeDrawer();
+    openStyleQuizModal();
+  });
+  drawer.querySelector('#cd-tool-unboxing').addEventListener('click', () => {
+    closeDrawer();
+    openUnboxingPreviewModal();
+  });
+  drawer.querySelector('#cd-tool-rescue').addEventListener('click', () => {
+    closeDrawer();
+    openSilverRescueModal();
+  });
+
+  // Currency Selector events
+  drawer.querySelectorAll('.cd-curr-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.dataset.code;
+      setSelectedCurrency(code);
+      drawer.querySelectorAll('.cd-curr-btn').forEach(b => {
+        const active = b.dataset.code === code;
+        b.style.background = active ? 'var(--color-brand-primary)' : '#fff';
+        b.style.color = active ? '#fff' : 'var(--color-text-primary)';
+        b.style.borderColor = active ? 'var(--color-brand-primary)' : 'var(--color-border)';
+      });
+      showToast(`Đã đổi đơn vị hiển thị sang ${code}!`, 'success', 2200);
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    });
   });
 
   const igQrThumb = drawer.querySelector('#cd-ig-qr-thumb');

@@ -2,6 +2,12 @@
    BASE STYLES — Element-level defaults
    ============================================================ */
 
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-body);
   font-size: var(--fs-body);
@@ -11,7 +17,16 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
   overflow-x: hidden;
+  min-height: 100vh;
 }
+
+/* Prevent iOS auto-zoom on input focus */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
 
 /* ── Headings ── */
 h1, h2, h3 {

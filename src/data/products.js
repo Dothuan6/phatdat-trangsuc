@@ -212,10 +212,26 @@ export function slugify(str) {
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// Format price — kiểu Việt Nam: 129.000 ₫
-export function formatPrice(price, currency = '₫') {
-  return `${price.toLocaleString('vi-VN')} ${currency}`;
+import { getSelectedCurrency, formatConvertedPrice } from './wishlist-store.js';
+
+// Format price — kiểu Việt Nam: 129.000 ₫ (hỗ trợ chuyển đổi ngoại tệ tham khảo)
+export function formatPrice(price, currency = '₫', withConverted = true) {
+  if (price === undefined || price === null) return 'Liên hệ';
+  const base = `${price.toLocaleString('vi-VN')} ${currency}`;
+  if (!withConverted) return base;
+  try {
+    const curr = getSelectedCurrency();
+    if (curr && curr !== 'VND') {
+      return `${base} <span class="price-converted" style="font-size: 0.85em; color: var(--color-accent-gold); font-weight: 500; white-space: nowrap;">(≈ ${formatConvertedPrice(price)})</span>`;
+    }
+  } catch (e) {}
+  return base;
 }
+
+export function formatPricePlain(price, currency = '₫') {
+  return `${(price || 0).toLocaleString('vi-VN')} ${currency}`;
+}
+
 
 export function getProductsByCategory(category) {
   if (!category || category === 'all') return products;

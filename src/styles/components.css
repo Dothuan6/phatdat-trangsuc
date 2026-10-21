@@ -240,6 +240,23 @@
   height: 104px;
 }
 
+/* Responsive header adjustments for tablets & iPad */
+@media (max-width: 1024px) {
+  .header-inner {
+    padding: 0 var(--space-md);
+  }
+  .header-left, .header-right {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 920px) {
+  #fengshui-header-btn {
+    display: none !important;
+  }
+}
+
+
 /* ══════════════════════════════════════════════════════════════
    NAVIGATION MENU (Slide-out)
    ══════════════════════════════════════════════════════════════ */

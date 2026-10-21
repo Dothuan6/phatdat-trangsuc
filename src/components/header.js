@@ -6,8 +6,14 @@ import {
   openGiftFinderModal,
   openQuickViewModal,
   openFengShuiMatcherModal,
-  openWarrantyLookupModal
+  openWarrantyLookupModal,
+  openChainVisualizerModal,
+  openWristSizerModal,
+  openStyleQuizModal,
+  openSilverRescueModal,
+  openUnboxingPreviewModal
 } from './feedback-modal.js';
+import { getSelectedCurrency, CURRENCY_RATES } from '../data/wishlist-store.js';
 
 const SVG_ICONS = {
   hamburger: `<div class="hamburger-icon"><span></span><span></span><span></span></div>`,
@@ -83,6 +89,9 @@ export function createHeader() {
         <button type="button" class="header-region hide-mobile" id="gift-finder-header-btn" style="background: var(--color-brand-light); color: var(--color-brand-primary); border: 1px solid var(--color-border); border-radius: 16px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Trợ lý chọn quà tặng">
           <span>🎁 Chọn quà</span>
         </button>
+        <button type="button" class="header-region hide-mobile" id="curr-header-btn" style="background: #F4F7F6; border: 1px solid var(--color-border); border-radius: 16px; padding: 5px 9px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" title="Đổi đơn vị tiền tệ hiển thị">
+          <span>${CURRENCY_RATES[getSelectedCurrency()]?.flag || '🇻🇳'} ${getSelectedCurrency()}</span>
+        </button>
         <button class="header-region hide-mobile" id="lang-toggle" aria-label="Toggle language">
           <span style="${currentLang === 'vi' ? 'font-weight: 600;' : 'opacity: 0.5;'}">VN</span>
           <span style="margin: 0 4px;">|</span>
@@ -149,6 +158,14 @@ export function createHeader() {
     const event = new CustomEvent('toggle-contact-drawer');
     document.dispatchEvent(event);
   });
+
+  const currBtn = header.querySelector('#curr-header-btn');
+  if (currBtn) {
+    currBtn.addEventListener('click', () => {
+      const event = new CustomEvent('toggle-contact-drawer');
+      document.dispatchEvent(event);
+    });
+  }
 
   // Language toggle
   const langToggle = header.querySelector('#lang-toggle');
@@ -222,6 +239,26 @@ function openNavDrawer() {
         <span>🔮 Cố vấn chọn trang sức hợp mệnh</span>
         <span class="nav-item__chevron">›</span>
       </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-chain">
+        <span>✨ Thước kéo xương quai xanh (38 – 60cm)</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-wrist">
+        <span>📏 Thước đo cổ tay & size lắc</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-quiz">
+        <span>🎯 Trắc nghiệm phong cách cá nhân</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-rescue">
+        <span>🧼 Cấp cứu bạc xỉn màu tại nhà</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
+      <a class="nav-item" href="javascript:void(0)" id="nav-open-unboxing">
+        <span>🎁 Trải nghiệm mở hộp quà VIP</span>
+        <span class="nav-item__chevron">›</span>
+      </a>
       <a class="nav-item" href="javascript:void(0)" id="nav-open-warranty">
         <span>🛡️ Tra cứu thẻ bảo hành điện tử</span>
         <span class="nav-item__chevron">›</span>
@@ -276,6 +313,31 @@ function openNavDrawer() {
     e.preventDefault();
     closeDrawer();
     openWarrantyLookupModal();
+  });
+  drawer.querySelector('#nav-open-chain').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openChainVisualizerModal();
+  });
+  drawer.querySelector('#nav-open-wrist').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openWristSizerModal();
+  });
+  drawer.querySelector('#nav-open-quiz').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openStyleQuizModal();
+  });
+  drawer.querySelector('#nav-open-rescue').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openSilverRescueModal();
+  });
+  drawer.querySelector('#nav-open-unboxing').addEventListener('click', (e) => {
+    e.preventDefault();
+    closeDrawer();
+    openUnboxingPreviewModal();
   });
 
   drawer.querySelectorAll('.nav-item').forEach(item => {

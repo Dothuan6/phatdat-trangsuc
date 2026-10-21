@@ -354,4 +354,90 @@ export function saveComfortPrefs(prefs) {
   return merged;
 }
 
+// ── 11. MULTI-CURRENCY CONVERTER PREVIEW (ROUND 28) ──
+const CURRENCY_KEY = 'phatdat_user_currency';
+
+export const CURRENCY_RATES = {
+  VND: { code: 'VND', symbol: '₫', rate: 1, name: 'Việt Nam Đồng', flag: '🇻🇳', isBase: true },
+  USD: { code: 'USD', symbol: '$', rate: 25400, name: 'Đô la Mỹ (USD)', flag: '🇺🇸', isBase: false },
+  EUR: { code: 'EUR', symbol: '€', rate: 27500, name: 'Euro (EUR)', flag: '🇪🇺', isBase: false },
+  AUD: { code: 'AUD', symbol: 'A$', rate: 16500, name: 'Đô la Úc (AUD)', flag: '🇦🇺', isBase: false },
+  JPY: { code: 'JPY', symbol: '¥', rate: 165, name: 'Yên Nhật (JPY)', flag: '🇯🇵', isBase: false },
+  CAD: { code: 'CAD', symbol: 'C$', rate: 18400, name: 'Đô la Canada (CAD)', flag: '🇨🇦', isBase: false }
+};
+
+export function getSelectedCurrency() {
+  try {
+    const code = localStorage.getItem(CURRENCY_KEY) || 'VND';
+    return CURRENCY_RATES[code] ? code : 'VND';
+  } catch (e) {
+    return 'VND';
+  }
+}
+
+export function setSelectedCurrency(currencyCode) {
+  if (CURRENCY_RATES[currencyCode]) {
+    localStorage.setItem(CURRENCY_KEY, currencyCode);
+    window.dispatchEvent(new CustomEvent('currency-changed', { detail: { currency: currencyCode } }));
+    return currencyCode;
+  }
+  return 'VND';
+}
+
+export function formatConvertedPrice(priceVnd) {
+  const code = getSelectedCurrency();
+  const info = CURRENCY_RATES[code] || CURRENCY_RATES.VND;
+  if (!priceVnd || priceVnd <= 0) return 'Liên hệ';
+  if (info.isBase) {
+    return new Intl.NumberFormat('vi-VN').format(priceVnd) + ' ₫';
+  }
+  const converted = priceVnd / info.rate;
+  let formatted = '';
+  if (code === 'JPY') {
+    formatted = Math.round(converted).toLocaleString('ja-JP');
+  } else {
+    formatted = converted.toFixed(2);
+  }
+  return `${info.symbol}${formatted} ${code}`;
+}
+
+// ── 12. STYLE QUIZ & PERSONA STORE (ROUND 24) ──
+const STYLE_QUIZ_KEY = 'phatdat_style_quiz_result';
+
+export function getStyleQuizResult() {
+  try {
+    const raw = localStorage.getItem(STYLE_QUIZ_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function saveStyleQuizResult(result) {
+  localStorage.setItem(STYLE_QUIZ_KEY, JSON.stringify(result));
+  window.dispatchEvent(new CustomEvent('style-quiz-saved', { detail: result }));
+  return result;
+}
+
+// ── 13. USER JEWELRY SIZES STORE (WRIST & CHAIN - ROUNDS 21, 22) ──
+const SIZES_KEY = 'phatdat_user_sizes';
+
+export function getUserJewelrySizes() {
+  try {
+    const raw = localStorage.getItem(SIZES_KEY);
+    return raw ? JSON.parse(raw) : { ringSize: null, wristCm: null, chainCm: null };
+  } catch (e) {
+    return { ringSize: null, wristCm: null, chainCm: null };
+  }
+}
+
+export function saveUserJewelrySizes(sizes) {
+  const current = getUserJewelrySizes();
+  const merged = { ...current, ...sizes };
+  localStorage.setItem(SIZES_KEY, JSON.stringify(merged));
+  window.dispatchEvent(new CustomEvent('user-sizes-updated', { detail: merged }));
+  return merged;
+}
+
+
 

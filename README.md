@@ -14,12 +14,12 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 
 ---
 
-### 2. Danh Sách Tính Năng Đã Triển Khai
+### 2. Tổng Hợp 30 Vòng Nâng Cấp Trải Nghiệm Khách Hàng (UX 3 Giai Đoạn)
 
-#### A. 10 Vòng Nâng Cấp Trải Nghiệm Người Dùng — Giai Đoạn 1 (Core Luxury & O2O UX)
+#### A. Giai Đoạn 1: Nền Tảng Trang Sức Cao Cấp & Trải Nghiệm O2O (Vòng 1 - 10)
 1. **Cố Vấn Phong Thủy & Cung Mệnh Ngũ Hành**: Tra cứu mệnh theo năm sinh, gợi ý màu đá quý và mẫu bạc S925 tương sinh.
 2. **Xưởng Khắc Tên Laser Cá Nhân Hóa Trên Bạc S925**: Nhập chữ khắc, chọn phông chữ và xem trước trực tiếp trên vòng đai bạc S925.
-3. **Phòng Ướm Thử Trang Sức Ảo Qua Camera (Virtual Try-On)**: Hỗ trợ bật Camera trực tiếp hoặc tải ảnh cá nhân để ướm thử mẫu trang sức và chụp ảnh lưu về máy.
+3. **Phòng Ướm Thử Trang Sức Ảo Qua Camera (Virtual Try-On)**: Bật Camera trực tiếp hoặc tải ảnh cá nhân để ướm thử mẫu trang sức và chụp ảnh lưu về máy.
 4. **Cổng Tra Cứu Bảo Hành & Đặt Lịch Đánh Bóng Bạc Trọn Đời**: Tra cứu thông tin bảo hành qua SĐT/mã đơn và đặt lịch làm sáng bạc siêu âm miễn phí.
 5. **Thanh Ghim Tư Vấn Thông Minh Trên Mobile (Sticky Bottom Action Bar)**: Hiển thị nhanh thông tin mẫu đang xem kèm nút Chat Zalo & Yêu cầu gọi lại.
 6. **Gợi Ý Phối Bộ "Mix & Match Complete The Look"**: Tự động đề xuất bộ trang sức đồng điệu cùng bộ sưu tập và chất liệu.
@@ -28,7 +28,7 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 9. **Thuyết Minh Giọng Đọc Tự Động (Audio Storyteller)**: Nghe giới thiệu câu chuyện chế tác và thông số bạc S925 bằng giọng đọc tiếng Việt.
 10. **Xuất Phiếu Báo Giá Tư Vấn VIP Chuẩn Khổ In A4/PDF**: In hoặc lưu PDF danh sách sản phẩm yêu thích kèm mã SKU và mã QR.
 
-#### B. 10 Vòng Nâng Cấp Trải Nghiệm Người Dùng — Giai Đoạn 2 (Deep Personalization & Interactive Tools)
+#### B. Giai Đoạn 2: Cá Nhân Hóa Chuyên Sâu & Công Cụ Tương Tác Cận Cảnh (Vòng 11 - 20)
 11. **Xưởng Thiết Kế Nhẫn & Vòng Đôi Khắc Laser Kép (`openCoupleBuilderModal`)**: Ghép cặp 2 mẫu trang sức bất kỳ, khắc chữ Laser riêng cho từng món kèm ký hiệu đôi (`♥`, `∞`, `★`, `🍀`, `♔`, `♕`) và xem trước trên 2 đai bạc S925.
 12. **Kính Lúp Soi Giác Cắt Đá 2.2x & Thanh Trượt Đánh Bóng Bạc Before/After**:
     - Thấu kính lúp tròn phóng đại 2.2x trên ảnh sản phẩm chi tiết.
@@ -42,10 +42,21 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 19. **Chế Độ Hiển Thị Dịu Mắt & Cỡ Chữ Lớn (`A+` / `🌙 Nền Ấm`)**: Phóng to chữ dễ đọc và chuyển tông nền kem ấm dịu mắt, tự động lưu cấu hình cá nhân.
 20. **Công Cụ In Standee QR Để Bàn Quầy Kính Showroom**: Tạo và in bảng Standee A4 đặt tại quầy kính cửa hàng để khách quét mã trải nghiệm các công cụ số và kênh Instagram/TikTok/Facebook.
 
-#### C. Hệ Thống Quản Trị Backoffice Pro (`#/admin`)
-- Dashboard thống kê phễu chuyển đổi & Top 5 sản phẩm được quan tâm nhất.
-- Quản lý Sản phẩm & Bộ sưu tập (CRUD, tải 3 ảnh từ máy, chỉnh giá hàng loạt, kiểm tra chất lượng dữ liệu, in tem QR).
-- CRM Khách hàng, Lịch hẹn Showroom, Kịch bản trả lời Zalo 1 chạm & Sổ bàn giao ca nội bộ.
-- In Giấy Chứng Nhận Bạc S925 & Bảo Hành chuẩn A4 kèm mã QR tra cứu.
-- Social Content Studio & Chiến dịch Flash Voucher thanh thông báo đầu trang.
-- Sao lưu & Khôi phục toàn bộ cơ sở dữ liệu (`.JSON` 2 chiều) và đồng bộ Supabase Cloud.
+#### C. Giai Đoạn 3: Tương Tác Đa Giác Quan & Trình Chiếu Kiosk Showroom (Vòng 21 - 30)
+21. **Bảng Tính Độ Dài Dây Chuyền & Xương Quai Xanh Tương Tác (`openChainVisualizerModal`)**: Mô phỏng SVG động vị trí dây rơi trên cổ áo (cổ tròn, cổ V, sơ mi) từ 38cm đến 60cm (*Choker, Princess, Matinee, Opera*).
+22. **Thước Đo Chu Vi Cổ Tay & Tư Vấn Độ Ôm Vừa Vặn Lắc Tay (`openWristSizerModal`)**: Thước kéo đo cm cổ tay trực tiếp, tính toán độ ôm (ôm khít, vừa vặn, buông lơi) và đề xuất size lắc tay Phát Đạt.
+23. **Tùy Chọn Mở Hộp Quà VIP & Thiệp Sáp Niêm Phong (`openUnboxingPreviewModal`)**: Xem trước trọn bộ trải nghiệm mở hộp (Gói Tiêu chuẩn, Gói VIP Hoàng Gia đèn LED + Dấu Sáp, Gói Cặp Đôi Tình Nhân).
+24. **Trắc Nghiệm Phong Cách Trang Sức 3 Bước (`openStyleQuizModal`)**: Khảo sát gu thẩm mỹ, tông da, dịp sử dụng -> Tính điểm tương thích 98% và gợi ý set bạc S925 tôn vinh thần thái.
+25. **Chế Độ So Sánh Cận Cảnh Song Song 1:1 (`openSplitScreenCompareModal`)**: Chia đôi màn hình đối chiếu chi tiết 2 sản phẩm: giác cắt đá, loại chấu, bản đai, giá bán và đánh giá.
+26. **Hành Trình Kim Hoàn 6 Bước Chế Tác Thủ Công**: Khám phá 6 công đoạn từ nung phôi bạc Ý, đúc chân không, nạm đá vi mô, mài gương siêu âm, xi Rodium 3 lớp đến kiểm định quang phổ XRF.
+27. **Cẩm Nang Cấp Cứu Bạc Xỉn Màu & Vệ Sinh Cấp Tốc (`openSilverRescueModal`)**: Giải thích khoa học về bạc S925, 3 công thức làm sáng cấp tốc tại nhà trong 3 phút và đặt lịch hấp bóng siêu âm miễn phí trọn đời.
+28. **Bộ Chuyển Đổi Ngoại Tệ Tham Khảo Cho Kiều Bào**: Chuyển đổi linh hoạt `VND`, `USD`, `EUR`, `AUD`, `JPY`, `CAD` theo tỷ giá thực tế, hiển thị giá tham khảo song song toàn site.
+29. **Trải Nghiệm Cài Đặt Web App PWA Thông Minh (`initPwaInstallBanner`)**: Thông báo cài đặt ứng dụng nhẹ nhàng cho Android và iOS Safari, hỗ trợ lướt xem mượt mà kể cả khi mạng yếu.
+30. **Chế Độ Trình Chiếu iPad Cho Quầy Kính Showroom (Kiosk Mode trong Backoffice)**: Chế độ full-screen dành cho tư vấn viên tại cửa hàng, hiển thị lookbook ảnh lớn, chạm mở lúp soi đá và mã QR tư vấn tại quầy.
+
+---
+
+### 3. Tối Ưu Hóa Responsive Đa Thiết Bị
+- **Mobile (iPhone/Android)**: Chống auto-zoom input, căn chỉnh thanh ghim điều hướng bottom nav an toàn tránh thanh Home indicator (`env(safe-area-inset-bottom)`), không bao giờ có lỗi tràn ngang (`overflow-x: hidden`).
+- **iPad / Tablet (768px - 1024px)**: Lưới 2 cột cân đối, thanh header thu gọn khoảng cách tự động, menu quản trị Backoffice cuộn ngang mượt mà.
+- **Desktop / Laptop**: Bố cục chuẩn tỷ lệ vàng, thanh công cụ ghim thông minh và hình ảnh sắc nét chuẩn Retina.

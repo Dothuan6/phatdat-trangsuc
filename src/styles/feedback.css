@@ -759,3 +759,191 @@
   transform: scale(1.35);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PHASE 3 EXPANSION: CHAIN VISUALIZER, WRIST SIZER, UNBOXING & QUIZ
+   ══════════════════════════════════════════════════════════════ */
+
+/* Collarbone & Chain Length Visualizer (Round 21) */
+.pd-chain-visualizer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #fbfbf9;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #e8edea;
+}
+
+.pd-chain-svg-stage {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #F9F7F2 0%, #FFFFFF 100%);
+  border-radius: 10px;
+  border: 1px solid #E2E8E5;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.pd-chain-svg-stage svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.pd-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: #D5E2DF;
+  outline: none;
+  transition: background 0.2s;
+}
+
+.pd-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #C99738;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: transform 0.15s ease;
+}
+
+.pd-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Wrist Strap Sizer (Round 22) */
+.pd-wrist-ruler-band {
+  background: repeating-linear-gradient(90deg, #E6EBE8, #E6EBE8 9px, #1E5D57 10px);
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid #C4D6D1;
+  position: relative;
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1E5D57;
+}
+
+/* Unboxing Package Preview Cards (Round 23) */
+.pd-unboxing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 680px) {
+  .pd-unboxing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pd-unboxing-card {
+  border: 1.5px solid #E0EAE6;
+  border-radius: 10px;
+  padding: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  text-align: center;
+}
+
+.pd-unboxing-card:hover {
+  border-color: #1E5D57;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 93, 87, 0.08);
+}
+
+.pd-unboxing-card.is-active {
+  border-color: #C99738;
+  background: #FDFBF7;
+  box-shadow: 0 0 0 2px #C99738;
+}
+
+/* Style Quiz Cards (Round 24) */
+.pd-quiz-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1.5px solid #e5ebe8;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.pd-quiz-option:hover {
+  border-color: #1E5D57;
+  background: #F6FAF9;
+}
+
+.pd-quiz-option.is-selected {
+  border-color: #1E5D57;
+  background: #EAF3F1;
+  box-shadow: 0 0 0 1px #1E5D57;
+}
+
+/* Split-Screen Compare View (Round 25) */
+.pd-split-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .pd-split-compare-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pd-split-compare-col {
+  background: #ffffff;
+  border: 1px solid #e1ebe7;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Emergency Silver Rescue Cards (Round 27) */
+.pd-rescue-step-card {
+  background: #ffffff;
+  border: 1px solid #e3eae7;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.pd-rescue-badge {
+  background: #EAF3F1;
+  color: #1E5D57;
+  font-weight: 700;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+
+

@@ -33,7 +33,11 @@ import {
   openVirtualTryOnModal,
   openDigitalGiftCardModal,
   openCoupleBuilderModal,
-  openFaceHandStylingModal
+  openFaceHandStylingModal,
+  openChainVisualizerModal,
+  openWristSizerModal,
+  openUnboxingPreviewModal,
+  openSilverRescueModal
 } from '../components/feedback-modal.js';
 
 export function renderProductDetail(container, params = {}) {
@@ -597,10 +601,15 @@ export function renderProductDetail(container, params = {}) {
         <button type="button" class="gift-preset-chip" data-msg="Gửi ngàn điều may mắn và yêu thương đến bạn!" style="background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 2px 8px; font-size: 11px; color: var(--color-text-secondary); cursor: pointer;">+ Lời chúc may mắn</button>
       </div>
       <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(201,151,56,0.45); display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
-        <span style="font-size: 11.5px; color: #7A5411;">Muốn gửi thiệp ảnh kèm mẫu trang sức này qua Zalo trước?</span>
-        <button type="button" id="pdp-open-digital-card-btn" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
-          🖼️ Tạo & Tải Ảnh Thiệp (.PNG)
-        </button>
+        <span style="font-size: 11.5px; color: #7A5411;">Muốn xem trước hộp quà mở ra như thế nào?</span>
+        <div style="display: flex; gap: 6px;">
+          <button type="button" id="pdp-open-unboxing-btn" style="background: #FAF4E8; border: 1px solid var(--color-accent-gold); color: #8A6218; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+            👁️ Xem Mở Hộp VIP
+          </button>
+          <button type="button" id="pdp-open-digital-card-btn" style="background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; padding: 6px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
+            🖼️ Tải Thiệp (.PNG)
+          </button>
+        </div>
       </div>
     </div>
   `;
@@ -609,6 +618,9 @@ export function renderProductDetail(container, params = {}) {
   const giftToggle = giftBox.querySelector('#pdp-gift-toggle');
   const giftPane = giftBox.querySelector('#pdp-gift-pane');
   const giftNoteInput = giftBox.querySelector('#pdp-gift-note-input');
+  giftBox.querySelector('#pdp-open-unboxing-btn').addEventListener('click', () => {
+    openUnboxingPreviewModal();
+  });
   giftBox.querySelector('#pdp-open-digital-card-btn').addEventListener('click', () => {
     openDigitalGiftCardModal(product, {
       giftCardNote: giftNoteInput.value.trim(),
