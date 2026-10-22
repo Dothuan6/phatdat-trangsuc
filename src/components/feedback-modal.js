@@ -24,6 +24,7 @@ import {
 } from '../data/wishlist-store.js';
 import { products, getProductById, formatPrice } from '../data/products.js';
 import { siteInfo } from '../data/site-info.js';
+import { playCrystalChime, playSoftClick, playSparkle, playCameraSnap } from '../services/sound-effects.js';
 
 // SVG Icons
 const ICONS = {
@@ -104,6 +105,10 @@ export function showToast(options, type = 'info', duration = 3500) {
     title = options.title || '';
     toastType = options.type || 'info';
     toastDuration = options.duration !== undefined ? options.duration : 3500;
+  }
+
+  if (toastType === 'success') {
+    playCrystalChime();
   }
 
   const container = getToastContainer();
@@ -4264,6 +4269,971 @@ export function openPendantScaleModal(product = null) {
   render();
 }
 
+// ══════════════════════════════════════════════════════════════
+// 29. FAST SOCIAL SHARE CARD GENERATOR (ROUND 51)
+// ══════════════════════════════════════════════════════════════
+
+export function openShareCardModal(product = null) {
+  const prod = product || products[0];
+  let theme = 'emerald';
+  let format = 'square';
+
+  const { overlay, close } = createModalBase({
+    title: 'Tạo Ảnh Thiệp Chia Sẻ Mạng Xã Hội',
+    subtitle: 'Xuất thiệp ảnh sản phẩm sang trọng để gửi Zalo hoặc đăng Story',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="pd-share-theme-btn is-active" data-theme="emerald" style="padding: 6px 12px; border-radius: 6px; border: 1.5px solid var(--color-brand-primary); background: #1E5D57; color: #fff; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+          🌿 Ngọc Lục Bảo
+        </button>
+        <button type="button" class="pd-share-theme-btn" data-theme="ivory" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--color-border); background: #FAF7EE; color: #8A6218; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+          ✨ Kem Hoàng Gia
+        </button>
+        <button type="button" class="pd-share-theme-btn" data-theme="onyx" style="padding: 6px 12px; border-radius: 6px; border: 1px solid var(--color-border); background: #18201E; color: #FFF; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+          🌙 Dạ Tiệc Đen
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button type="button" class="pd-share-fmt-btn is-active" data-fmt="square" style="padding: 6px 10px; border-radius: 6px; border: 1.5px solid var(--color-brand-primary); background: var(--color-brand-light); color: var(--color-brand-primary); font-size: 11.5px; font-weight: 600; cursor: pointer;">
+          1:1 Vuông
+        </button>
+        <button type="button" class="pd-share-fmt-btn" data-fmt="story" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-text-primary); font-size: 11.5px; font-weight: 600; cursor: pointer;">
+          9:16 Story
+        </button>
+      </div>
+    </div>
+
+    <div class="pd-share-card-preview-wrap">
+      <canvas id="pd-share-canvas" class="pd-share-card-canvas" width="600" height="600"></canvas>
+    </div>
+
+    <div style="font-size: 11.5px; color: var(--color-text-secondary); text-align: center; margin-bottom: 4px;">
+      💡 Ảnh được tích hợp logo Phát Đạt, mã chuẩn và hotline tư vấn chính hãng
+    </div>
+  `;
+
+  const canvas = body.querySelector('#pd-share-canvas');
+
+  function drawCanvas() {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const isSquare = format === 'square';
+    canvas.width = 600;
+    canvas.height = isSquare ? 600 : 800;
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    if (theme === 'emerald') {
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, '#0F2A27');
+      grad.addColorStop(0.5, '#1E5D57');
+      grad.addColorStop(1, '#143F3B');
+      ctx.fillStyle = grad;
+    } else if (theme === 'ivory') {
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#FFFFFF');
+      grad.addColorStop(1, '#F7F2E7');
+      ctx.fillStyle = grad;
+    } else {
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#1C2524');
+      grad.addColorStop(1, '#0D1413');
+      ctx.fillStyle = grad;
+    }
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.strokeStyle = '#C99738';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(18, 18, w - 36, h - 36);
+
+    ctx.strokeStyle = theme === 'ivory' ? 'rgba(201,151,56,0.3)' : 'rgba(201,151,56,0.35)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(24, 24, w - 48, h - 48);
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 20px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = theme === 'ivory' ? '#1E5D57' : '#C99738';
+    ctx.fillText('PHÁT ĐẠT JEWELRY', w / 2, 58);
+
+    ctx.font = '500 10.5px "Be Vietnam Pro", sans-serif';
+    ctx.fillStyle = theme === 'ivory' ? '#666' : 'rgba(255,255,255,0.75)';
+    ctx.fillText('TRANG SỨC BẠC Ý S925 & MOISSANITE CAO CẤP', w / 2, 76);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const imgSize = isSquare ? 280 : 360;
+      const imgX = (w - imgSize) / 2;
+      const imgY = isSquare ? 110 : 130;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(w / 2, imgY + imgSize / 2, imgSize / 2 + 10, 0, Math.PI * 2);
+      ctx.fillStyle = theme === 'ivory' ? '#FFFFFF' : 'rgba(255,255,255,0.08)';
+      ctx.fill();
+      ctx.restore();
+
+      ctx.drawImage(img, imgX, imgY, imgSize, imgSize);
+
+      ctx.textAlign = 'center';
+      const textY = isSquare ? 435 : 540;
+      ctx.font = '700 19px "Playfair Display", Georgia, serif';
+      ctx.fillStyle = theme === 'ivory' ? '#1A2826' : '#FFFFFF';
+      ctx.fillText(prod.name, w / 2, textY);
+
+      ctx.font = '700 18px "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = '#C99738';
+      ctx.fillText(formatPrice(prod.price), w / 2, textY + 30);
+
+      ctx.font = '400 11px "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = theme === 'ivory' ? '#777' : 'rgba(255,255,255,0.7)';
+      ctx.fillText(`Mã: ${prod.reference} · Chuẩn Bạc Ý S925`, w / 2, textY + 52);
+
+      const footerY = isSquare ? 545 : 735;
+      ctx.font = '600 11.5px "Be Vietnam Pro", sans-serif';
+      ctx.fillStyle = theme === 'ivory' ? '#1E5D57' : '#F3D184';
+      ctx.fillText(`Hotline/Zalo: ${siteInfo.phoneDisplay} · Bảo Hành Trọn Đời`, w / 2, footerY);
+    };
+    img.onerror = () => {
+      ctx.fillStyle = '#C99738';
+      ctx.font = '700 18px sans-serif';
+      ctx.fillText(prod.name, w / 2, 280);
+    };
+    img.src = (prod.images && prod.images[0]) || './images/products/Daychuyen4.3-removebg-preview.png';
+  }
+
+  body.querySelectorAll('.pd-share-theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      playSoftClick();
+      theme = btn.dataset.theme;
+      body.querySelectorAll('.pd-share-theme-btn').forEach(b => {
+        b.style.borderColor = 'var(--color-border)';
+      });
+      btn.style.borderColor = 'var(--color-brand-primary)';
+      drawCanvas();
+    });
+  });
+
+  body.querySelectorAll('.pd-share-fmt-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      playSoftClick();
+      format = btn.dataset.fmt;
+      body.querySelectorAll('.pd-share-fmt-btn').forEach(b => {
+        b.style.background = '#fff';
+        b.style.color = 'var(--color-text-primary)';
+        b.style.borderColor = 'var(--color-border)';
+      });
+      btn.style.background = 'var(--color-brand-light)';
+      btn.style.color = 'var(--color-brand-primary)';
+      btn.style.borderColor = 'var(--color-brand-primary)';
+      drawCanvas();
+    });
+  });
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="share-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="share-download-btn" style="flex: 1.5; padding: 11px; background: var(--color-accent-gold); color: #143F3B; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      📥 Tải Ảnh HD (.PNG)
+    </button>
+    <button type="button" id="share-zalo-btn" style="flex: 1.5; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Gửi Zalo Tư Vấn
+    </button>
+  `;
+
+  footer.querySelector('#share-close-btn').addEventListener('click', close);
+  footer.querySelector('#share-download-btn').addEventListener('click', () => {
+    playCameraSnap();
+    const link = document.createElement('a');
+    link.download = `PhatDat-Jewelry-${prod.reference}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Đã tải ảnh thiệp sản phẩm HD về máy!', 'success');
+  });
+
+  footer.querySelector('#share-zalo-btn').addEventListener('click', () => {
+    const text = encodeURIComponent(`Chào tiệm Phát Đạt, mình đang quan tâm mẫu [${prod.name} - Mã: ${prod.reference}]. Nhờ tiệm gửi ảnh thật và tư vấn giúp mình nhé!`);
+    close();
+    window.open(`${siteInfo.zalo}?text=${text}`, '_blank', 'noopener,noreferrer');
+  });
+
+  drawCanvas();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 30. INTERACTIVE RING FINGER MEANING GUIDE (ROUND 52)
+// ══════════════════════════════════════════════════════════════
+
+export function openFingerMeaningModal() {
+  let selectedFinger = 'middle';
+
+  const fingerData = {
+    thumb: {
+      name: 'Ngón Cái (Cột Trụ Khởi Sinh)',
+      element: 'Hành Mộc (Cây cối sinh sôi)',
+      symbol: '👑 Quyền Lực · Bản Lĩnh · Sự Nghiệp Vững Vàng',
+      desc: 'Đeo nhẫn ngón cái tượng trưng cho ý chí độc lập, quyền uy và phong thái lãnh đạo. Thích hợp cho người làm kinh doanh, chủ doanh nghiệp hoặc đang mở rộng sự nghiệp.',
+      ringAdvice: 'Nên chọn nhẫn bản đai rộng, họa tiết rồng phượng hoặc đính đá xanh lục / cẩm thạch để kích hoạt mộc khí vững chãi.'
+    },
+    index: {
+      name: 'Ngón Trỏ (Định Hướng Khát Vọng)',
+      element: 'Hành Hỏa (Ngọn lửa thắp sáng)',
+      symbol: '🔥 Thăng Tiến · Thi Cử · Uy Quyền & Quyết Đoán',
+      desc: 'Ngón trỏ đại diện cho tham vọng, sự thăng hoa trong công danh và khả năng quyết định nhanh nhạy. Đeo nhẫn ngón này giúp cải thiện vận may thi cử và ngoại giao.',
+      ringAdvice: 'Rất hợp với các mẫu nhẫn đính đá Moissanite giác cắt sắc nét, đai nhẫn uốn lượn phong cách hoặc đá đỏ Ruby.'
+    },
+    middle: {
+      name: 'Ngón Giữa (Trọng Tâm Thu Hút Tài Lộc)',
+      element: 'Hành Thổ (Đất mẹ nuôi dưỡng & tụ tài)',
+      symbol: '💰 Tụ Tài Tích Của · Giữ Vững Cân Bằng · Bình An',
+      desc: 'Là ngón tay dài nhất và nằm ở vị trí trung tâm, ngón giữa có sức mạnh hội tụ năng lượng tốt nhất, giúp chủ nhân giữ tiền của, hạn chế hao tài tán của.',
+      ringAdvice: 'Vị trí lý tưởng nhất để đeo nhẫn đá chủ Solitaire lớn, nhẫn cỏ ba lá hoặc đai Eternity kim tiền.'
+    },
+    ring: {
+      name: 'Ngón Áp Út (Mạch Máu Tình Yêu Vena Amoris)',
+      element: 'Hành Kim (Kim khí bền bỉ trọn đời)',
+      symbol: '💍 Đính Ước · Hôn Nhân Hạnh Phúc · Tình Yêu Vĩnh Cửu',
+      desc: 'Theo truyền thuyết La Mã, mạch máu ngón áp út dẫn thẳng về trái tim. Đây là ngón tay thiêng liêng biểu tượng cho sự gắn kết lứa đôi và tình yêu thủy chung son sắt.',
+      ringAdvice: 'Phù hợp nhất cho nhẫn cặp đôi, nhẫn cầu hôn Moissanite Hearts & Arrows 8 tim 8 tên hoặc nhẫn đính hôn S925.'
+    },
+    pinky: {
+      name: 'Ngón Út (Quý Nhân & Tuyên Ngôn Tự Do)',
+      element: 'Hành Thủy (Nước mềm mại, trí tuệ linh hoạt)',
+      symbol: '🕊️ Quý Nhân Phù Trợ · Khéo Léo · Tự Do & Cá Tính',
+      desc: 'Ngón út tượng trưng cho trí tuệ cảm xúc, khả năng giao tiếp duyên dáng và sự bảo trợ của quý nhân. Đồng thời mang thông điệp độc lập, yêu thương bản thân.',
+      ringAdvice: 'Nên chọn các mẫu nhẫn mảnh freesize, nhẫn hoa cúc, nhẫn nơ đính đá tấm CZ tinh tế không vướng víu.'
+    }
+  };
+
+  const { overlay, close } = createModalBase({
+    title: 'Cẩm Nang Ý Nghĩa Đeo Nhẫn Từng Ngón Tay',
+    subtitle: 'Khám phá ý nghĩa phong thủy & cách chọn nhẫn thu hút tài lộc lứa đôi',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const cur = fingerData[selectedFinger];
+
+    body.innerHTML = `
+      <div class="pd-finger-hand-stage">
+        <svg viewBox="0 0 320 220" width="100%" height="180" style="display: block; margin: 0 auto; max-width: 280px;">
+          <defs>
+            <linearGradient id="handSkin" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FCEEE6"/>
+              <stop offset="100%" stop-color="#F1D2BD"/>
+            </linearGradient>
+            <filter id="glowGold" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#C99738" flood-opacity="0.8"/>
+            </filter>
+          </defs>
+
+          <path d="M70,220 C60,180 50,150 75,130 C90,120 110,135 125,140 C140,140 180,130 205,145 C220,155 245,180 235,220 Z" fill="url(#handSkin)"/>
+
+          <path d="M70,185 C40,165 30,130 45,105 C55,90 75,100 80,125 L88,150 Z" fill="url(#handSkin)" stroke="#DFC9B8" stroke-width="1"/>
+          ${selectedFinger === 'thumb' ? `
+            <ellipse cx="58" cy="120" rx="12" ry="7" fill="#C99738" filter="url(#glowGold)"/>
+            <circle cx="58" cy="116" r="3.5" fill="#FFF"/>
+          ` : ''}
+
+          <path d="M85,135 C80,90 85,50 102,40 C115,35 125,50 120,95 L118,140 Z" fill="url(#handSkin)" stroke="#DFC9B8" stroke-width="1"/>
+          ${selectedFinger === 'index' ? `
+            <ellipse cx="107" cy="85" rx="10" ry="5.5" fill="#C99738" filter="url(#glowGold)"/>
+            <circle cx="107" cy="82" r="3" fill="#FFF"/>
+          ` : ''}
+
+          <path d="M122,138 C122,80 128,30 146,20 C160,15 168,32 165,85 L160,140 Z" fill="url(#handSkin)" stroke="#DFC9B8" stroke-width="1"/>
+          ${selectedFinger === 'middle' ? `
+            <ellipse cx="150" cy="78" rx="11" ry="6" fill="#C99738" filter="url(#glowGold)"/>
+            <circle cx="150" cy="74" r="3.5" fill="#FFF"/>
+          ` : ''}
+
+          <path d="M165,140 C168,85 175,45 190,38 C202,32 210,48 205,95 L198,142 Z" fill="url(#handSkin)" stroke="#DFC9B8" stroke-width="1"/>
+          ${selectedFinger === 'ring' ? `
+            <ellipse cx="192" cy="88" rx="10" ry="5.5" fill="#C99738" filter="url(#glowGold)"/>
+            <circle cx="192" cy="84" r="3" fill="#FFF"/>
+          ` : ''}
+
+          <path d="M202,148 C215,108 228,80 240,75 C250,72 256,88 248,120 L235,160 Z" fill="url(#handSkin)" stroke="#DFC9B8" stroke-width="1"/>
+          ${selectedFinger === 'pinky' ? `
+            <ellipse cx="236" cy="115" rx="8" ry="4.5" fill="#C99738" filter="url(#glowGold)"/>
+            <circle cx="236" cy="112" r="2.5" fill="#FFF"/>
+          ` : ''}
+        </svg>
+
+        <div style="font-size: 11px; color: #8A6218; font-weight: 600; margin-top: 4px;">
+          👆 Chạm vào ngón tay bên dưới để xem luận giải phong thủy chi tiết
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px;">
+        <button type="button" class="pd-finger-sel-btn ${selectedFinger === 'thumb' ? 'is-active' : ''}" data-f="thumb" style="padding: 8px 4px; border-radius: 6px; border: ${selectedFinger === 'thumb' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${selectedFinger === 'thumb' ? 'var(--color-brand-light)' : '#fff'}; color: ${selectedFinger === 'thumb' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;">
+          Ngón Cái
+        </button>
+        <button type="button" class="pd-finger-sel-btn ${selectedFinger === 'index' ? 'is-active' : ''}" data-f="index" style="padding: 8px 4px; border-radius: 6px; border: ${selectedFinger === 'index' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${selectedFinger === 'index' ? 'var(--color-brand-light)' : '#fff'}; color: ${selectedFinger === 'index' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;">
+          Ngón Trỏ
+        </button>
+        <button type="button" class="pd-finger-sel-btn ${selectedFinger === 'middle' ? 'is-active' : ''}" data-f="middle" style="padding: 8px 4px; border-radius: 6px; border: ${selectedFinger === 'middle' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${selectedFinger === 'middle' ? 'var(--color-brand-light)' : '#fff'}; color: ${selectedFinger === 'middle' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;">
+          Ngón Giữa
+        </button>
+        <button type="button" class="pd-finger-sel-btn ${selectedFinger === 'ring' ? 'is-active' : ''}" data-f="ring" style="padding: 8px 4px; border-radius: 6px; border: ${selectedFinger === 'ring' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${selectedFinger === 'ring' ? 'var(--color-brand-light)' : '#fff'}; color: ${selectedFinger === 'ring' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;">
+          Áp Út
+        </button>
+        <button type="button" class="pd-finger-sel-btn ${selectedFinger === 'pinky' ? 'is-active' : ''}" data-f="pinky" style="padding: 8px 4px; border-radius: 6px; border: ${selectedFinger === 'pinky' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${selectedFinger === 'pinky' ? 'var(--color-brand-light)' : '#fff'}; color: ${selectedFinger === 'pinky' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;">
+          Ngón Út
+        </button>
+      </div>
+
+      <div class="pd-finger-card-active">
+        <div style="font-weight: 700; font-size: 14.5px; color: var(--color-brand-primary); margin-bottom: 2px;">
+          ${cur.name}
+        </div>
+        <div style="font-size: 11.5px; font-weight: 600; color: #8A6218; margin-bottom: 8px;">
+          Ngũ hành: ${cur.element} · ${cur.symbol}
+        </div>
+        <p style="margin: 0 0 10px; font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.55;">
+          ${cur.desc}
+        </p>
+        <div style="background: #F8FAF9; border: 1px dashed var(--color-border); border-radius: 6px; padding: 10px 12px; font-size: 12px; line-height: 1.5;">
+          💡 <strong>Gợi ý mẫu nhẫn Phát Đạt:</strong> ${cur.ringAdvice}
+        </div>
+      </div>
+    `;
+
+    body.querySelectorAll('.pd-finger-sel-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playSoftClick();
+        selectedFinger = btn.dataset.f;
+        render();
+      });
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="finger-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="finger-view-rings-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💍 Xem Danh Sách Nhẫn Bạc S925
+    </button>
+  `;
+
+  footer.querySelector('#finger-close-btn').addEventListener('click', close);
+  footer.querySelector('#finger-view-rings-btn').addEventListener('click', () => {
+    close();
+    window.location.hash = '#/jewelry/rings';
+  });
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 31. EARRING FACE SHAPE ADVISOR (ROUND 53)
+// ══════════════════════════════════════════════════════════════
+
+export function openEarringFitModal() {
+  let faceShape = 'round';
+
+  const faceAdvice = {
+    round: {
+      name: 'Khuôn Mặt Tròn (Bầu bĩnh, phúc hậu)',
+      features: 'Chiều dài và chiều rộng khuôn mặt tương đương, đường viền hàm mềm mại.',
+      bestStyles: ['Dáng dài (Dangle/Threader 40mm)', 'Giọt nước thanh mảnh', 'Hình học góc cạnh'],
+      matchScore: '98%',
+      stylingTip: 'Bông tai dáng dài hoặc giọt nước sẽ tạo hiệu ứng thị giác kéo dài khuôn mặt, giúp cằm trông thon gọn và thanh thoát hơn.'
+    },
+    oval: {
+      name: 'Khuôn Mặt Trái Xoan (Chuẩn tỷ lệ vàng)',
+      features: 'Trán hơi rộng hơn cằm, các đường nét cân đối, xương gò má thanh tú.',
+      bestStyles: ['Mọi kiểu dáng bông tai', 'Bông tai nụ đá Moissanite', 'Khuyên tròn Hoop sang chảnh'],
+      matchScore: '100%',
+      stylingTip: 'Bạn sở hữu dáng mặt hoàn hảo nhất! Thoải mái biến hóa từ bông nụ Cỏ Ba Lá tinh khôi đến khuyên tròn bản vừa quyến rũ.'
+    },
+    square: {
+      name: 'Khuôn Mặt Vuông / Chữ Điền (Góc cạnh cá tính)',
+      features: 'Trán và xương hàm rộng tương đương, quai hàm sắc nét quyền lực.',
+      bestStyles: ['Khuyên tròn mềm mại (Hoop)', 'Bông tai giọt nước uốn cong', 'Bông nụ đá chủ tròn'],
+      matchScore: '95%',
+      stylingTip: 'Hãy ưu tiên các đường cong mềm mại của khuyên tròn hoặc giọt nước để làm dịu đường nét quai hàm, mang lại vẻ nữ tính hài hòa.'
+    },
+    heart: {
+      name: 'Khuôn Mặt Trái Tim / V-line (Cằm nhọn thanh tú)',
+      features: 'Trán rộng, gò má cao và thon dần về phía cằm sắc nét.',
+      bestStyles: ['Bông tai dáng đèn chùm (Chandelier)', 'Dáng quả chuông / Tam giác đáy rộng', 'Bông nụ đá tấm'],
+      matchScore: '96%',
+      stylingTip: 'Chọn bông tai có phần đáy nở rộng (hình giọt lệ, chùm hoa) để tạo sự cân bằng tự nhiên với phần cằm thon.'
+    }
+  };
+
+  const { overlay, close } = createModalBase({
+    title: 'Cố Vấn Bông Tai Tôn Khuôn Mặt Chuẩn Stylist',
+    subtitle: 'Tìm kiểu bông tai hoàn hảo giúp gương mặt thanh thoát & rạng ngời',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const cur = faceAdvice[faceShape];
+
+    body.innerHTML = `
+      <div style="margin-bottom: 14px;">
+        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--color-brand-primary); margin-bottom: 6px;">
+          1. Chọn dáng khuôn mặt của bạn:
+        </label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+          <button type="button" class="pd-face-btn ${faceShape === 'round' ? 'is-active' : ''}" data-face="round" style="padding: 9px 4px; border-radius: 8px; border: ${faceShape === 'round' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${faceShape === 'round' ? 'var(--color-brand-light)' : '#fff'}; color: ${faceShape === 'round' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            🌕 Mặt Tròn
+          </button>
+          <button type="button" class="pd-face-btn ${faceShape === 'oval' ? 'is-active' : ''}" data-face="oval" style="padding: 9px 4px; border-radius: 8px; border: ${faceShape === 'oval' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${faceShape === 'oval' ? 'var(--color-brand-light)' : '#fff'}; color: ${faceShape === 'oval' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            🥚 Trái Xoan
+          </button>
+          <button type="button" class="pd-face-btn ${faceShape === 'square' ? 'is-active' : ''}" data-face="square" style="padding: 9px 4px; border-radius: 8px; border: ${faceShape === 'square' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${faceShape === 'square' ? 'var(--color-brand-light)' : '#fff'}; color: ${faceShape === 'square' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            🔲 Chữ Điền
+          </button>
+          <button type="button" class="pd-face-btn ${faceShape === 'heart' ? 'is-active' : ''}" data-face="heart" style="padding: 9px 4px; border-radius: 8px; border: ${faceShape === 'heart' ? '1.5px solid var(--color-brand-primary)' : '1px solid var(--color-border)'}; background: ${faceShape === 'heart' ? 'var(--color-brand-light)' : '#fff'}; color: ${faceShape === 'heart' ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'}; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center;">
+            💎 Trái Tim
+          </button>
+        </div>
+      </div>
+
+      <div style="background: #FAF9F5; border: 1.5px solid #E2D7C5; border-radius: 10px; padding: 16px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-weight: 700; font-size: 14.5px; color: var(--color-brand-primary);">${cur.name}</span>
+          <span style="background: #27ae60; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px;">Độ hợp: ${cur.matchScore}</span>
+        </div>
+        <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 10px; line-height: 1.5;">
+          ${cur.features}
+        </div>
+
+        <div style="background: #ffffff; border-radius: 8px; padding: 12px; margin-bottom: 10px; border: 1px solid #efeae0;">
+          <div style="font-size: 12px; font-weight: 700; color: #27ae60; margin-bottom: 4px;">
+            ✨ Kiểu bông tai tôn nét nhất:
+          </div>
+          <div style="font-size: 12.5px; color: var(--color-text-primary); line-height: 1.5;">
+            ${cur.bestStyles.map(s => `• <strong>${s}</strong>`).join('<br>')}
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: #8A6218; line-height: 1.5;">
+          💡 <strong>Mẹo Stylist:</strong> ${cur.stylingTip}
+        </div>
+      </div>
+    `;
+
+    body.querySelectorAll('.pd-face-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        playSoftClick();
+        faceShape = btn.dataset.face;
+        render();
+      });
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="earring-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="earring-view-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      ✨ Xem Bộ Sưu Tập Bông Tai
+    </button>
+  `;
+
+  footer.querySelector('#earring-close-btn').addEventListener('click', close);
+  footer.querySelector('#earring-view-btn').addEventListener('click', () => {
+    close();
+    window.location.hash = '#/jewelry/earrings';
+  });
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 32. MOISSANITE CARAT TO MM SIZE SCALE (ROUND 54)
+// ══════════════════════════════════════════════════════════════
+
+export function openCaratScaleModal() {
+  let caratIdx = 3;
+
+  const caratData = [
+    { carat: 0.3, mm: 4.0, desc: 'Thanh lịch tinh tế, nhẹ nhàng đeo hàng ngày đi làm hoặc đi học mà không lo vướng víu.' },
+    { carat: 0.5, mm: 5.0, desc: 'Kích cỡ ngọt ngào, ánh lửa vừa vặn, rất được yêu thích cho nhẫn kỷ niệm hoặc quà tặng tự thưởng.' },
+    { carat: 0.8, mm: 6.0, desc: 'Bắt sáng lấp lánh rõ nét, tương đương viên kim cương 80 phân sang trọng quý phái.' },
+    { carat: 1.0, mm: 6.5, desc: '🌟 TỶ LỆ VÀNG QUỐC TẾ: Size kinh điển cho nhẫn cầu hôn Solitaire, cân đối hoàn hảo trên mọi bàn tay phụ nữ Việt Nam.' },
+    { carat: 1.5, mm: 7.5, desc: 'Viên chủ nổi bật lộng lẫy, độ lửa Moissanite Hearts & Arrows rực rỡ thu hút mọi ánh nhìn.' },
+    { carat: 2.0, mm: 8.0, desc: '👑 ĐẲNG CẤP DẠ TIỆC: Tạo điểm nhấn quyền quý xa hoa, rất tôn dáng bàn tay thon dài.' },
+    { carat: 3.0, mm: 9.0, desc: 'Viên chủ bản lớn kiêu sa, phô diễn trọn vẹn 57 giác cắt giác tâm hoàn mỹ.' }
+  ];
+
+  const { overlay, close } = createModalBase({
+    title: 'Thước Đo Kích Thước Carat vs Millimeter (Moissanite)',
+    subtitle: 'Quy đổi kích thước đá chủ & mô phỏng tỷ lệ thực tế trên ngón tay',
+    maxWidth: '560px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  function render() {
+    const cur = caratData[caratIdx];
+    const pxSize = cur.mm * 6;
+
+    body.innerHTML = `
+      <div class="pd-carat-stage">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #F3D184; font-weight: 700; margin-bottom: 12px;">
+          Mô Phỏng Độ Lớn: ${cur.carat} Carat (Đường kính ${cur.mm} mm)
+        </div>
+
+        <svg viewBox="0 0 320 180" width="100%" height="150" style="display: block; margin: 0 auto; max-width: 320px;">
+          <defs>
+            <radialGradient id="moissGlow" cx="40%" cy="40%" r="65%">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="35%" stop-color="#E2F7F6"/>
+              <stop offset="70%" stop-color="#BEE8E5"/>
+              <stop offset="100%" stop-color="#6FB5AE"/>
+            </radialGradient>
+            <filter id="gemFireGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#68D8D6" flood-opacity="0.9"/>
+            </filter>
+          </defs>
+
+          <rect x="80" y="30" width="160" height="120" rx="30" fill="#E8D1BE" opacity="0.45"/>
+          <path d="M70,90 L250,90" stroke="#C99738" stroke-width="12" stroke-linecap="round"/>
+          <path d="M70,90 L250,90" stroke="#FAF8F5" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+
+          <circle cx="${160 - pxSize/2.2}" cy="${90 - pxSize/2.2}" r="3" fill="#D5DFDC" stroke="#fff" stroke-width="1"/>
+          <circle cx="${160 + pxSize/2.2}" cy="${90 - pxSize/2.2}" r="3" fill="#D5DFDC" stroke="#fff" stroke-width="1"/>
+          <circle cx="${160 - pxSize/2.2}" cy="${90 + pxSize/2.2}" r="3" fill="#D5DFDC" stroke="#fff" stroke-width="1"/>
+          <circle cx="${160 + pxSize/2.2}" cy="${90 + pxSize/2.2}" r="3" fill="#D5DFDC" stroke="#fff" stroke-width="1"/>
+
+          <circle cx="160" cy="90" r="${pxSize / 2}" fill="url(#moissGlow)" stroke="#FFFFFF" stroke-width="2" filter="url(#gemFireGlow)"/>
+
+          <polygon points="160,${90 - pxSize/2.5} ${160 + pxSize/3.5},90 160,${90 + pxSize/2.5} ${160 - pxSize/3.5},90" fill="#FFFFFF" opacity="0.6"/>
+          <circle cx="160" cy="90" r="${pxSize / 5}" fill="#FFFFFF" opacity="0.9"/>
+
+          <text x="160" y="${90 + pxSize/2 + 24}" text-anchor="middle" font-size="12" font-weight="700" fill="#F3D184">Ø ${cur.mm} mm</text>
+        </svg>
+      </div>
+
+      <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 13px; font-weight: 700; color: var(--color-brand-primary);">Trọng lượng đá:</span>
+          <span style="font-size: 16px; font-weight: 800; color: #D4380D;">${cur.carat} Carat (~${cur.mm} mm)</span>
+        </div>
+        <input type="range" id="carat-range-slider" min="0" max="6" step="1" value="${caratIdx}" class="pd-range-slider" style="cursor: pointer;">
+        <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: var(--color-text-secondary); margin-top: 6px;">
+          <span>0.3 ct</span>
+          <span>0.5 ct</span>
+          <span>0.8 ct</span>
+          <span style="font-weight: 700; color: var(--color-brand-primary);">1.0 ct</span>
+          <span>1.5 ct</span>
+          <span>2.0 ct</span>
+          <span>3.0 ct</span>
+        </div>
+      </div>
+
+      <div style="background: #FAF9F5; border: 1.5px solid #DFC9A8; border-radius: 10px; padding: 14px; font-size: 12.5px; line-height: 1.6; color: var(--color-text-primary);">
+        💎 <strong>Tư vấn chọn size:</strong> ${cur.desc}
+      </div>
+    `;
+
+    const slider = body.querySelector('#carat-range-slider');
+    slider.addEventListener('input', (e) => {
+      caratIdx = Number(e.target.value);
+      playSparkle();
+      render();
+    });
+  }
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="carat-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="carat-zalo-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Nhận Báo Giá Đá Moissanite ${caratData[caratIdx].carat}ct
+    </button>
+  `;
+
+  footer.querySelector('#carat-close-btn').addEventListener('click', close);
+  footer.querySelector('#carat-zalo-btn').addEventListener('click', () => {
+    const cur = caratData[caratIdx];
+    const text = encodeURIComponent(`Chào Phát Đạt Jewelry, mình muốn tư vấn mẫu nhẫn đính đá Moissanite cỡ [${cur.carat} Carat - ${cur.mm}mm]. Nhờ tiệm gửi video lửa đá thực tế dưới ánh đèn giúp mình nhé!`);
+    close();
+    window.open(`${siteInfo.zalo}?text=${text}`, '_blank', 'noopener,noreferrer');
+  });
+
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 33. LIVE DISTANCE & SHOWROOM ROUTE ESTIMATOR (ROUND 55)
+// ══════════════════════════════════════════════════════════════
+
+export function openShowroomRouteModal() {
+  const showroomLat = 10.8122;
+  const showroomLng = 106.5828;
+
+  const { overlay, close } = createModalBase({
+    title: 'Chỉ Đường & Đo Khoảng Cách Đến Showroom',
+    subtitle: 'Ấp 3B, Tân Vĩnh Lộc, TP. Hồ Chí Minh · Mở cửa 09:00 – 21:00',
+    maxWidth: '540px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div style="background: #F4F9F8; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+      <div style="font-weight: 700; color: var(--color-brand-primary); font-size: 14px; margin-bottom: 4px;">
+        📍 Showroom Phát Đạt Jewelry
+      </div>
+      <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5;">
+        ${siteInfo.address}
+      </div>
+      <div style="font-size: 12px; color: #27ae60; font-weight: 600; margin-top: 6px;">
+        ● Giờ đón khách: ${siteInfo.hours} (Có chỗ đỗ ô tô & xe máy an toàn)
+      </div>
+    </div>
+
+    <div id="route-distance-box" style="background: #FAF9F5; border: 1.5px dashed #DFC9A8; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 16px;">
+      <div style="font-size: 13px; color: var(--color-text-primary); margin-bottom: 6px;">
+        Bấm nút bên dưới để ước tính khoảng cách & thời gian di chuyển từ vị trí của bạn:
+      </div>
+      <button type="button" id="route-calc-btn" class="btn" style="background: var(--color-accent-gold); color: #143F3B; font-weight: 700; border: none; padding: 9px 18px; font-size: 12.5px; cursor: pointer;">
+        🧭 TÍNH KHOẢNG CÁCH TỪ VỊ TRÍ CỦA TÔI
+      </button>
+    </div>
+
+    <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.5;">
+      💡 <strong>Đặc quyền khách ghé Showroom:</strong> Được làm sáng siêu âm trang sức bạc miễn phí, đo size tay bằng bộ ni chuyên dụng và thưởng trà bánh thư giãn.
+    </div>
+  `;
+
+  const calcBtn = body.querySelector('#route-calc-btn');
+  const distBox = body.querySelector('#route-distance-box');
+
+  calcBtn.addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      showToast('Trình duyệt không hỗ trợ định vị GPS.', 'warning');
+      return;
+    }
+
+    calcBtn.disabled = true;
+    calcBtn.textContent = 'Đang định vị...';
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const uLat = pos.coords.latitude;
+        const uLng = pos.coords.longitude;
+
+        const R = 6371;
+        const dLat = (showroomLat - uLat) * Math.PI / 180;
+        const dLng = (showroomLng - uLng) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(uLat * Math.PI / 180) * Math.cos(showroomLat * Math.PI / 180) *
+                  Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distKm = (R * c).toFixed(1);
+
+        const motoMins = Math.round(distKm * 2.2);
+        const carMins = Math.round(distKm * 2.8);
+
+        distBox.innerHTML = `
+          <div style="font-size: 11px; text-transform: uppercase; color: #8A6218; font-weight: 700; margin-bottom: 4px;">KHOẢNG CÁCH ƯỚC TÍNH</div>
+          <div style="font-size: 26px; font-weight: 800; color: var(--color-brand-primary); margin-bottom: 6px;">~${distKm} km</div>
+          <div style="font-size: 12.5px; color: var(--color-text-primary); line-height: 1.6;">
+            🛵 Đi xe máy: khoảng <strong>${motoMins} phút</strong><br>
+            🚗 Đi ô tô / Taxi: khoảng <strong>${carMins} phút</strong>
+          </div>
+        `;
+        playCrystalChime();
+      },
+      () => {
+        distBox.innerHTML = `
+          <div style="font-size: 12.5px; color: var(--color-error); margin-bottom: 6px;">
+            Không thể lấy vị trí hiện tại (Quyền vị trí đã bị từ chối).
+          </div>
+          <a href="${siteInfo.mapsLink}" target="_blank" rel="noopener" class="btn" style="background: var(--color-brand-primary); color: #fff; font-size: 12px; padding: 8px 16px;">
+            Mở Bản Đồ Google Maps
+          </a>
+        `;
+      },
+      { timeout: 8000 }
+    );
+  });
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="route-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <a href="${siteInfo.mapsLink}" target="_blank" rel="noopener" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 700; text-align: center; display: inline-flex; align-items: center; justify-content: center;">
+      🗺️ Chỉ Đường Google Maps
+    </a>
+  `;
+
+  footer.querySelector('#route-close-btn').addEventListener('click', close);
+}
+
+// ══════════════════════════════════════════════════════════════
+// 34. VIP SHOWROOM APPOINTMENT PASS (ROUND 56)
+// ══════════════════════════════════════════════════════════════
+
+export function openShowroomBookingModal(product = null) {
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const passCode = 'PD-VIP-' + Math.floor(1000 + Math.random() * 9000);
+
+  const { overlay, close } = createModalBase({
+    title: 'Đặt Lịch Hẹn Thử Mẫu & Nhận Thẻ VIP Pass',
+    subtitle: 'Được phục vụ tại quầy riêng & giữ sẵn mẫu trang sức bạn yêu thích',
+    maxWidth: '540px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div class="pd-vip-pass-card">
+      <div style="font-size: 11px; text-transform: uppercase; color: #F3D184; letter-spacing: 0.1em; margin-bottom: 2px;">THẺ TIẾP ĐÓN SHOWROOM</div>
+      <div style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: #FFF; margin-bottom: 8px;">PHÁT ĐẠT JEWELRY VIP GUEST</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; border-top: 1px dashed rgba(201,151,56,0.5); padding-top: 8px;">
+        <div>Mã đặt chỗ: <strong style="color: #F3D184; font-family: monospace; font-size: 13px;">${passCode}</strong></div>
+        <div>Địa điểm: Tân Vĩnh Lộc, HCM</div>
+      </div>
+    </div>
+
+    ${product ? `
+      <div style="display: flex; gap: 10px; align-items: center; background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 8px; padding: 8px 12px; margin-bottom: 14px;">
+        <img src="${product.images[0]}" alt="${product.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px;">
+        <div style="font-size: 12px;">
+          <div style="font-weight: 700; color: var(--color-brand-primary);">${product.name}</div>
+          <div style="color: var(--color-text-secondary);">Mã: ${product.reference} · Chuẩn bị mẫu sẵn tại quầy</div>
+        </div>
+      </div>
+    ` : ''}
+
+    <form id="pd-vip-book-form">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Họ tên của bạn *</label>
+          <input type="text" id="vip-name" required placeholder="Nguyễn Văn A" class="admin-form-input" style="font-size: 13px; width: 100%;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Số điện thoại *</label>
+          <input type="tel" id="vip-phone" required placeholder="09xx xxx xxx" class="admin-form-input" style="font-size: 13px; width: 100%;">
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px;">
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Ngày ghé *</label>
+          <input type="date" id="vip-date" required value="${tomorrow}" class="admin-form-input" style="font-size: 13px; width: 100%;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">Khung giờ</label>
+          <select id="vip-time" class="admin-form-input" style="font-size: 13px; width: 100%; background: #fff;">
+            <option value="Sáng (09:00 - 12:00)">Sáng (09:00 - 12:00)</option>
+            <option value="Chiều (13:30 - 17:30)">Chiều (13:30 - 17:30)</option>
+            <option value="Tối (17:30 - 21:00)">Tối (17:30 - 21:00)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pd-callback-footer" style="padding: 0; margin-top: 14px;">
+        <button type="button" class="pd-dialog-btn pd-dialog-btn--cancel" id="vip-cancel-btn">Hủy bỏ</button>
+        <button type="submit" class="pd-dialog-btn pd-dialog-btn--primary" id="vip-submit-btn">
+          ✨ Xác Nhận & Nhận Thẻ VIP Pass
+        </button>
+      </div>
+    </form>
+  `;
+
+  body.querySelector('#vip-cancel-btn').addEventListener('click', close);
+  body.querySelector('#pd-vip-book-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = body.querySelector('#vip-name').value.trim();
+    const phone = body.querySelector('#vip-phone').value.trim();
+    const date = body.querySelector('#vip-date').value;
+    const time = body.querySelector('#vip-time').value;
+
+    const prodNote = product ? ` | Mẫu quan tâm: ${product.name} (${product.reference})` : '';
+
+    await addCustomerContact({
+      fullName: name,
+      phone,
+      subject: `Lịch hẹn Showroom VIP Pass [${passCode}]`,
+      message: `Khách đặt lịch ngày ${date} khung giờ ${time}${prodNote}`
+    });
+
+    close();
+    showToast(`Đã cấp thẻ VIP Pass ${passCode} thành công! Showroom hân hạnh được đón tiếp bạn.`, 'success');
+
+    const zaloMsg = encodeURIComponent(`Chào tiệm Phát Đạt, tôi vừa đăng ký Thẻ VIP Pass [${passCode}] để ghé Showroom Tân Vĩnh Lộc vào ngày ${date} (${time})${prodNote}. Nhờ tiệm xác nhận giúp nhé!`);
+    window.open(`${siteInfo.zalo}?text=${zaloMsg}`, '_blank', 'noopener,noreferrer');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 35. SILVER CARE SCHEDULE & CALENDAR EXPORT (ROUND 58)
+// ══════════════════════════════════════════════════════════════
+
+export function openCareCalendarModal(product = null) {
+  const prodName = product ? product.name : 'Trang Sức Bạc Ý S925 Phát Đạt';
+
+  const { overlay, close } = createModalBase({
+    title: 'Chu Kỳ Bảo Dưỡng Bạc S925 & Thêm Vào Lịch Nhắc',
+    subtitle: 'Đặc quyền hấp sóng siêu âm & làm sáng bạc miễn phí trọn đời',
+    maxWidth: '540px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div style="background: #F8FAF9; border: 1px solid #C5DEDB; border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 12.5px; line-height: 1.6;">
+      🛡️ <strong>Chu Kỳ Chăm Sóc Vàng 90 Ngày:</strong><br>
+      Bạc nguyên chất tiếp xúc mồ hôi và không khí định kỳ cần được làm sạch để giữ độ sáng gương hoàn hảo. Hãy lưu lịch nhắc để Phát Đạt đồng hành bảo dưỡng món trang sức của bạn.
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid #E2EBE7; border-radius: 8px; padding: 12px;">
+        <span style="background: var(--color-brand-light); color: var(--color-brand-primary); font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px;">30 Ngày</span>
+        <div style="font-size: 12px;">
+          <div style="font-weight: 700; color: var(--color-brand-primary);">Lau Nhẹ Khăn Chuyên Dụng Tại Nhà</div>
+          <div style="color: var(--color-text-secondary); margin-top: 2px;">Dùng khăn lau bạc Phát Đạt tặng kèm để lau sạch lớp dầu mồ hôi sau khi đeo.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid #E2EBE7; border-radius: 8px; padding: 12px;">
+        <span style="background: #FFF8E7; color: #8A6218; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px;">60 Ngày</span>
+        <div style="font-size: 12px;">
+          <div style="font-weight: 700; color: #8A6218;">Hấp Sóng Siêu Âm Làm Sáng Tại Tiệm (0đ)</div>
+          <div style="color: var(--color-text-secondary); margin-top: 2px;">Mang trang sức đến Showroom Tân Vĩnh Lộc để được rửa sóng siêu âm 3 phút sáng bóng như mới.</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: flex-start; background: #fff; border: 1px solid #E2EBE7; border-radius: 8px; padding: 12px;">
+        <span style="background: #F0FDF4; color: #166534; font-weight: 700; font-size: 11px; padding: 3px 8px; border-radius: 12px;">90 Ngày</span>
+        <div style="font-size: 12px;">
+          <div style="font-weight: 700; color: #166534;">Kiểm Tra Chấu Đá & Phủ Lớp Bảo Vệ</div>
+          <div style="color: var(--color-text-secondary); margin-top: 2px;">Kỹ thuật viên kim hoàn kiểm tra độ chặt của chấu đá và hấp bóng chống xỉn bảo vệ lớp xi Rodium.</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="care-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="care-ics-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      📅 Tải Lịch Nhắc Vào Điện Thoại (.ICS)
+    </button>
+  `;
+
+  footer.querySelector('#care-close-btn').addEventListener('click', close);
+  footer.querySelector('#care-ics-btn').addEventListener('click', () => {
+    const remindDate = new Date(Date.now() + 60 * 86400000);
+    const startStr = remindDate.toISOString().replace(/-|:|\.\d+/g, '').slice(0, 15) + 'Z';
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Phat Dat Jewelry//Silver Care//VI',
+      'BEGIN:VEVENT',
+      `UID:care-${Date.now()}@phatdatjewelry.vn`,
+      `DTSTAMP:${startStr}`,
+      `DTSTART:${startStr}`,
+      `SUMMARY:Bảo Dưỡng & Làm Sáng Bạc Miễn Phí — Phát Đạt Jewelry`,
+      `DESCRIPTION:Nhắc lịch ghé Showroom Phát Đạt (Ấp 3B, Tân Vĩnh Lộc, HCM) để được hấp sóng siêu âm làm sáng bạc miễn phí trọn đời cho: ${prodName}. Hotline: 0898 025 013.`,
+      `LOCATION:${siteInfo.address}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'Lich-Bao-Duong-Bac-PhatDat.ics';
+    link.click();
+    playCrystalChime();
+    showToast('Đã tải tệp lịch nhắc bảo dưỡng về máy!', 'success');
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// 36. QR VOICE GREETING CARD PREVIEW (ROUND 60)
+// ══════════════════════════════════════════════════════════════
+
+export function openVoiceCardModal() {
+  const { overlay, close } = createModalBase({
+    title: 'Thư Thoại Kèm Quà Tặng (Voice Note QR)',
+    subtitle: 'Gửi gắm lời chúc chân thành bằng chính giọng nói của bạn',
+    maxWidth: '540px'
+  });
+
+  const body = overlay.querySelector('.pd-callback-body');
+
+  body.innerHTML = `
+    <div style="background: #FDF9F5; border: 1.5px solid #EADBBA; border-radius: 12px; padding: 18px; margin-bottom: 16px;">
+      <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 12px;">
+        <div style="width: 64px; height: 64px; background: #0F2A27; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #F3D184; font-size: 28px; flex-shrink: 0;">
+          🎙️
+        </div>
+        <div>
+          <div style="font-weight: 700; font-size: 14px; color: var(--color-brand-primary);">Cách Thức Hoạt Động</div>
+          <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5; margin-top: 2px;">
+            Khi bạn đặt quà tặng người thương, Phát Đạt sẽ in mã QR mạ vàng đính kèm trong phong bao thiệp sáp niêm phong. Khi người nhận dùng camera quét mã, lời chúc ghi âm của bạn sẽ vang lên ngọt ngào!
+          </div>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E5DEC9; border-radius: 8px; padding: 14px; text-align: center;">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8A6218; font-weight: 700; margin-bottom: 4px;">MÔ PHỎNG THIỆP THỰC TẾ</div>
+        <div style="font-family: var(--font-display); font-size: 15px; color: var(--color-brand-primary); font-style: italic; margin-bottom: 8px;">
+          "Gửi người thương món quà từ trái tim..."
+        </div>
+        <div style="display: inline-block; padding: 8px; border: 1.5px dashed #C99738; border-radius: 6px; background: #FAF7EE; font-size: 11px; color: #143F3B; font-weight: 600;">
+          📲 Quét mã để nghe lời chúc của anh
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 1.5;">
+      ✨ <strong>Dịch vụ hoàn toàn miễn phí:</strong> Bạn chỉ cần gửi tin nhắn thoại qua Zalo tiệm Phát Đạt, chuyên viên sẽ tạo mã QR và chuẩn bị hộp quà chu đáo nhất.
+    </div>
+  `;
+
+  const footer = overlay.querySelector('.pd-callback-footer');
+  footer.innerHTML = `
+    <button type="button" id="voice-close-btn" style="flex: 1; padding: 11px; background: #fff; border: 1px solid var(--color-border); border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+      Đóng
+    </button>
+    <button type="button" id="voice-zalo-btn" style="flex: 1.6; padding: 11px; background: var(--color-brand-primary); color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;">
+      💬 Gửi Tin Nhắn Thoại Qua Zalo
+    </button>
+  `;
+
+  footer.querySelector('#voice-close-btn').addEventListener('click', close);
+  footer.querySelector('#voice-zalo-btn').addEventListener('click', () => {
+    const text = encodeURIComponent(`Chào tiệm Phát Đạt, mình muốn đặt quà tặng kèm [Thư Thoại Voice Note QR]. Mình gửi file ghi âm lời chúc để tiệm in mã QR kèm thiệp sáp niêm phong nhé!`);
+    close();
+    window.open(`${siteInfo.zalo}?text=${text}`, '_blank', 'noopener,noreferrer');
+  });
+}
+
+
 
 
 
@@ -4306,7 +5276,15 @@ export const modal = {
   lovedOnesSize: openLovedOnesSizeModal,
   menConcierge: openMenConciergeModal,
   certificate: openCertificateModal,
-  pendantScale: openPendantScaleModal
+  pendantScale: openPendantScaleModal,
+  shareCard: openShareCardModal,
+  fingerMeaning: openFingerMeaningModal,
+  earringFit: openEarringFitModal,
+  caratScale: openCaratScaleModal,
+  showroomRoute: openShowroomRouteModal,
+  showroomBooking: openShowroomBookingModal,
+  careCalendar: openCareCalendarModal,
+  voiceCard: openVoiceCardModal
 };
 
 

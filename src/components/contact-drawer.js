@@ -23,8 +23,16 @@ import {
   openLovedOnesSizeModal,
   openMenConciergeModal,
   openCertificateModal,
-  openPendantScaleModal
+  openPendantScaleModal,
+  openFingerMeaningModal,
+  openEarringFitModal,
+  openCaratScaleModal,
+  openShowroomRouteModal,
+  openShowroomBookingModal,
+  openCareCalendarModal,
+  openVoiceCardModal
 } from './feedback-modal.js';
+import { isSoundEnabled, toggleSound, playSoftClick } from '../services/sound-effects.js';
 import { openGlobalSizeGuide } from './size-guide-modal.js';
 import {
   getComfortPrefs,
@@ -133,6 +141,27 @@ export function createContactDrawer() {
           <button type="button" id="cd-tool-pendant" style="background: #FDF9F3; border: 1px solid #EADBBA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
             ✨ Đo tỷ lệ mặt dây & dáng người
           </button>
+          <button type="button" id="cd-tool-finger" style="background: #FAF7EE; border: 1px solid #EADBBA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            🖐️ Ý nghĩa ngón tay đeo nhẫn
+          </button>
+          <button type="button" id="cd-tool-earring" style="background: #FAF7EE; border: 1px solid #EADBBA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            👂 Cố vấn bông tai dáng mặt
+          </button>
+          <button type="button" id="cd-tool-carat" style="background: #F0FDF9; border: 1px solid #99F6E4; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #0F766E;">
+            💎 Thước đo Carat & MM
+          </button>
+          <button type="button" id="cd-tool-route" style="background: #F4F9F8; border: 1px solid #C5DEDB; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-brand-primary);">
+            🧭 Khoảng cách & đường đến tiệm
+          </button>
+          <button type="button" id="cd-tool-vip" style="background: #0F2A27; border: 1px solid #C99738; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #F3D184;">
+            👑 Thẻ VIP Pass Showroom
+          </button>
+          <button type="button" id="cd-tool-care" style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #166534;">
+            📅 Lịch nhắc làm sáng bạc 90 ngày
+          </button>
+          <button type="button" id="cd-tool-voice" style="background: #FDF9F5; border: 1px solid #EADBBA; border-radius: 8px; padding: 10px; text-align: left; cursor: pointer; font-size: 12px; font-weight: 600; color: #8A6218;">
+            🎙️ Thư thoại QR kèm quà tặng
+          </button>
           <button type="button" id="cd-tool-warranty" style="grid-column: 1 / -1; background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--color-text-primary);">
             🛡️ Tra cứu Thẻ Bảo Hành Điện Tử bằng Số Điện Thoại
           </button>
@@ -154,6 +183,17 @@ export function createContactDrawer() {
         </div>
       </div>
 
+
+      <!-- Sound of Luxury Toggle (Round 59) -->
+      <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-size: 12px; font-weight: 700; color: var(--color-brand-primary); display: block;">🔊 Âm thanh trải nghiệm cao cấp</span>
+          <span style="font-size: 10.5px; color: var(--color-text-secondary);">Tiếng chuông pha lê & chạm kim hoàn</span>
+        </div>
+        <button type="button" id="cd-sound-toggle-btn" style="padding: 6px 12px; border-radius: 16px; border: 1px solid var(--color-border); background: #fff; font-size: 12px; font-weight: 600; cursor: pointer;">
+          ${isSoundEnabled() ? '🔊 Đang bật' : '🔇 Đang tắt'}
+        </button>
+      </div>
 
       <!-- Comfort Reading & Eye Care Mode (Vòng 9) -->
       <div style="background: #F8FAF9; border: 1px solid var(--color-border-light); border-radius: 10px; padding: 12px 14px; margin-bottom: 18px;">
@@ -254,78 +294,141 @@ export function createContactDrawer() {
   });
 
   // Tool Launchers
-  drawer.querySelector('#cd-tool-ruler').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-ruler')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openGlobalSizeGuide('ruler');
   });
-  drawer.querySelector('#cd-tool-gift').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-gift')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openGiftFinderModal();
   });
-  drawer.querySelector('#cd-tool-fengshui').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-fengshui')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openFengShuiMatcherModal();
   });
-  drawer.querySelector('#cd-tool-warranty').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-warranty')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openWarrantyLookupModal();
   });
-  drawer.querySelector('#cd-tool-couple').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-couple')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openCoupleBuilderModal();
   });
-  drawer.querySelector('#cd-tool-styling').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-styling')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openFaceHandStylingModal();
   });
-  drawer.querySelector('#cd-tool-reminder').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-reminder')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openAnniversaryReminderModal();
   });
-  drawer.querySelector('#cd-tool-wrist').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-wrist')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openWristSizerModal();
   });
-  drawer.querySelector('#cd-tool-chain').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-chain')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openChainVisualizerModal();
   });
-  drawer.querySelector('#cd-tool-quiz').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-quiz')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openStyleQuizModal();
   });
-  drawer.querySelector('#cd-tool-unboxing').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-unboxing')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openUnboxingPreviewModal();
   });
-  drawer.querySelector('#cd-tool-rescue').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-rescue')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openSilverRescueModal();
   });
-  drawer.querySelector('#cd-tool-loved').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-loved')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openLovedOnesSizeModal();
   });
-  drawer.querySelector('#cd-tool-stacking').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-stacking')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openRingStackingModal();
   });
-  drawer.querySelector('#cd-tool-fire').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-fire')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openDiamondFireModal();
   });
-  drawer.querySelector('#cd-tool-men').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-men')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openMenConciergeModal();
   });
-  drawer.querySelector('#cd-tool-cert').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-cert')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openCertificateModal();
   });
-  drawer.querySelector('#cd-tool-pendant').addEventListener('click', () => {
+  drawer.querySelector('#cd-tool-pendant')?.addEventListener('click', () => {
+    playSoftClick();
     closeDrawer();
     openPendantScaleModal();
   });
+  drawer.querySelector('#cd-tool-finger')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openFingerMeaningModal();
+  });
+  drawer.querySelector('#cd-tool-earring')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openEarringFitModal();
+  });
+  drawer.querySelector('#cd-tool-carat')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openCaratScaleModal();
+  });
+  drawer.querySelector('#cd-tool-route')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openShowroomRouteModal();
+  });
+  drawer.querySelector('#cd-tool-vip')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openShowroomBookingModal();
+  });
+  drawer.querySelector('#cd-tool-care')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openCareCalendarModal();
+  });
+  drawer.querySelector('#cd-tool-voice')?.addEventListener('click', () => {
+    playSoftClick();
+    closeDrawer();
+    openVoiceCardModal();
+  });
+
+  // Sound Toggle (Round 59)
+  const soundToggleBtn = drawer.querySelector('#cd-sound-toggle-btn');
+  if (soundToggleBtn) {
+    soundToggleBtn.addEventListener('click', () => {
+      const enabled = toggleSound();
+      soundToggleBtn.textContent = enabled ? '🔊 Đang bật' : '🔇 Đang tắt';
+      showToast(enabled ? 'Đã bật âm thanh trải nghiệm kim hoàn!' : 'Đã tắt âm thanh.', 'info', 2000);
+    });
+  }
 
   // Currency Selector events
   drawer.querySelectorAll('.cd-curr-btn').forEach(btn => {

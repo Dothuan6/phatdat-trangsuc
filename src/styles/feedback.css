@@ -1059,6 +1059,135 @@
   color: var(--color-text-primary);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   PHASE 6 EXPANSION: LUXURY TOUCH & ADVANCED O2O TOOLS (ROUNDS 51 – 60)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Fast Social Share Card Preview (Round 51) */
+.pd-share-card-preview-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #F4F6F5;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.pd-share-card-canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  display: block;
+}
+
+/* Finger Meaning Interactive Hand Stage (Round 52) */
+.pd-finger-hand-stage {
+  background: radial-gradient(circle at 50% 40%, #FFFDFB 0%, #F5EFE6 100%);
+  border: 1px solid #EADCC7;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.pd-finger-card-active {
+  background: #FFFFFF;
+  border: 1.5px solid var(--color-brand-primary);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--color-text-primary);
+  text-align: left;
+  box-shadow: 0 4px 12px rgba(30, 93, 87, 0.08);
+}
+
+/* Earring Proportions & Face Shape Advisor (Round 53) */
+.pd-earring-card {
+  background: #FFFFFF;
+  border: 1px solid #E2EBE7;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.pd-earring-card.is-active {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-light);
+}
+
+/* Carat to Millimeter Scale (Round 54) */
+.pd-carat-stage {
+  background: radial-gradient(circle at 50% 50%, #2A3634 0%, #14201E 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* VIP Showroom Booking Pass (Round 56) */
+.pd-vip-pass-card {
+  background: linear-gradient(135deg, #0F2A27 0%, #1E5D57 100%);
+  color: #FFF8E7;
+  border: 2px solid #C99738;
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  box-shadow: 0 10px 28px rgba(15, 42, 39, 0.25);
+  margin-bottom: 14px;
+}
+.pd-vip-pass-card::after {
+  content: '★ VIP PASS ★';
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #C99738;
+  font-weight: 700;
+  border: 1px solid #C99738;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* PDP Live Laser Engraving Box (Round 57) */
+.pd-engrave-sandbox {
+  background: #FBF9F5;
+  border: 1.5px dashed #DFC9A8;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.pd-engrave-metal-band {
+  background: linear-gradient(180deg, #E8ECEB 0%, #FFFFFF 30%, #D5DFDC 70%, #B8C7C3 100%);
+  border: 1px solid #B0C0BC;
+  border-radius: 6px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  position: relative;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.8), 0 2px 6px rgba(0,0,0,0.06);
+}
+.pd-engrave-text-preview {
+  color: #3B524E;
+  text-shadow: 0.5px 0.5px 0px rgba(255,255,255,0.9), -0.5px -0.5px 0px rgba(0,0,0,0.4);
+  letter-spacing: 0.08em;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+
 
 
 

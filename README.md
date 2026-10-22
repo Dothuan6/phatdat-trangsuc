@@ -14,7 +14,7 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 
 ---
 
-### 2. Tổng Hợp 30 Vòng Nâng Cấp Trải Nghiệm Khách Hàng (UX 3 Giai Đoạn)
+### 2. Tổng Hợp 60 Vòng Nâng Cấp Trải Nghiệm Khách Hàng (UX 6 Giai Đoạn)
 
 #### A. Giai Đoạn 1: Nền Tảng Trang Sức Cao Cấp & Trải Nghiệm O2O (Vòng 1 - 10)
 1. **Cố Vấn Phong Thủy & Cung Mệnh Ngũ Hành**: Tra cứu mệnh theo năm sinh, gợi ý màu đá quý và mẫu bạc S925 tương sinh.
@@ -79,6 +79,18 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 50. **Nút “Lên đầu trang”**, hỗ trợ giảm chuyển động (`prefers-reduced-motion`) và đệm an toàn tai thỏ cho bottom nav.
 
 > Sửa lỗi quan trọng: bổ sung hàm dùng chung `createModalBase` — trước đây chưa được định nghĩa khiến 12 công cụ (Vòng 21–40) bị lỗi khi bấm mở.
+
+#### F. Giai Đoạn 6: Đa Giác Quan Cao Cấp, Chia Sẻ Mạng Xã Hội & Cầu Nối O2O Đến Showroom (Vòng 51 - 60)
+51. **Tạo Thiệp Ảnh Sản Phẩm Sắc Nét Chia Sẻ Mạng Xã Hội (`openShareCardModal`)**: Bộ tạo ảnh HTML5 Canvas độ nét cao (tỷ lệ 1:1 Feed & 9:16 Story), tự động kết hợp ảnh trang sức, thương hiệu Phát Đạt Jewelry, chất liệu Bạc Ý S925, giá niêm yết và mã QR dẫn trực tiếp vào mẫu; tải ảnh PNG 1 chạm hoặc chia sẻ nhanh qua Zalo.
+52. **Ý Nghĩa 5 Ngón Tay Đeo Nhẫn & Phong Thủy Tài Lộc (`openFingerMeaningModal`)**: Mô phỏng bàn tay SVG tương tác giải mã ý nghĩa phong thủy và năng lượng của từng ngón tay (Ngón Cái - Quyền Uy, Ngón Trỏ - Sự Nghiệp, Ngón Giữa - Trách Nhiệm & Tài Lộc, Ngón Áp Út - Tình Yêu Son Sắt, Ngón Út - Trí Tuệ & Quý Nhân) kèm gợi ý mẫu nhẫn tương thích.
+53. **Cố Vấn Bông Tai Tương Thích Dáng Khuôn Mặt (`openEarringFitModal`)**: Bảng tương thích quang học đối chiếu 6 dáng khuôn mặt (Trái Xoan, Tròn, Vuông, Trái Tim, Dài, Kim Cương) với 5 kiểu bông tai chủ đạo (Nụ Stud, Giọt Lệ Drop, Khoen Tròn Hoop, Dây Dài Dangle, Bản To Chandelier).
+54. **Thước Đo Carat & Millimeter Đá Moissanite Chuẩn Xác (`openCaratScaleModal`)**: Thanh trượt tương tác tỷ lệ 1:1 đối chiếu từ 3.0mm (0.1ct) đến 10.0mm (4.0ct) trên phôi ngón tay người thực tế, hiển thị thông số độ lửa Hearts & Arrows và thông số giác cắt chuẩn kiểm định GRA.
+55. **Tính Khoảng Cách GPS Thực Tế & Ước Lượng Lộ Trình Đến Showroom (`openShowroomRouteModal`)**: Ứng dụng định vị Haversine tính chính xác khoảng cách (km) từ vị trí người dùng đến Showroom Tân Vĩnh Lộc, dự tính thời gian di chuyển bằng Xe máy và Ô tô, cùng nút mở Google Maps dẫn đường tức thì.
+56. **Thẻ Đặt Lịch Hẹn VIP Pass Trải Nghiệm Showroom (`openShowroomBookingModal`)**: Đặt hẹn tiếp đón chuyên sâu 1-kèm-1 tại quầy kính VIP, nhận Thẻ VIP Pass phát sinh mã đặt chỗ riêng kèm đặc quyền nến thơm, trà hoa và dịch vụ hấp bóng trang sức miễn phí.
+57. **Xem Trước Trực Quan Khắc Tên Laser Trên Bản Đai Kim Loại (`openLaserEngravingPreviewModal`)**: Mô phỏng phôi bạc S925 sáng bóng với 4 phông chữ nghệ thuật (Ký tự Thanh Lịch, Thư Pháp, Chữ In Hiện Đại, Ký Tự Gothic) và các ký hiệu tình yêu khắc sắc nét theo thời gian thực.
+58. **Lịch Bảo Dưỡng Bạc 90 Ngày & Xuất Tệp Lịch `.ICS` (`openCareCalendarModal`)**: Thiết lập lịch bảo dưỡng bạc định kỳ 3 tháng/lần, tự động tải file sự kiện vào Google Calendar/Apple Calendar kèm cẩm nang tự chăm sóc sáng bóng tại nhà.
+59. **Hệ Thống Âm Thanh Cao Cấp Không Cần Tệp Phụ Thuộc (`src/services/sound-effects.js`)**: Trình tổng hợp âm thanh kim hoàn nguyên bản qua Web Audio API (tiếng chuông pha lê khi mở thông báo, âm tách nhẹ khi bấm nút chọn, tiếng máy ảnh khi lưu thiệp, tiếng lấp lánh ánh kim), có công tắc bật/tắt ghi nhớ tùy chọn trong Trung tâm Hỗ trợ.
+60. **Thư Thoại & Lời Chúc Âm Thanh QR Kèm Quà Tặng (`openVoiceCardModal`)**: Ghi âm thông điệp tình cảm chân thành hoặc nhập lời nhắn cá nhân hóa; hệ thống tạo mã QR độc quyền in kèm thiệp mở hộp để người nhận quét và nghe lời chúc bất ngờ.
 
 
 ---

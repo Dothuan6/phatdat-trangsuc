@@ -41,8 +41,15 @@ import {
   openDiamondFireModal,
   openRingStackingModal,
   openCertificateModal,
-  openPendantScaleModal
+  openPendantScaleModal,
+  openShareCardModal,
+  openFingerMeaningModal,
+  openEarringFitModal,
+  openCaratScaleModal,
+  openShowroomBookingModal,
+  openCareCalendarModal
 } from '../components/feedback-modal.js';
+import { playSoftClick } from '../services/sound-effects.js';
 
 export function renderProductDetail(container, params = {}) {
   const productId = params.id;
@@ -405,14 +412,25 @@ export function renderProductDetail(container, params = {}) {
   });
   info.appendChild(stockEl);
 
-  // Quick Jewelry Assistant Chips (Rounds 31, 32, 40)
+  // Quick Jewelry Assistant Chips (Rounds 31, 32, 40, 51-56, 58)
   const assistantRow = document.createElement('div');
   assistantRow.className = 'pd-mobile-scroll-row';
   assistantRow.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px;';
   assistantRow.innerHTML = `
+    <button type="button" id="pdp-open-share-card-btn" style="background: #F4FAF8; border: 1px solid #B8DDD6; color: var(--color-brand-primary); padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      📸 Tạo Thiệp Ảnh HD
+    </button>
     ${product.category === 'rings' ? `
       <button type="button" id="pdp-open-stack-btn" style="background: #FDFBF7; border: 1px solid #EEDFCA; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
         💍 Phối Nhẫn Xếp Tầng
+      </button>
+      <button type="button" id="pdp-open-finger-meaning-btn" style="background: #FAF7EE; border: 1px solid #EADBBA; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+        🖐️ Ý Nghĩa Ngón Tay
+      </button>
+    ` : ''}
+    ${product.category === 'earrings' ? `
+      <button type="button" id="pdp-open-earring-fit-btn" style="background: #FAF7EE; border: 1px solid #EADBBA; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+        ✨ Cố Vấn Dáng Mặt
       </button>
     ` : ''}
     ${product.category === 'necklaces' ? `
@@ -420,19 +438,40 @@ export function renderProductDetail(container, params = {}) {
         ✨ Thước Đo Tỷ Lệ Mặt Dây
       </button>
     ` : ''}
+    <button type="button" id="pdp-open-carat-scale-btn" style="background: #F0FDF9; border: 1px solid #99F6E4; color: #0F766E; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      💎 Thước Đo Carat/MM
+    </button>
     <button type="button" id="pdp-open-fire-btn" style="background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
-      💎 Soi Độ Lửa Đá Moissanite
+      ✨ Soi Độ Lửa Moissanite
     </button>
     <button type="button" id="pdp-open-cert-btn" style="background: #FAF5E8; border: 1px solid #C99738; color: #8A6218; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
-      📜 Chứng Thư Kiểm Định S925
+      📜 Chứng Thư S925
+    </button>
+    <button type="button" id="pdp-open-care-cal-btn" style="background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      📅 Lịch Bảo Dưỡng Bạc
+    </button>
+    <button type="button" id="pdp-open-vip-pass-btn" style="background: #0F2A27; border: 1px solid #C99738; color: #F3D184; padding: 5px 10px; border-radius: 14px; font-size: 11.5px; font-weight: 600; cursor: pointer;">
+      👑 Thẻ VIP Showroom
     </button>
   `;
+  const shareCardBtn = assistantRow.querySelector('#pdp-open-share-card-btn');
+  if (shareCardBtn) shareCardBtn.addEventListener('click', () => { playSoftClick(); openShareCardModal(product); });
   const stackBtn = assistantRow.querySelector('#pdp-open-stack-btn');
-  if (stackBtn) stackBtn.addEventListener('click', () => openRingStackingModal(product.id));
+  if (stackBtn) stackBtn.addEventListener('click', () => { playSoftClick(); openRingStackingModal(product.id); });
+  const fingerBtn = assistantRow.querySelector('#pdp-open-finger-meaning-btn');
+  if (fingerBtn) fingerBtn.addEventListener('click', () => { playSoftClick(); openFingerMeaningModal(); });
+  const earringBtn = assistantRow.querySelector('#pdp-open-earring-fit-btn');
+  if (earringBtn) earringBtn.addEventListener('click', () => { playSoftClick(); openEarringFitModal(); });
   const pendantBtn = assistantRow.querySelector('#pdp-open-pendant-scale-btn');
-  if (pendantBtn) pendantBtn.addEventListener('click', () => openPendantScaleModal(product));
-  assistantRow.querySelector('#pdp-open-fire-btn').addEventListener('click', () => openDiamondFireModal());
-  assistantRow.querySelector('#pdp-open-cert-btn').addEventListener('click', () => openCertificateModal(product));
+  if (pendantBtn) pendantBtn.addEventListener('click', () => { playSoftClick(); openPendantScaleModal(product); });
+  const caratBtn = assistantRow.querySelector('#pdp-open-carat-scale-btn');
+  if (caratBtn) caratBtn.addEventListener('click', () => { playSoftClick(); openCaratScaleModal(); });
+  assistantRow.querySelector('#pdp-open-fire-btn').addEventListener('click', () => { playSoftClick(); openDiamondFireModal(); });
+  assistantRow.querySelector('#pdp-open-cert-btn').addEventListener('click', () => { playSoftClick(); openCertificateModal(product); });
+  const careBtn = assistantRow.querySelector('#pdp-open-care-cal-btn');
+  if (careBtn) careBtn.addEventListener('click', () => { playSoftClick(); openCareCalendarModal(product); });
+  const vipBtn = assistantRow.querySelector('#pdp-open-vip-pass-btn');
+  if (vipBtn) vipBtn.addEventListener('click', () => { playSoftClick(); openShowroomBookingModal(product); });
   info.appendChild(assistantRow);
 
 

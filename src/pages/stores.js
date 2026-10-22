@@ -5,6 +5,7 @@
 import { siteInfo } from '../data/site-info.js';
 import { addCustomerContact } from '../services/supabase.js';
 import { showToast } from '../components/feedback-modal.js';
+import { playCrystalChime } from '../services/sound-effects.js';
 
 export function renderStores(container) {
   const page = document.createElement('div');
@@ -84,6 +85,26 @@ export function renderStores(container) {
         </div>
       </div>
 
+      <!-- Live Distance & Route Estimator (Round 55) -->
+      <div style="background: #F4F9F8; border: 1.5px solid #C5DEDB; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center;">
+        <h3 style="font-family: var(--font-display); font-size: 18px; color: var(--color-brand-primary); margin: 0 0 6px;">
+          🧭 Ước Tính Khoảng Cách Từ Vị Trí Của Bạn Đến Showroom
+        </h3>
+        <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 14px;">
+          Bật định vị GPS để xem số km và thời gian di chuyển bằng xe máy / ô tô chính xác nhất.
+        </p>
+        <div id="store-distance-result" style="margin-bottom: 14px;">
+          <button type="button" id="store-calc-distance-btn" class="btn" style="background: var(--color-accent-gold); color: #143F3B; font-weight: 700; border: none; font-size: 12.5px;">
+            📍 TÍNH KHOẢNG CÁCH NGAY
+          </button>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+          <a href="${siteInfo.mapsLink}" target="_blank" rel="noopener" class="btn" style="background: var(--color-brand-primary); color: #fff; font-size: 12.5px;">
+            🗺️ Mở Bản Đồ Google Maps
+          </a>
+        </div>
+      </div>
+
       <iframe class="map-embed" src="${siteInfo.mapsEmbed}" loading="lazy" title="Bản đồ cửa hàng" referrerpolicy="no-referrer-when-downgrade"></iframe>
       <div class="text-center" style="margin-top: 24px;">
         <a href="${siteInfo.mapsLink}" target="_blank" rel="noopener" class="btn">CHỈ ĐƯỜNG GOOGLE MAPS</a>
@@ -117,6 +138,59 @@ export function renderStores(container) {
     page.querySelector('#book-date').value = tomorrow;
     showToast(`Đã đặt lịch hẹn ngày ${date} (${time}) thành công! Cửa hàng sẽ liên hệ xác nhận với bạn.`, 'success');
   });
+
+  // GPS Distance Handler (Round 55)
+  const calcDistBtn = page.querySelector('#store-calc-distance-btn');
+  const distResultBox = page.querySelector('#store-distance-result');
+  if (calcDistBtn && distResultBox) {
+    calcDistBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        showToast('Trình duyệt không hỗ trợ định vị GPS.', 'warning');
+        return;
+      }
+      calcDistBtn.disabled = true;
+      calcDistBtn.textContent = 'ĐANG ĐỊNH VỊ...';
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const uLat = pos.coords.latitude;
+          const uLng = pos.coords.longitude;
+          const sLat = 10.8122;
+          const sLng = 106.5828;
+
+          const R = 6371;
+          const dLat = (sLat - uLat) * Math.PI / 180;
+          const dLng = (sLng - uLng) * Math.PI / 180;
+          const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(uLat * Math.PI / 180) * Math.cos(sLat * Math.PI / 180) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          const distKm = (R * c).toFixed(1);
+          const motoMins = Math.round(distKm * 2.2);
+          const carMins = Math.round(distKm * 2.8);
+
+          distResultBox.innerHTML = `
+            <div style="background: #ffffff; border: 1.5px solid #C99738; border-radius: 10px; padding: 14px; max-width: 440px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+              <div style="font-size: 11px; text-transform: uppercase; color: #8A6218; font-weight: 700; margin-bottom: 2px;">KHOẢNG CÁCH THỰC TẾ</div>
+              <div style="font-size: 24px; font-weight: 800; color: var(--color-brand-primary); margin-bottom: 4px;">~${distKm} km</div>
+              <div style="font-size: 12.5px; color: var(--color-text-secondary); line-height: 1.5;">
+                🛵 Đi xe máy: khoảng <strong>${motoMins} phút</strong> &nbsp;·&nbsp; 🚗 Ô tô: khoảng <strong>${carMins} phút</strong>
+              </div>
+            </div>
+          `;
+          playCrystalChime();
+        },
+        () => {
+          distResultBox.innerHTML = `
+            <div style="font-size: 12px; color: var(--color-error); margin-bottom: 8px;">
+              Không thể truy cập GPS vị trí hiện tại. Bạn có thể mở trực tiếp bản đồ Google Maps bên dưới.
+            </div>
+          `;
+        },
+        { timeout: 8000 }
+      );
+    });
+  }
 
   container.appendChild(page);
 }
