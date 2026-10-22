@@ -407,6 +407,7 @@ export function renderProductDetail(container, params = {}) {
 
   // Quick Jewelry Assistant Chips (Rounds 31, 32, 40)
   const assistantRow = document.createElement('div');
+  assistantRow.className = 'pd-mobile-scroll-row';
   assistantRow.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px;';
   assistantRow.innerHTML = `
     ${product.category === 'rings' ? `

@@ -10,6 +10,7 @@ import './styles/layout.css';
 import './styles/components.css';
 import './styles/pages.css';
 import './styles/feedback.css';
+import './styles/mobile.css';
 
 // Import components
 import { createHeader, createHeaderSpacer, openSearchDrawer } from './components/header.js';
@@ -131,7 +132,9 @@ window.addEventListener('keydown', (e) => {
   } else if (e.key === 'Escape') {
     const activeModal = document.querySelector('.pd-callback-overlay.is-visible, .pd-modal-overlay.is-visible, .pd-lightbox-overlay.is-visible');
     if (activeModal) {
-      activeModal.remove();
+      const xBtn = activeModal.querySelector('.modal-close-x');
+      if (xBtn) xBtn.click(); else activeModal.remove();
+      document.body.classList.remove('no-scroll');
     }
     const sizeGuide = document.querySelector('.size-guide-overlay.is-open');
     if (sizeGuide) {
@@ -146,3 +149,54 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }
+
+// ── Mobile UX (Vòng 50): Back-to-top button ──
+(function initBackToTop() {
+  if (document.getElementById('pd-back-to-top')) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'pd-back-to-top';
+  btn.className = 'pd-back-to-top';
+  btn.setAttribute('aria-label', 'Lên đầu trang');
+  btn.textContent = '↑';
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.body.appendChild(btn);
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      btn.classList.toggle('is-visible', window.scrollY > 700);
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+// ── Mobile UX (Vòng 42): Swipe down on bottom-sheet header to close ──
+(function initSheetSwipeClose() {
+  let startY = 0;
+  let card = null;
+  document.addEventListener('touchstart', (e) => {
+    const header = e.target.closest && e.target.closest('.pd-callback-header');
+    if (!header || window.innerWidth > 640) { card = null; return; }
+    card = header.closest('.pd-callback-card');
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (!card) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy > 0) card.style.setProperty('transform', `translateY(${dy}px)`, 'important');
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    if (!card) return;
+    const dy = (e.changedTouches[0] && e.changedTouches[0].clientY - startY) || 0;
+    const overlay = card.closest('.pd-callback-overlay');
+    if (dy > 90 && overlay) {
+      const closeBtn = overlay.querySelector('.modal-close-x, .pd-callback-close, [aria-label="Close"], [aria-label="Đóng"]');
+      if (closeBtn) closeBtn.click(); else overlay.remove();
+    } else {
+      card.style.removeProperty('transform');
+    }
+    card = null;
+  });
+})();

@@ -66,6 +66,20 @@ fouder:Mr. Dang, Mr. Phuong, Mr. Thuan
 39. **Chế Độ Ánh Nến Tiệc Tối Cho Ảnh Chi Tiết (`#pdp-toggle-candlelight-btn`)**: Nút chuyển đổi hiệu ứng ánh sáng quang học trên trang chi tiết sản phẩm giữa ánh sáng ban ngày tự nhiên và ánh nến tiệc tối ấm áp (`sepia/contrast/glow`).
 40. **Chứng Thư Kiểm Định Bạc S925 & Dấu Niêm Phong Hologram (`openCertificateModal`)**: Thẻ kiểm định chất lượng điện tử chính thức của Phát Đạt Jewelry với mã kiểm định duy nhất, thông số 4C, dấu bảo hành trọn đời và hỗ trợ in ấn trực tiếp.
 
+#### E. Giai Đoạn 5: Tối Ưu Trải Nghiệm Điện Thoại (Vòng 41 - 50) — `src/styles/mobile.css`
+41. **Thang chữ gọn cho điện thoại**: Giảm cỡ tiêu đề/nội dung trên màn hình ≤768px (Hero ~26–32px, tiêu đề mục ~22–27px, chữ thường 15px); chế độ A+ chỉ tăng 106% trên mobile.
+42. **Modal dạng Bottom Sheet**: Mọi hộp công cụ trượt lên từ đáy màn hình, bo góc trên, có thanh kéo, vuốt xuống để đóng, footer tránh thanh Home (`safe-area-inset`).
+43. **Vùng chạm tối thiểu 44px** cho nút/biểu tượng, phản hồi khi chạm, tắt hiệu ứng hover trên màn hình cảm ứng.
+44. **Thẻ sản phẩm 2 cột đều nhau**: Tên sản phẩm cắt 2 dòng, chất liệu 1 dòng, giá nổi bật.
+45. **Thanh công cụ PDP cuộn ngang** (chip Soi độ lửa, Chứng thư, Phối nhẫn, Tỷ lệ mặt dây) thay vì xuống nhiều dòng.
+46. **Bảng biểu bài viết cuộn ngang an toàn**, chống tràn khung ảnh/SVG/iframe.
+47. **Header gọn 56px**, thanh thông báo 1 dòng.
+48. **Trung tâm hỗ trợ & menu** hiển thị toàn màn hình trên điện thoại, nút công cụ dễ bấm.
+49. **Lưới nội tuyến tự xếp lại** trên màn hình ≤480px (4 cột → 2 cột).
+50. **Nút “Lên đầu trang”**, hỗ trợ giảm chuyển động (`prefers-reduced-motion`) và đệm an toàn tai thỏ cho bottom nav.
+
+> Sửa lỗi quan trọng: bổ sung hàm dùng chung `createModalBase` — trước đây chưa được định nghĩa khiến 12 công cụ (Vòng 21–40) bị lỗi khi bấm mở.
+
 
 ---
 

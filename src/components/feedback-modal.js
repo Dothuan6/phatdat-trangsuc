@@ -2647,6 +2647,50 @@ export function openFaceHandStylingModal() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// SHARED MODAL SHELL (used by Rounds 21 – 40 tools)
+// Returns { overlay, close } with .pd-callback-body & .pd-callback-footer ready to fill.
+// ══════════════════════════════════════════════════════════════
+
+function createModalBase({ title = '', subtitle = '', maxWidth = '520px' } = {}) {
+  const overlay = document.createElement('div');
+  overlay.className = 'pd-callback-overlay';
+  overlay.innerHTML = `
+    <div class="pd-callback-card" role="dialog" aria-modal="true" style="max-width: ${maxWidth};">
+      <div class="pd-callback-header">
+        <div style="min-width: 0;">
+          <h3>${title}</h3>
+          ${subtitle ? `<div style="font-size: 12px; opacity: 0.85; margin-top: 2px;">${subtitle}</div>` : ''}
+        </div>
+        <button type="button" class="modal-close-x" aria-label="Đóng" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;min-width:36px;min-height:36px;flex-shrink:0;">✕</button>
+      </div>
+      <div class="pd-callback-body"></div>
+      <div class="pd-callback-footer"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.body.classList.add('no-scroll');
+  requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+  let closed = false;
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  function close() {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener('keydown', onKey);
+    overlay.classList.remove('is-visible');
+    if (!document.querySelectorAll('.pd-callback-overlay.is-visible').length) {
+      document.body.classList.remove('no-scroll');
+    }
+    setTimeout(() => overlay.remove(), 250);
+  }
+  document.addEventListener('keydown', onKey);
+  overlay.querySelector('.modal-close-x').addEventListener('click', close);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  return { overlay, close };
+}
+
+// ══════════════════════════════════════════════════════════════
 // 17. COLLARBONE & CHAIN LENGTH VISUALIZER (ROUND 21)
 // ══════════════════════════════════════════════════════════════
 

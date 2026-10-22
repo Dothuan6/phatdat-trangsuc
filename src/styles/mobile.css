@@ -1,0 +1,223 @@
+/* ============================================================
+   MOBILE UX OPTIMIZATION — Giai Đoạn 5 (Vòng 41 – 50)
+   Loaded LAST so it can safely refine earlier styles on phones.
+   ============================================================ */
+
+/* ── Vòng 41: Thang chữ (Typography Scale) gọn gàng cho điện thoại ── */
+@media (max-width: 768px) {
+  :root {
+    --fs-hero: clamp(1.6rem, 6.4vw, 2.1rem);
+    --fs-section-title: clamp(1.35rem, 5.4vw, 1.7rem);
+    --fs-page-title: clamp(1.2rem, 4.8vw, 1.45rem);
+    --fs-product-name: 1rem;
+    --fs-body-lg: 1rem;
+    --fs-body: 0.9375rem;   /* 15px */
+    --fs-small: 0.8125rem;  /* 13px */
+    --fs-xs: 0.6875rem;     /* 11px */
+    --fs-label: 0.75rem;    /* 12px */
+    --lh-body: 1.6;
+    --space-3xl: 40px;
+    --space-4xl: 56px;
+    --space-5xl: 72px;
+  }
+
+  body { letter-spacing: 0; }
+  p { margin-bottom: 12px; }
+
+  .hero__title { font-size: clamp(1.55rem, 7vw, 2rem) !important; margin-bottom: 12px !important; }
+  .hero__subtitle { font-size: 0.9rem !important; margin-bottom: 20px !important; }
+  .section-heading { font-size: clamp(1.3rem, 5.6vw, 1.6rem) !important; margin-bottom: 20px !important; }
+  .brand-logo { font-size: 1.15rem; }
+  .pdp-info__name { font-size: 1.35rem !important; line-height: 1.25 !important; }
+
+  .info-hero { height: 170px; }
+  .info-hero h1 { font-size: 1.4rem !important; line-height: 1.3; }
+  .info-body { padding: 24px 16px; line-height: 1.65; font-size: 0.9rem; }
+  .info-body h2 { font-size: 1.15rem; margin: 22px 0 10px; }
+  .info-body h3 { font-size: 1rem !important; }
+}
+
+@media (max-width: 380px) {
+  :root { --fs-body: 0.875rem; }
+  .hero__title { font-size: 1.45rem !important; }
+  .brand-logo { font-size: 1.02rem; }
+}
+
+/* Comfort mode A+ stays readable but not oversized on phones */
+@media (max-width: 768px) {
+  html.pd-comfort-large-text { font-size: 106%; }
+}
+
+/* ── Vòng 42: Modal dạng Bottom Sheet chuẩn ứng dụng di động ── */
+@media (max-width: 640px) {
+  .pd-callback-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+  .pd-callback-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: 90vh !important;
+    max-height: 90dvh !important;
+    border-radius: 18px 18px 0 0 !important;
+    transform: translateY(40px) !important;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  }
+  .pd-callback-overlay.is-visible .pd-callback-card { transform: translateY(0) !important; }
+  .pd-callback-card::before {
+    content: '';
+    display: block;
+    width: 40px; height: 4px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.55);
+    position: absolute; top: 7px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .pd-callback-card { position: relative; }
+  .pd-callback-header { padding: 18px 16px 12px !important; }
+  .pd-callback-header h3 { font-size: 15px !important; line-height: 1.3; }
+  .pd-callback-header p { font-size: 11.5px !important; }
+  .pd-callback-body { padding: 14px 14px !important; font-size: 13px; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  .pd-callback-footer {
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid var(--color-border-light);
+    background: #fff;
+    flex-wrap: wrap;
+  }
+  .pd-callback-footer > button { min-height: 44px; font-size: 13px !important; }
+}
+
+/* ── Vòng 43: Vùng chạm tối thiểu 44px & phản hồi chạm ── */
+@media (hover: none) and (pointer: coarse) {
+  * { -webkit-tap-highlight-color: rgba(30, 93, 87, 0.12); }
+  .header-icon, .header-menu-btn, .header-search-btn { min-width: 44px; min-height: 44px; }
+  .btn { min-height: 44px; }
+  button:active, .btn:active, a.product-card:active { transform: scale(0.98); transition: transform 0.08s ease; }
+  .product-card:hover .product-card__image img { transform: none; }
+}
+
+/* ── Vòng 44: Thẻ sản phẩm 2 cột gọn & đều nhau ── */
+@media (max-width: 768px) {
+  .product-card__name {
+    font-size: 12.5px !important;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.7em;
+  }
+  .product-card__materials { font-size: 10.5px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .product-card__price { font-size: 13px !important; font-weight: 700; color: var(--color-brand-primary); }
+  .product-card__variations { font-size: 10px; }
+}
+
+/* ── Vòng 45: Trang chi tiết sản phẩm (PDP) tối giản trên mobile ── */
+@media (max-width: 768px) {
+  .pdp-info { padding-top: 14px !important; }
+  /* Nút công cụ dạng chip cuộn ngang thay vì xuống nhiều dòng */
+  .pd-mobile-scroll-row,
+  .pdp-info > div[style*="flex-wrap: wrap"][style*="gap: 6px"] {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-left: -16px; margin-right: -16px;
+    padding-left: 16px; padding-right: 16px;
+  }
+  .pd-mobile-scroll-row::-webkit-scrollbar,
+  .pdp-info > div[style*="flex-wrap: wrap"][style*="gap: 6px"]::-webkit-scrollbar { display: none; }
+  .pdp-info > div[style*="flex-wrap: wrap"][style*="gap: 6px"] > button { flex: 0 0 auto; white-space: nowrap; }
+}
+
+/* ── Vòng 46: Bảng & nội dung bài viết cuộn ngang an toàn ── */
+@media (max-width: 768px) {
+  .info-body table, .legal-content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  .info-body th, .info-body td { padding: 8px 10px; }
+  .info-body ul { padding-left: 18px; }
+  img, video, iframe, svg { max-width: 100%; }
+}
+
+/* ── Vòng 47: Header gọn 56px & thanh thông báo một dòng ── */
+@media (max-width: 768px) {
+  .header-inner { height: 56px; }
+  .header-spacer { height: 84px; }
+  .search-drawer { top: 84px; max-height: calc(100vh - 84px); }
+  .top-announcement-bar {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10.5px !important;
+  }
+  .header-icon svg { width: 21px; height: 21px; }
+}
+
+/* ── Vòng 48: Trung tâm hỗ trợ dạng ngăn kéo toàn màn hình ── */
+@media (max-width: 640px) {
+  .contact-drawer { width: 100% !important; max-width: 100% !important; }
+  .contact-drawer__body { padding: 14px !important; padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important; }
+  .contact-drawer__body button[id^="cd-tool-"] {
+    min-height: 46px;
+    font-size: 12px !important;
+    line-height: 1.3;
+    padding: 8px 10px !important;
+  }
+  .nav-drawer { width: 86vw !important; max-width: 340px; }
+  .nav-item { padding-top: 13px; padding-bottom: 13px; font-size: 14px; }
+}
+
+/* ── Vòng 49: Lưới & form nội tuyến tự xếp 1 cột trên màn hình nhỏ ── */
+@media (max-width: 480px) {
+  .pd-callback-body [style*="grid-template-columns: repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+  .pd-callback-body [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
+  .pd-cert-canvas { padding: 16px !important; }
+  .contact-cards { grid-template-columns: 1fr; gap: 12px; }
+  .contact-card { padding: 16px; }
+  .section-pad { padding: 32px 16px; }
+  .container { padding-left: 16px; padding-right: 16px; }
+}
+
+/* ── Vòng 50: Nút "Lên đầu trang", giảm chuyển động & an toàn tai thỏ ── */
+.pd-back-to-top {
+  position: fixed;
+  left: 14px;
+  bottom: 24px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,0.95);
+  color: var(--color-brand-primary);
+  font-size: 18px;
+  box-shadow: var(--shadow-md);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 870;
+  cursor: pointer;
+}
+.pd-back-to-top.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+body.is-admin-view .pd-back-to-top { display: none; }
+
+@media (max-width: 768px) {
+  .pd-back-to-top { bottom: calc(74px + env(safe-area-inset-bottom)); }
+  .mobile-bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
